@@ -1,0 +1,129 @@
+/*
+Color schemes:
+
+#5cb85c = green
+#d9534f = red
+#428bca = blue (primary)
+#5bc0de = light blue (info)
+#808080 = grey ?
+#f0ad4e = orange
+*/
+
+.body {
+	background-color: blue;
+}
+
+.well-sm {
+	padding:5px;
+	border-radius:1px
+}
+
+/* 
+HOME.PHP STYLING 
+*/
+
+.pool_top_row, .pool_row {
+	padding:6px;
+}
+
+.pool_status {
+	padding:6px;
+	font-weight:bold;
+}
+
+.pool_top_row{
+	font-weight:bold;
+}
+
+
+/*
+CREATE_POOL.PHP STYLING
+*/
+
+.field_label {
+	margin-left:20px; font-style:italic;
+}
+
+/*
+EDIT_POOL.PHP STYLING
+*/
+
+#pool_space {
+	margin-left:0%;
+}
+
+.edit_pool_heading {
+
+}
+
+.edit_pool_field {
+    color:white;
+}
+
+.edit_category_field{
+	color:blue;
+	margin-left:30px;
+}
+
+.remove_category {
+    margin-left:50px;
+}
+
+.accept_invite_button{
+	margin-left:30px;
+}
+
+.bfh-datepicker, .bfh-timepicker, #public_private_selector  {
+	width:30%;
+}
+
+#public_private_instructions {
+	margin-left:20px; font-style:italic;
+}
+
+
+
+/* Browse Templates Carousel CSS */
+
+/* Carousel base class */
+.carousel {
+  height: 300px;
+  margin-bottom: 60px;
+  margin-left:auto;
+  margin-right:auto;
+  background-color: #777;
+  width: 60%;
+}
+
+/* Declare heights because of positioning of img element */
+.carousel .item {
+  height: 300px;
+}
+
+
+/*
+POOL.PHP Styling
+*/
+
+#show_invites_link {
+	font-weight:bold;
+	text-decoration:underline;
+	font-size:130%;
+	color: #f0ad4e;
+}
+
+.pool_member_table_rank, .pool_member_table_nickname, .pool_member_table_username, .pool_member_table_email, .pool_member_table_tie, .pool_member_table_picks, .pool_member_table_score, .pool_member_table_tie_breaker {
+	padding:10px;
+}
+
+.pool_member_table_nickname {
+	font-weight:bold;
+}
+
+#pool_title {
+	text-decoration:underline;
+}
+
+
+
+
