@@ -242,7 +242,9 @@ $ git push</pre>
           </section>
           <section class="col-xs-12 col-sm-6 col-md-6">
 
-                <h2>Managing your application</h2>
+                <h2>Managing your application TEST2</h2>
+
+                <a href="home.php">Click here!</a>
 
                 <h3>Web Console</h3>
                 <p>You can use the OpenShift web console to enable additional capabilities via cartridges, add collaborator access authorizations, designate custom domain aliases, and manage domain memberships.</p>
