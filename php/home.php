@@ -148,6 +148,11 @@
         </div><!--END OF ROW DIV-->
     </div>
 
+<?php //following is only for testing email purposes
+    if($current_user_id == 1){
+        echo "<a href='send_mail_test.php'>Click here to test sending an email!</a>";
+    }
+?>
 <?php
     include_once 'inc/close.php';
 ?>
