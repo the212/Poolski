@@ -10,10 +10,11 @@ TO DO AS OF 7:30 PM ON 11/22/13:
 if($_POST['invite'] == 1){ //if this file is being run thru the invite ajax function:
     $invitee_array = $_POST['invitees_array']; //get array of invitee emails
     $pool_id = $_POST['pool_id']; //get pool ID that we are inviting people for
+    $inviter = $_POST['inviter']; //get email/username of inviter
     include_once 'inc/class.users.inc.php';
     $user = new SiteUser();
     foreach($invitee_array as $invitee_index => $invitee_email){ //foreach invitee email...
-        $invite_receive_result = $user->InviteReceive($invitee_email, $pool_id); //add pool id to user's "Pool Invites" field in DB
+        $invite_receive_result = $user->InviteReceive($invitee_email, $pool_id, $inviter); //add pool id to user's "Pool Invites" field in DB
         echo $invite_receive_result;
     }
     exit();
@@ -22,17 +23,18 @@ if($_POST['invite'] == 1){ //if this file is being run thru the invite ajax func
 else{ //if this file is being accessed by user navigation and not thru ajax:
     include_once "inc/loggedin_check.php";
     include_once "inc/constants.inc.php";
-    $pageTitle = "Pool";
+    $pageTitle = "Invite";
     include_once "inc/header.php";
 
     $pool_id = $_GET['pool_id'];
+    $inviter = $_SESSION['Username']; //get the inviter's email address/username (this is so that the invitee knows who is inviting them)
 ?>
 
     <h3>Enter email addresses to invite people to the pool:</h3>
     <br>
     <div id="invitee_email_form">   
             <input type="text" name="new_invitee_email" id="new_invitee_email" size="75" required>
-            <input id="submit_invitee_email" type="submit" value="Invite">
+            <input id="submit_invitee_email" type="submit" value="Add to invite list">
             <span id="invite_error_message" style='color:red'></span>
     </div>
     <br>
@@ -40,7 +42,7 @@ else{ //if this file is being accessed by user navigation and not thru ajax:
 
     </div>
     <br>
-    <form action="javascript:invite_people(<?php echo $pool_id; ?>)" method="post">
+    <form action="javascript:invite_people(<?php echo $pool_id; ?>, '<?php echo $inviter; ?>')" method="post">
         <h3><input id="invite_button" type="submit" value="Send Invites"><h3>
         <input type="hidden" name="form_sent" value="form_sent">
     </form>

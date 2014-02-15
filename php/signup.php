@@ -12,7 +12,17 @@
             include_once "inc/class.users.inc.php";
             $user = new SiteUser();
             $addNewUser_result = $user->addNewUser($entryValue); 
+
+            //Send Email to new user:
+            include_once 'inc/send_mail.php'; //include email file
+            SendEmail($entryValue, "Welcome to ".BRAND_NAME, 
+                "Thank you for signing up.  
+                Please click the following link to verify your account: ".$addNewUser_result[2]."\n
+                If clicking the link does not work, please copy and paste it into your browser."
+                );
+            
             echo $addNewUser_result[1];
+            echo "<h4>An verification link has been sent to your email address.  Please click the link to verify your account</h4>";
             if($addNewUser_result[0]==2){
                 //if email was stored successfully, don't show the signup HTML
                 exit(); 
@@ -27,16 +37,18 @@
     
 ?> 
 
-        <h2>Sign up here</h2>
-        <form method="post" action="signup.php" id="registerform">
-            <div>
-                <label for="username">Email:</label>
-                <input type="text" name="username" id="username" maxlength="50"><br />
-                <input type="submit" name="register" id="register" value="Sign up" />
-            </div>
-        </form>
+        <br>
+        <div style="margin-left:20px;">
+            <h2>Sign up here</h2>
+            <form method="post" action="signup.php" id="registerform">
+                <div>
+                    <label for="username">Email:</label>
+                    <input type="text" name="username" id="username" maxlength="50" style="width:25%;"><br/>
+                    <input type="submit" name="register" id="register" value="Sign up" />
+                </div>
+            </form>
+        </div>
 
 <?php
-   
-    //include_once 'common/close.php';
+    include_once 'inc/close.php';
 ?>

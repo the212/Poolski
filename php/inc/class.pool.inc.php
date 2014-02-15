@@ -84,15 +84,19 @@ class Pool {
         $query = "SELECT * FROM  `Pool` WHERE `Pool ID` = '$pool_id';";
         if($result = mysqli_query($this->cxn, $query)){
             $pool_data = mysqli_fetch_assoc($result);
-            $pool_start_time = strtotime($pool_data['Start Time']); //convert pool start timestamp to unix timestamp
-            $pool_end_time = strtotime($pool_data['End Time']); //convert pool end timestamp to unix timestamp
+            if(!is_null($pool_data['Start Time'])){ //only define pool_start_time variable if a pool start time is non-null in DB
+                $pool_start_time = strtotime($pool_data['Start Time']); //convert pool start timestamp to unix timestamp
+            }
+            if(!is_null($pool_data['End Time'])){ //only define pool_end_time variable if a pool end time is non-null in DB
+                $pool_end_time = strtotime($pool_data['End Time']); //convert pool end timestamp to unix timestamp
+            }
             $current_time = time(); //get current time (unix timestamp) - this should be based on the server's timezone rather than the user's?
-            if(($current_time-$pool_start_time) > 0) { //if it is past the pool start time:
+            if(isset($pool_start_time) AND ($current_time-$pool_start_time) > 0) { //if it is past the pool start time:
                 if($pool_data['Live?'] <> 1) { //if pool is not already live
                     $pool_start_query = "UPDATE  `Pool` SET `Live?` =  '1' WHERE  `Pool ID` ='$pool_id';"; //make pool live
                     $pool_start_result = mysqli_query($this->cxn, $pool_start_query);
                 }
-                if(($current_time-$pool_end_time) > 0 AND $pool_data['Pool Ended?'] <> 1) { //if pool is not already over and it is past the pool end time:
+                if(isset($pool_end_time) AND ($current_time-$pool_end_time) > 0 AND $pool_data['Pool Ended?'] <> 1) { //if pool is not already over and it is past the pool end time:
                     $pool_end_query = "UPDATE  `Pool` SET `Pool Ended?` =  '1' WHERE  `Pool ID` ='$pool_id';"; //end pool
                     $pool_end_result = mysqli_query($this->cxn, $pool_end_query);
                 }

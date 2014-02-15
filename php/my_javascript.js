@@ -261,11 +261,11 @@
                     var pick_value_array = pick_value.split('|'); //split pick_value_array into pick component and correct/incorrect component (separared by | )
                     if(pick_value_array[1] == 1) { //if pick has been marked as CORRECT:
                         $("#display_user_pick_for_category_"+key).parents().eq(4).css("background-color", "#5cb85c");
-                        $("#display_user_pick_for_category_"+key).parents().eq(0).removeClass("label label-primary").addClass("label label-success");
+                        $("#display_user_pick_for_category_"+key).parents().eq(0).removeClass("label label-primary").addClass("label label-success see_picks"); //we add the "see_picks" class here to differentiate these labels from the rest of the labels in pool.php (since we change these back when the "hideuserpicks" javascript method is called)
                     }
                     if(pick_value_array[1] == 0) { //if pick has been marked as INCORRECT:
                         $("#display_user_pick_for_category_"+key).parents().eq(4).css("background-color", "#d9534f");
-                        $("#display_user_pick_for_category_"+key).parents().eq(0).removeClass("label label-primary").addClass("label label-danger");
+                        $("#display_user_pick_for_category_"+key).parents().eq(0).removeClass("label label-primary").addClass("label label-danger see_picks"); //we add the "see_picks" class here to differentiate these labels from the rest of the labels in pool.php (since we change these back when the "hideuserpicks" javascript method is called)
                     }
                     //for each category in the picks_array, replace the content of the display_pick_for_category span element on the page with the appropriate pick for the given user:
                     $("#display_user_pick_for_category_"+key).html(pick_value_array[0]);
@@ -283,8 +283,9 @@
         $(".pool_members_container").css("display", "block"); //display pool_members_container
         $(".pool_members_container").animate({"left":"0%"}, 400);
         $(".user_picks_container").animate({"right":"-100%"}, 400, function(){
-            $(".well-sm").css("background-color", "transparent"); //reset pick background colors
-            $(".label").attr("class", "label label-primary"); //reset pick labels - AS OF 12/25/13, THIS NEEDS TO BE REVISED - CURRENTLY WILL CHANGE ANY AND ALL LABELS ON THE PAGE
+                //On 2/8/14, I commented out the below line and it seemed to solve the issue of clicking the "Back button" and making the wells on the "my picks" page change 
+                //$(".well-sm").css("background-color", "transparent"); //reset pick background colors
+            $(".see_picks").attr("class", "label label-primary"); //reset see_picks labels (this ensures that only the labels on the pool_members page get changed and all other labels in pool.php remain untouched)
             $('.display_user_pick').html("**No Pick**"); //reset user picks page values
             $(".user_picks_container").css("display", "none");
         });
@@ -338,12 +339,12 @@
         invitees.splice(remove_email_index, 1); //use index to remove given email from invitees array
     }
 
-    function invite_people(pool_id){
+    function invite_people(pool_id, inviter){
         //when inviter clicks "invite" button:
         $.ajax({
                 type: "POST",
                 url: "invite_people.php",
-                data: {invitees_array : invitees, invite : "1", pool_id : pool_id} //send the invitee array and an invite value of 1 to invite_people.php
+                data: {invitees_array : invitees, invite : "1", pool_id : pool_id, inviter : inviter} //send the invitee array, an invite value of 1, and the inviter's email/username to invite_people.php
             })
                 .done(function(html){ //when ajax request completes
                     alert(html);

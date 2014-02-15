@@ -7,11 +7,78 @@ Color schemes:
 #5bc0de = light blue (info)
 #808080 = grey ?
 #f0ad4e = orange
+
 */
 
-.body {
-	background-color: blue;
+/*BEGIN NAVBAR STYLING*/
+
+.navbar-default .navbar-brand, .navbar-header, .collapse, .navbar .nav > li > a {
+	background:#5bc0de;
+	color:white; 
+	/*Figured this out for navbar from:
+	http://stackoverflow.com/questions/13437579/failing-at-changing-the-text-color-in-bootstrap-navbar
+	and
+	http://stackoverflow.com/questions/18534390/bootstrap-3-navbar-branding-colour 
+	*/
 }
+/*END NAVBAR STYLING*/
+
+
+/*BEGINNING OF FOOTER CSS
+SEE FOLLOWING LINK FOR MORE INFO ON FOOTER METHOD:
+http://matthewjamestaylor.com/blog/keeping-footers-at-the-bottom-of-the-page 
+*/
+html,
+body {
+   margin:0;
+   padding:0;
+   height:100%;
+}
+#full_container {
+   min-height:100%;
+   position:relative;
+}
+#body {
+   padding-bottom:20px;   /* Height of the footer */
+}
+#footer {
+   position:absolute;
+   bottom:0;
+   width:100%;
+   height:20px;   /* Height of the footer */
+}
+
+.footer_text {
+	text-align: center;
+	position:absolute;
+	bottom:0px;
+	width:100%;
+	font-size:80%;
+}
+
+/*END OF FOOTER CSS
+*/
+
+
+/*BEGIN LANDING PAGE CSS
+*/
+
+#landing_page_welcome {
+	position:relative;
+	text-align: center;
+	top:50px;
+}
+
+#landing_page_list {
+	width:220px;
+	margin-left:auto;
+	margin-right:auto;
+	font-size:120%;
+}
+
+/*END LANDING PAGE CSS
+*/
+
 
 .well-sm {
 	padding:5px;
@@ -52,10 +119,6 @@ EDIT_POOL.PHP STYLING
 	margin-left:0%;
 }
 
-.edit_pool_heading {
-
-}
-
 .edit_pool_field {
     color:white;
 }
@@ -82,8 +145,12 @@ EDIT_POOL.PHP STYLING
 }
 
 
+/*BEGIN NEW.PHP CSS*/
 
-/* Browse Templates Carousel CSS */
+/*END NEW.PHP CSS*/
+
+
+/* BEGIN BROWSE_TEMPLATES.PHP CSS*/
 
 /* Carousel base class */
 .carousel {
@@ -100,16 +167,23 @@ EDIT_POOL.PHP STYLING
   height: 300px;
 }
 
+#template_container {
+	padding-top:5px;
+	margin-left:20px;
+	margin-right:10px;
+}
+
+/*END BROWSE_TEMPLATES.PHP CSS*/
 
 /*
-POOL.PHP Styling
+POOL.PHP CSS
 */
 
 #show_invites_link {
 	font-weight:bold;
-	text-decoration:underline;
 	font-size:130%;
-	color: #f0ad4e;
+	padding:5px;
+	color: white;
 }
 
 .pool_member_table_rank, .pool_member_table_nickname, .pool_member_table_username, .pool_member_table_email, .pool_member_table_tie, .pool_member_table_picks, .pool_member_table_score, .pool_member_table_tie_breaker {
@@ -125,5 +199,12 @@ POOL.PHP Styling
 }
 
 
+.pool_members_container{
+	position: absolute; 
+}
 
+.pool_members_container, .well {
+	padding-left: 10px;
+	padding-right: 10px;
+}
 

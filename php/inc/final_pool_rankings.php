@@ -11,10 +11,10 @@ This page is included on the pool.php page when pool has ended and a pool winner
     $pool_members_array = array();
 ?>
 
-<div class="pool_members_container" style="position: absolute;">
+<div class="pool_members_container">
     <br>
     <h3 style="text-decoration:underline;">Pool Results</h3>
-    <table style="margin-left:20px">
+    <table border="1" style="margin-left:20px">
         <tr>
             <th class="pool_member_table_rank" style="width:10%; text-decoration:underline">Rank</th>
             <th class="pool_member_table_nickname" style="width:30%; text-decoration:underline">Pool Nickname</th>
@@ -53,8 +53,11 @@ This page is included on the pool.php page when pool has ended and a pool winner
     <h3>Tie Breaker Correct Answer: </h3>
     <h4><?php echo $pool_fetch_result['Tie-Breaker Question']; ?></h4>
     <h4 style="margin-left:50px;">Correct answer: <span class="label label-info" style="font-size:110%;"><?php echo $pool_fetch_result['Tie-Breaker Correct Answer']; ?></span></h4>
+<?php
+    include 'inc/close.php';
+?>
 </div> <!--END OF POOL MEMBERS CONTAINER-->
-<br>
+
 
 <!--****************************************************-->
 

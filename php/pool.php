@@ -53,7 +53,7 @@
         <div class="col-md-5" id="pool_title">
             <h1><?php echo $pool_fetch_result['Title']; ?></h1>
         </div>
-        <div class="col-md-3" id="pool_status_message">
+        <div class="col-md-7" id="pool_status_message">
             <!--BEGIN POOL LIVE STATUS MESSAGE-->
             <h1 style="position:relative;">
 <?php
@@ -64,23 +64,20 @@
                 echo " <span class='label label-success'>Live! Picks are Locked</span>";
             }
             else{ //if pool has ended:
-                echo " <span class='label label-default'>Pool Ended</span>";
+                $pool_members_id_array = $pool->GetPoolMembers($pool_id);
+                $pool_winner_nickmane = $pool_members_id_array[$pool_fetch_result['Pool Winner']]['Nickname'];
+                if(!isset($pool_winner_nickmane)){
+                    echo " <span class='label label-info'>Pool Ended.</span>";
+                }
+                else{
+                    echo " <span class='label label-info'>Pool Winner: ".$pool_winner_nickmane." </span>";
+                }
             }
 ?>
             </h1>
             <!--END POOL LIVE STATUS MESSAGE--> 
-        </div>
-         <div class="col-md-4" id="pool_winner_message">
-            <h1>
-<?php
-            if(isset($pool_fetch_result['Pool Winner']) AND $pool_fetch_result['Pool ended?']==1) { //display the pool winner nickname:   
-                $pool_members_id_array = $pool->GetPoolMembers($pool_id);
-                $pool_winner_nickmane = $pool_members_id_array[$pool_fetch_result['Pool Winner']]['Nickname'];
-                echo "<span class='label label-primary'>Winner is: ".$pool_winner_nickmane." </span>";
-            }
-?>
-            </h1>
-         </div>      
+         </div> 
+             
     </div>
 
     <!--POOL UPDATED SUCCESS MESSAGE: -->
@@ -94,8 +91,8 @@
     <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
         <li class="active"><a href="#summary" data-toggle="tab">Pool Summary</a></li>
         <li><a href="#my_picks" data-toggle="tab">My Picks</a></li>
-        <li><a href="#pool_members" data-toggle="tab">Pool Members</a></li>
-        <!--<li><a href="#message_board" data-toggle="tab">Message Board</a></li>-->
+        <!--<li><a href="#pool_members" data-toggle="tab">Pool Members</a></li>
+        <li><a href="#message_board" data-toggle="tab">Message Board</a></li>-->
     </ul>
     <div id="pool_tab_content" class="tab-content">
 
@@ -104,40 +101,26 @@
 
 
         <div class="tab-pane fade in active" id="summary">
-            <div class="row">
-                    <div class="col-md-6">
-                        <h3>&#8220;<?php echo $pool_fetch_result['Description']; ?>&#8221;</h3>
-                    </div>
+            <div class="row" style="padding-left:10px;">   
+                <h3>&#8220;<?php echo $pool_fetch_result['Description']; ?>&#8221;</h3>
+            </div>
+                    
 <?php
-            $invite_people_button = "<h3><form method='post' action='invite_people.php?pool_id=".$pool_id."'><input type='submit' value='Click here to invite people to the pool'></form></h3>";
+            $invite_people_button = "<h4><form method='post' action='invite_people.php?pool_id=".$pool_id."'><input type='submit' value='Click here to invite people to the pool'></form></h4>";
             
             /* BEGIN INVITE BUTTON LOGIC*/
             if($user_is_leader == 1) { //if user is the leader of the pool:
-?>
-                    <div class='col-md-6'>
-                        <h3><span style='font-weight:bold'>**You are the leader of this pool**</span></h3>
-                    </div>
-                </div> <!--END OF ROW DIV ABOVE INVITE BUTTON LOGIC -->
-<?php
                 if($pool_fetch_result['Live?']==0){ //if pool is not let live, let leader invite new people:
                     echo $invite_people_button;
                 }
             } 
             else{ //if user is NOT the leader of the pool:
                 if($pool_fetch_result['Private?'] == 0 && $pool_fetch_result['Live?']==0){ //if pool is public and is not yet Live, allow a non-leader user to invite others:
-?>
-                    </div> <!--END OF ROW DIV ABOVE INVITE BUTTON LOGIC -->
-                    <br>
-<?php
                     echo $invite_people_button; 
-                }
-                else{ //if the pool is LIVE or Private, we need to close out the row div from above invite button logic
-                    echo "</div>"; //END OF ROW DIV ABOVE INVITE BUTTON LOGIC
                 }
             }
             /*END INVITE BUTTON LOGIC*/
             
-
             //BEGIN POOL NICKNAME LOGIC
             $user_nickname = $pool->GetNickname($_SESSION['Username'], $pool_id);
             if ($pool_fetch_result['Live?']==0) {
@@ -154,7 +137,7 @@
             if($pool_fetch_result['Pool ended?']== 0) { //only display the start/end times and end pool button if pool has not ended:
                 
                 /*BEGIN START TIME DISPLAY AND START POOL BUTTON LOGIC*/
-                if($pool_fetch_result['Start Time']!== NULL && $pool_fetch_result['Live?']==0) {  //if start time is set:
+                if($pool_fetch_result['Start Time']!== NULL && $pool_fetch_result['Live?']==0) {  //if start time is set and pool is not yet live:
 ?>
                     <br>
                     <div class="row" style="width:55%">
@@ -176,8 +159,9 @@
 
         /*BEGIN END TIME DISPLAY AND END POOL BUTTON LOGIC*/
         
-                if($pool_fetch_result['End Time']!== NULL) {  //if end time is set:
+                if($pool_fetch_result['End Time']!== NULL && $pool_fetch_result['Live?']==1) {  //if end time is set and the pool is live:
 ?>
+                    <br>
                     <div class="row" style="width:55%">
                         <div class="col-md-6">
                             <h4>The pool will end at: </h4>
@@ -190,11 +174,11 @@
                 }
                 else { //if pool does not have any end date defined, we allow the leader to end the pool manually:
                     if($user_is_leader == 1 && $pool_fetch_result['Live?']==1) { //if no end date defined, and user is leader, and the pool is live:
-                        echo "<p>No end date set - click button below when pool is finished: <span style='margin-left:30px'><form method='post' action='JAVASCRIPT:endPool($pool_id);'><input type='submit' value='End Pool'></form></span></p>";
+                        echo "<br><div style='padding-left:25px'><h4><form method='post' action='JAVASCRIPT:endPool($pool_id);'><input type='submit' value='No end date set - click here when pool is finished'></form></h4></div>";
                     }
                 }
         /*END END TIME DISPLAY AND END POOL BUTTON LOGIC*/
-
+                include_once "inc/pool_members.php";
             } //END "IF POOL HAS NOT ENDED" LOGIC
 
         /*BEGIN "IF POOL HAS ENDED" LOGIC*/
@@ -228,7 +212,8 @@
                 }
                 else { //if pool HAS been scored:
                     $pool_rankings_array = $pool->GetFinalPoolRankings($pool_id); //generate pool rankings array
-                    include_once "inc/final_pool_rankings.php"; //show pool ranking list
+                    //include_once "inc/final_pool_rankings.php"; //show pool ranking list
+                    include_once "inc/pool_members.php";
                 }  
             }
         /*END "IF POOL HAS ENDED" LOGIC*/
@@ -249,17 +234,18 @@
             }
 ?>
         </div>
-        <div class="tab-pane fade" id="pool_members">
-            <?php include_once "inc/pool_members.php"; ?>
-        </div>
         <!--
+        <div class="tab-pane fade" id="pool_members">
+            <?php //include "inc/pool_members.php"; ?>
+        </div>
+        
         <div class="tab-pane fade" id="message_board">
             <h1>Message Board</h1>
             <p>Message Board here</p>
         </div>
         -->
     </div> <!--END OF pool_tab_content DIV-->
-</div>  <!--END OF content DIV--> 
+</div>  <!--END OF content DIV-->
 
 <?php 
     /*DISPLAY CURRENT TIME IN TIMESTAMP FORM (ONLY FOR TESTING)
@@ -268,5 +254,5 @@
     echo $current_time;
     */
     endif;
-    include_once 'inc/close.php';
+    //include_once 'inc/close.php';
 ?>

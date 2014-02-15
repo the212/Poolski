@@ -5,17 +5,15 @@
     include_once "inc/header.php";
 
 ?>
-
+    <!--
     <h1>Browse Pool Templates</h1>
     <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-        <!-- Indicators -->
         <ol class="carousel-indicators">
         <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
         <li data-target="#carousel-example-generic" data-slide-to="1"></li>
         <li data-target="#carousel-example-generic" data-slide-to="2"></li>
         </ol>
 
-        <!-- Wrapper for slides -->
         <div class="carousel-inner">
             <div class="item active">
                 <img data-src="holder.js/900x500/auto/#777:#7a7a7a/text:First slide" alt="First slide">
@@ -24,7 +22,7 @@
                     <p>Make your picks for who is taking home the golden statue.</p>
                 </div>
             </div>
-            <!--
+            
             <div class="item">
                 <img data-src="holder.js/900x500/auto/#777:#7a7a7a/text:First slide" alt="Second slide">
                 <div class="carousel-caption">
@@ -39,10 +37,8 @@
                     <p>Who will live and who will die during season 4?  If you've read the book, then don't bother.</p>
                 </div>
             </div>
-            -->
         </div>
 
-        <!-- Controls -->
         <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
         <span class="glyphicon glyphicon-chevron-left"></span>
         </a>
@@ -50,17 +46,21 @@
         <span class="glyphicon glyphicon-chevron-right"></span>
         </a>
     </div>
-
-    <div id="template_container">
-        <h2 style="text-decoration:underline;">All Pool Templates:</h2>
-
-        <span style="text-align:center;">
-            <h3><a href="create_new_template.php?template_id=3">Academy Awards Pick 'em</a></h3>
-            <p>Make your picks for who is taking home the golden statue.</p>
-        </span>
-
-        <br><br><br><br><br><br><br><br><br><br><br><br>s
-
+    -->
+    <div id="template_container" style="text-align: center">
+        <h2>Choose one of our pre-set templates for your new pool!  </h2>
+        <div style="margin-left:15%; margin-right:15%; padding-top:10px; text-align:left;">
+            <h4>All pick 'em categories and questions are already made, and scoring is done automatically when the pool ends.  
+                You don't have to worry about anything except making your picks!</h4>
+            <br><br>
+        </div>
+        <h2 style="text-decoration:underline; padding-bottom:20px;">Available Templates:</h2>
+        <div class="thumbnail" style="margin-left:15%; margin-right:15%;">
+            <h2><a href="create_new_template.php?template_id=3">Academy Awards Pick 'em 2014</a></h2>
+            <h4>Make your picks for who is taking home the golden statue.</h4>
+        </div>    
+        <br><br><br><br>
+        <h4>More templates coming soon...</h4>
     </div>
 
 <?php    

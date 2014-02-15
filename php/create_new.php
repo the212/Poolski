@@ -4,10 +4,6 @@
     $pageTitle = "New Pool";
     include_once "inc/header.php";
 
-    /*
-    11/30/13 - IF WE WANT TO INCLUDE THE ABILITY TO SET THE START/END DATES/TIMES FOR THE POOL ON THIS PAGE, THEN WE SHOULD JUST ADD THEM AS INPUTS ON THE PAGE AND THEN ADD PHP CODE TO TAKE THE POST VALUES AND RUN A METHOD IN THE POOL CLASS FOR THEM - SEE EDIT POOL.PHP PAGE 
-    */
-
     if(!empty($_POST['pool_title']) && !empty($_POST['pool_question']) && !empty($_POST['tie_question'])):
         //IF WE ARE ABLE TO CREATE THE POOL FROM THE USER'S INPUTS:
         //if page loads and all required inputs have been given:

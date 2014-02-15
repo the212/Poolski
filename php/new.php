@@ -8,7 +8,7 @@
 <br>
 <div style="text-align: center">
     <h1>Create New Pool</h1>
-    <h5>You are presented with a choice...</h5>
+    <h4>You are presented with a choice...</h4>
 </div>
 
 <div id="container">

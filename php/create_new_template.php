@@ -21,8 +21,10 @@
         //if form was not submitted:
         $template_category_info = $pool->GetTemplateCategories($_GET['template_id']);
 ?>
-    <h2><?php echo $pool_template_info['Template Name']; ?> Template </h2>
-    <h4><?php echo $pool_template_info['Template Description']; ?></h4>
+    <div style="text-align:center;">
+        <h2><?php echo $pool_template_info['Template Name']; ?> Template </h2>
+        <h4><?php echo $pool_template_info['Template Description']; ?></h4>
+    </div>
     <br>
     <div id="content">
         <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
@@ -42,7 +44,7 @@
                         <br><br>
                         <label for="pool_description">Pool Description (optional)</label>
                         <br>
-                        <textarea rows="4" cols="50" name="pool_description" id="pool_description" form="new_pool_form"></textarea>
+                        <input type="text" name="pool_description" id="pool_description" size="60"></input>
                         <br>
                         <br>
                         <input type="radio" name="public_private" value="public" checked="checked"> Make Pool Public (Default - any member can invite others to join the pool)<br>

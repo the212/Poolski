@@ -120,8 +120,12 @@
 
 
     <div id="edit_pool_header_container">
-        <h2>Edit pool <span style="margin-left:100px;"><input type="button" onclick="submit_pool()" value="Finalize Pool"></span><span style="font-size:50%"> Click here when everything looks the way you want it.</span></h2>
-        
+        <div style="text-align:center;">
+            <h1>Edit pool </h1>
+            <h5>Configure the pool settings to your liking before inviting others.</h5>
+        </div>
+        <h2 style="margin-left:20px;"><input type="button" onclick="submit_pool()" value="Finalize Pool"><span style="font-size:50%"> Click here when everything looks the way you want it.</span></h2>
+    
         <!--POOL UPDATE SUCCESS MESSAGE -->
         <span class="alert alert-success alert-dismissable" id="edit_pool_success" style="display:none; padding:8px; width:250px; float:right">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>

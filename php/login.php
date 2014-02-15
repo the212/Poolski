@@ -38,7 +38,8 @@
         else:
             //if the login form was not submitted, then display the below HTML prompting user to login:
 ?>
-
+    <div style="margin-left:20px;">
+        <br>
         <h2>Please log in...</h2>
         <form method="post" action="javascript:login_function()" name="loginform" id="loginform">
             <div>
@@ -50,8 +51,12 @@
                 <br /><br />
                 <input type="submit" name="login" id="login" value="Login" class="button" />
             </div>
-        </form><br /><br />
-        <p><a href="password.php">Did you forget your password?</a></p>
+        </form>
+        <br>
+        <h4><a href="password.php">Did you forget your password?</a></h4>
+        <br>
+        <h4><a href="signup.php">Don't have an account?  Click here to sign up!</a></h4>
+    </div>
 <?php
         endif;
     endif;

@@ -13,7 +13,7 @@ if($_GET['finalize_template'] == 998) {
         include_once 'inc/class.pool.inc.php';
         $pool = new Pool(); //new instance of the Pool class
         $finalize_template_result = $pool->FinalizeTemplateScores($_GET['template_id']);
-        print_r($finalize_template_result);
+        echo "<h2>Pool Results Stored.</h2><br>";
     }
     else{ //IF USER IS ANYONE BESIDES USER ID #1
         header("Location: home.php");
@@ -37,8 +37,6 @@ else {
 //************************************BEGIN MULTIPLE CHOICE SECTION***********************************
         
 
-    
-    
     if($current_user_id == 1){ 
         /*12/29/13 - FOR NOW, WE ONLY LET USER ID 1 TALLY THE SCORE OF A MULTIPLE CHOICE POOL
         **THIS IS JUST AN INTERNAL INTERFACE FOR MARKING TEMPLATES AS CORRECT
@@ -54,8 +52,14 @@ else {
                 <h4 style="text-decoration:underline"><?php echo $template_fetch_result['Overall Question']; ?></h4> 
             </div>
             <div class="col-md-7">
+<?php
+                if($_GET['finalize_template'] <> 998) {
+?>
                 <h4><input type="button" id="score_pool_button" class="btn btn-warning btn-lg" value="Submit" onclick="JAVASCRIPT:FinalizeTemplateScores(<?php echo $template_id; ?>);" /> Click here once all correct answers have been chosen</h4>
                 <p>Submitting will mark all user picks correct/incorrect for this template.</p>
+<?php
+                }
+?>
             </div>
         </div>
         <br>

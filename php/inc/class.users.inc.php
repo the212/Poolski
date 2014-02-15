@@ -2,6 +2,11 @@
 /*Class to handle user interactions within app*/
 /*By Evan Paul October 2013*/
 
+// Include the Autoloader for MailGun(see "Libraries" for install instructions)
+require '../vendor/autoload.php';
+use Mailgun\Mailgun;
+
+//Include DB constants
 include_once "constants.inc.php";
 
 class SiteUser {
@@ -63,15 +68,17 @@ class SiteUser {
     	    //if email does not already exist, add input value as email address for new row in database
     		$query = "INSERT INTO `User` (`Email Address`, `Date`) VALUES ('".$email."',CURRENT_TIMESTAMP);";
     		if($result = mysqli_query($this->cxn,$query)){
+                //Get User ID for new user:
+                $new_user_id = mysqli_insert_id($this->cxn);
+
                 //call the GenerateVerification function in order to generate verification code for user to activate acct
                 $ver_code = $this->GenerateVerification($email);
-                    //$ver = "testing1"; this is for email testing 
-                    //$this->sendVerificationEmail($email, $ver); this is for email testing
-                $return_variable = array(2, "<p>Email was successfully stored!</p>");
-                //create the URL for user to verify account (this will normally be sent in the verification email)
-                $verify_url = "http://localhost/custom_pool_site/accountverify.php?v=".$ver_code."&e=".$email;
+
+                //create the URL for user to verify account (this will be sent in the verification email)
+                $verify_url = DOMAIN."accountverify.php?v=".$ver_code."&e=".$new_user_id;
+                $return_variable = array(2, "<h3>Email was successfully stored!</h3>", $verify_url, $new_user_id);
                 //display verification URL on screen (needs to eventually be email)
-                echo "<p><a href=".$verify_url.">Click here to verify your account</a></p>";
+                //echo "<p><a href=".$verify_url.">Click here to verify your account</a></p>";
             }
             else {
                 $return_variable = array(3, "<p style='color:red'>There was an error connecting to the database<p>");
@@ -81,28 +88,8 @@ class SiteUser {
     } //END OF ADDNEWUSER METHOD
 
 
-    //SEND VERIFICATION EMAIL METHOD - currently not working on localhost server :(
-    public function sendVerificationEmail($email, $ver){
-        //I'm having trouble getting this to work as of 10/16/13 - I'll come back to it later I guess
-        $e = sha1($email); // For verification purposes.  $e will be appended to verification URL
-        $to = 'evanwpaul@gmail.com';
-        $subject = "This is an automated test email";
-        $msg = "Hi!";
-        $headers = 'From: webmaster@example.com' . "\n" .
-    		'Reply-To: webmaster@example.com' . "\n" .
-    		'X-Mailer: PHP/' . phpversion();
-        mail($to, $subject, $msg, $headers);
-        if (mail($to, $subject, $msg, $headers)) {
-            echo "<br>message sent!!";
-        }
-        else {
-            echo "<br>email failed to send! bummer";
-        }
-    } //END OF SENDVERIFICATIONEMAIL METHOD
-
-
     //CHECK VERIFICATION CODE METHOD
-    //Accepts verification code and email address.  Returns result code and result message in array as $return_variable
+    //Accepts verification code and user ID.  Returns result code and result message in array as $return_variable
     /*Result codes: 
     **  2=account is already activated but password is null
     **  3=account is already activated with a stored password
@@ -110,20 +97,20 @@ class SiteUser {
     **  5=database query error
     **  6=account successfully verified (account was previously unverified)
     */
-    public function verifyAccount($ver_code, $email){
-        $query = "SELECT * FROM `User` WHERE `Verification`='$ver_code' AND `Email Address`='$email'"; //AND `Account activated`=0
+    public function verifyAccount($ver_code, $user_id){
+        $query = "SELECT * FROM `User` WHERE `Verification`='$ver_code' AND `User ID`='$user_id'"; //AND `Account activated`=0
         if($result = mysqli_query($this->cxn, $query)){
             //if database query was successful, store the selected acct data in $verification_result variable array:
             $verification_result = mysqli_fetch_assoc($result); //this converts $result into an object we can use and display on the page
-            //check if the given email and verification code combination exist in DB
+            //check if the given user ID and verification code combination exist in DB
             if (isset($verification_result)) {
-                //if we are able to find the email and verification code combination in DB:
+                //if we are able to find the user ID and verification code combination in DB:
                 if($verification_result['Account activated']==0){
                     //if the given account is not already activated:
-                    $activate_query = "UPDATE  `User` SET  `Account activated` =  '1' WHERE  `user`.`Email Address` ='$email';";
+                    $activate_query = "UPDATE  `User` SET  `Account activated` =  '1' WHERE  `user`.`User ID` ='$user_id';";
                     mysqli_query($this->cxn,$activate_query)
                         or die("<br>Error: Could activate account");
-                    $return_variable = array (6, "<p>Verification successful!</p>");
+                    $return_variable = array (6, "<h3>Verification successful!</h3>");
                 }
                 else{
                     //check to see if a password is set
@@ -151,15 +138,21 @@ class SiteUser {
     } //END OF VERIFY ACCOUNT METHOD
 
 
-    //UPDATE PASSWORD METHOD
-    public function updatePassword($password_entry1, $password_entry2, $email) {
+    /*UPDATE PASSWORD METHOD
+    **NOTE: AS OF 2/10/14, THIS METHOD IS ONLY TO BE USED WHEN A USER IS CREATING THEIR PASSWORD FOR THE FIRST TIME
+    ACCEPTS 1ST AND 2ND PASSWORD ENTRIES AND THE USER'S ID
+    UPDATES PASSWORD IN USER TABLE WITH ENCRYPTED PASSWORD
+    LOGS USER IN ONCE PASSWORD IS SUCCESSFULLY STORED
+    */
+    public function updatePassword($password_entry1, $password_entry2, $user_id) {
         $encrypt_password = md5($password_entry1);
-        $query = "UPDATE  `User` SET  `Password` =  '$encrypt_password' WHERE  `Email Address` ='$email';";
+        $query = "UPDATE  `User` SET  `Password` =  '$encrypt_password' WHERE  `User ID` ='$user_id';";
         if($result = mysqli_query($this->cxn, $query)) {
             //if connection to DB was successful:
-            $return_variable = "<p>Your new password has been successfully stored.</p>";
+            $return_variable = "<h3>Your new password has been successfully stored.</h3>";
             //Log the user in once their password is successfully stored:
-            $_SESSION['Username'] = $email;
+            $user_info = $this->GetUserInfo($user_id);
+            $_SESSION['Username'] = $user_info['Email Address'];
             $_SESSION['LoggedIn'] = 999;  //didn't want to make the LoggedIn session variable intuitive.  999 for logged in, 0 otherwise
         }
         else {
@@ -169,6 +162,21 @@ class SiteUser {
         return $return_variable;
     } //END OF UPDATE PASSWORD METHOD
 
+
+    /*RESET PASSWORD METHOD
+    **ACCEPTS USER ID AND NEW VERIFICATION CODE FOR ACCOUNT
+    **SETS GIVEN USER'S "ACCOUNT ACTIVATED?" FIELD IN USER TABLE TO 0
+    **SENDS RESET PASSWORD EMAIL TO GIVEN USER
+    */
+    public function ResetPassword($user_id, $email){
+        $unverify_query = "UPDATE  `User` SET  `Account activated` =  '0' WHERE  `User ID` ='$user_id';";
+        $unverify_result = mysqli_query($this->cxn, $unverify_query);
+        //generate new verification code for given account
+        $ver = $this->GenerateVerification($email);
+        //Send email to invitee:
+        include 'send_mail.php'; //include email file
+        SendEmail($email, "Reset Password", "Click the following link to reset your password: ".DOMAIN."resetpassword.php?v=".$ver."&user_id=".$user_id);
+    }
 
     //UPDATE USERNAME METHOD
     //ACCEPTS EMAIL ADDRESS AND USERNAME.  CHANGES USERNAME IN DATABASE TO THE GIVEN USERNAME
@@ -255,7 +263,7 @@ class SiteUser {
     ADDS POOL ID TO THE GIVEN USER'S "POOL INVITES" FIELD IN USER TABLE
     RETURNS THE APPENDED VALUE
     */
-    public function InviteReceive($email, $pool_id){
+    public function InviteReceive($email, $pool_id, $inviter=NULL){
         //get Pool Invites values for given user (this is a string of pool ids that a user has been invited to)
         $query = "SELECT `Pool Invites` FROM  `User` WHERE  `Email Address` = '$email'"; 
         $result = mysqli_query($this->cxn, $query);
@@ -267,14 +275,25 @@ class SiteUser {
             $check_pool_membership_query = "SELECT * FROM  `Pool Membership` WHERE `User ID` = '$user_id' AND `Pool ID` = '$pool_id'";
             $membership_check_result = mysqli_query($this->cxn, $check_pool_membership_query);
             $membership_check_array = mysqli_fetch_assoc($membership_check_result);
-            if(!isset($membership_check_array)){ //if given user is not already a member of given pool:
+            if(!isset($membership_check_array)){ //if given user is NOT already a member of given pool:
                 $existing_pool_invites = $result_array['Pool Invites']; //store original Pool Invites value
-                $append_value = $pool_id.","; //this is the value we will be appending to the original Pool Invites value
-                $append_query = "UPDATE `User` SET `Pool Invites` = concat('$append_value', '$existing_pool_invites') WHERE `Email Address` = '$email';";
-                $result2 = mysqli_query($this->cxn, $append_query); //append given pool id into user's Pool Invites field in DB
+                //Check to make sure invitee does not already have an invite for this pool waiting:
+                    $existing_pool_invites_array = explode(',', $existing_pool_invites);
+                    if(in_array($pool_id, $existing_pool_invites_array)){
+                        return "\n\nInvite NOT sent to ".$email." because they have already been invited to the pool.";
+                        exit();
+                    }
+                //If invitee does not already have an invite pending for this pool:
+                    $append_value = $pool_id.","; //this is the value we will be appending to the original Pool Invites value
+                    $append_query = "UPDATE `User` SET `Pool Invites` = concat('$append_value', '$existing_pool_invites') WHERE `Email Address` = '$email';";
+                    $result2 = mysqli_query($this->cxn, $append_query); //append given pool id into user's Pool Invites field in DB
+                //Send email to invitee:
+                    include 'send_mail.php'; //include email file
+                    SendEmail($email, "You have been invited to a pool!", "You have been invited to a pool by ".$inviter."!  Click here to see the invite: ".DOMAIN."home.php");
+                
                 return "\n\nInvite sent to ".$email."!";
             }
-            else{
+            else{ //if the given user IS already a member of the given pool:
                 return "\n\nInvite NOT sent to ".$email." because they have already been invited to the pool.";
             }     
         }
@@ -299,11 +318,22 @@ class SiteUser {
         $result2 = mysqli_query($this->cxn, $remove_invite_query);
     }
 
-/*
-    public function SendTestEmail(){
+
+    /**********************************************************************
+    MAIL METHODS
+    **********************************************************************/
+
+
+    /*SENDMAIL METHOD
+    **ACCEPTS EMAIL ADDRESS THAT WE ARE SENDING MAIL TO, SUBJECT, AND MAIL TEXT VARIABLES
+    **MAIL TEXT IS THE BODY OF THE EMAIL
+    
+    public function SendEmail($to_email=NULL, $subject, $mail_text) {
+        INCLUDE AUTOLOADER FROM MAILGUN LIBRARY - THIS IS DEFINED AT THE TOP OF THIS FILE - JUST PASTED HERE FOR REFERENCE
         # Include the Autoloader (see "Libraries" for install instructions)
-        require 'vendor/autoload.php';
+        require '../vendor/autoload.php';
         use Mailgun\Mailgun;
+        
 
         # Instantiate the client.
         $mgClient = new Mailgun('key-9ugjcrpnblx1m98gcpyqejyi75a96ta5');
@@ -313,11 +343,11 @@ class SiteUser {
         $result = $mgClient->sendMessage("$domain",
                   array('from'    => 'Mailgun Sandbox <postmaster@sandbox40726.mailgun.org>',
                         'to'      => 'Evan Paul <evanwpaul@gmail.com>',
-                        'subject' => 'Hello Evan Paul',
-                        'text'    => 'Congratulations Evan Paul, you just sent an email with Mailgun!  You are truly awesome!  You can see a record of this email in your logs: https://mailgun.com/cp/log .  You can send up to 300 emails/day from this sandbox server.  Next, you should add your own domain so you can send 10,000 emails/month for free.'));
-    
+                        'subject' => $subject,
+                        'text'    => $mail_text
+                        ));
     }
-*/
+    */
 }
 
 ?>  

@@ -46,7 +46,7 @@
     } 
     else {
 ?>
-                    <h3><a id="show_invites_link" style="cursor:pointer;">You have been invited to a new pool!  Click here to see your list of invites.</a></span></h3>
+                    <h3><span class='label label-warning'><a id="show_invites_link" style="cursor:pointer;">You have been invited to a new pool!  Click here to see your list of invites.</a></span></h3>
                     <br>
                     <div id='pool_invite_list' style='display:none'>
                         <h4>Pool invites:</h4>
@@ -76,7 +76,7 @@
     if($number_of_total_pools==0){
         //if user doesn't have any pools:
         echo "<br><h3 style='text-decoration:underline'>You do not currently have any active pools</h3>";
-        echo "<p>Perhaps you would like to <a href='create_new.php'>create a new one?</a></p>";
+        echo "<p>Perhaps you would like to <a href='new.php'>create a new one?</a></p>";
     }
     else {
         //if user does have pools:       
@@ -126,10 +126,21 @@
                             <td class="pool_status"><a href=<?php echo $pool_url; ?> style="<?php echo $status_styling; ?>"><?php echo $live_variable; ?></a></td>
                             <td class="pool_row"><?php echo $leader_variable; ?></td>
 <?php
-                        if($current_user_id == 1){
+                        if($current_user_id == 1){ //if user is user #1 (admin):
+                            $score_template_url = "score_template_choices.php?template_id=".$pool_info['Template ID'];
                             $delete_pool_url = "delete_pool.php?pool_id=$pool_id";
 ?>
-                            <td><a href=<?php echo $delete_pool_url; ?>>Delete</a></td>
+                            <td>
+<?php
+                            if(isset($pool_info['Template ID'])){ //display score_template_choices link only if given pool is a template:
+?>                            
+                                <a href=<?php echo $score_template_url; ?>>Score Template ID <?php echo $pool_info['Template ID']; ?></a>
+                                &nbsp;
+<?php
+                            } 
+?>
+                                <a href=<?php echo $delete_pool_url; ?>>Delete</a>
+                            </td>
 <?php
                         }
 ?>
@@ -148,11 +159,6 @@
         </div><!--END OF ROW DIV-->
     </div>
 
-<?php //following is only for testing email purposes
-    if($current_user_id == 1){
-        echo "<a href='send_mail_test.php'>Click here to test sending an email!</a>";
-    }
-?>
 <?php
     include_once 'inc/close.php';
 ?>

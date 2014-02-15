@@ -94,7 +94,7 @@ All of the necessary php variables are defined on the pool.php page
 ?>
     
     <br>
-    <div class="well well-sm" style="width:60%">
+    <div class="well well-sm" style="width:60%;">
         <h3 style="margin-left:50px; text-decoration:underline">Tie breaker question:</h3>
         <p style="margin-left:50px"><?php echo $pool_fetch_result['Tie-Breaker Question']; ?></p> 
         <div id="tie-breaker" style="margin-left:50px;">
@@ -112,6 +112,7 @@ All of the necessary php variables are defined on the pool.php page
 ?>
         </div>
     </div>
-    <br><br><br><br>
-    <span></span>
+<?php
+    //include 'inc/close.php';
+?>
 

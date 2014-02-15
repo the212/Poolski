@@ -18,6 +18,12 @@ All of the necessary php variables are defined on the pool.php page
             $tie_breaker_answer_display = "**Enter your tie-breaker answer here!**";
         }
 ?>
+    <script>
+        //make the page reload every 7 min so that it will eventually become live automatically when the start time passes (if start time is set)
+        //this will prevent someone from sitting on the mypicks page and editing their picks after the pool goes live
+        setInterval('window.location.reload()', 420000);
+    </script>
+
     <h3 style="text-decoration:underline"><?php echo $pool_fetch_result['Overall Question']; ?></h3> 
     <br>
 
@@ -92,7 +98,13 @@ All of the necessary php variables are defined on the pool.php page
                     </div>
                      <div class="col-md-2">
                         <h5>Correct Answer: </h5>
-                        <span class="label label-primary" style="font-size:100%; white-space:normal"><?php echo $category_correct_answer; ?></span>
+<?php
+                        if($pool_fetch_result['Pool ended?']==1){ //only show correct answer span if pool has ended:
+?>
+                        <span class="label label-primary" style="font-size:100%; white-space:normal; padding-left:0px; padding-right:0px;"><?php echo $category_correct_answer; ?></span>
+<?php
+                        }
+?>
                     </div>
                 </div><!--END OF ROW DIV FOR CATEGORY-->
             </div>
@@ -108,5 +120,6 @@ All of the necessary php variables are defined on the pool.php page
             <h3 style="margin-left:50px;"><span class="label label-info"><span id="tie_breaker_input" class="<?php if($pool_fetch_result['Live?']==0){echo 'edit_pick'; } else {echo 'display_pick';} ?>" style="font-weight:bold;"><?php echo $tie_breaker_answer_display; ?></span></span></h3>
         </div>
     </div>
-
-
+<?php
+    //include 'inc/close.php';
+?>

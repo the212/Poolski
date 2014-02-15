@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>Custom Pools| <?php echo $pageTitle ?></title>   
+    <title>Poolski| <?php echo $pageTitle ?></title>   
 
 <!--GET JQUERY FROM ONLINE SITE-->
 <!-- JQUERY COMMENTED OUT FOR SPEED REASONS 12/12/13<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>-->
@@ -22,8 +22,6 @@
 <script src="inc/bootstrap_addons/bootstrap-formhelpers.min.js"></script>
 
 
-<!--GET STYLESHEET-->
-<link rel="stylesheet" href="inc/styles.css" type="text/css" media="screen" title="no title" />
 <!--Bootstrap Form Helpers -->
     <link href="inc/bootstrap_addons/bootstrap-formhelpers.min.css" rel="stylesheet" media="screen">
 
@@ -32,13 +30,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="inc/bootstrap_addons/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
+<!--GET STYLESHEET-->
+<link rel="stylesheet" href="inc/styles.css" type="text/css" media="screen" title="no title" />
+
 </head>
 
 <body>
+<div id="full_container">
+    <div id="body">
 
-    <div id="page-wrap">
-        <div id="header">
-            <div id="control">
+        <div id="page-wrap">
+            <div id="header">
+                <div id="control">
 <?php
 	session_start();
 ?>
@@ -51,7 +54,7 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand" href="home.php">Custom Pools</a>
+                        <a class="navbar-brand" href="home.php"><?php echo BRAND_NAME; ?></a>
                     </div>
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 <?php

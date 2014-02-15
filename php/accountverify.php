@@ -9,29 +9,29 @@
     if(isset($_GET['v']) && isset($_GET['e'])) {
     	//store variables from URL:
         $verification_value = $_GET['v'];
-        $email_value = $_GET['e'];
+        $user_id = $_GET['e'];
     	include_once "inc/class.users.inc.php";
         $user = new SiteUser();
-        $verify_account_result = $user->verifyAccount($verification_value, $email_value); 
+        $verify_account_result = $user->verifyAccount($verification_value, $user_id); 
         if($verify_account_result[0]>3){
             //if verifyAccount result is greater than 3 and we don't want the user to enter a new password:
             echo $verify_account_result[1];
         }
     }
 
-    //if form is submitted and username has been entered and the input passwords are correct length and match each other:
-    if(isset($_POST['form_sent']) && !empty($_POST['username']) && strlen($_POST['p'])>7 && $_POST['p']===$_POST['r']) {   
+    //if form is submitted and the input passwords are correct length and match each other:
+    if(isset($_POST['form_sent']) /*&& !empty($_POST['username'])*/ && strlen($_POST['p'])>7 && $_POST['p']===$_POST['r']) {   
         include_once "inc/class.users.inc.php";
         $user = new SiteUser();
-        $username_entry = $_POST['username'];
+        //$username_entry = $_POST['username'];
         $password_entry1 = $_POST['p'];
         $password_entry2 = $_POST['r'];
-        $email = $_POST['form_sent']; //store email address from hidden field in form as $email variable (hidden field value comes from URL)
+        $user_id = $_POST['form_sent']; //store user ID from hidden field in form as $user_id variable (hidden field value comes from URL)
         //store entered password in database:
-        $updatePassword_result = $user->updatePassword($password_entry1, $password_entry2, $email);
-        $user->updateUsername($email, $username_entry);
+        $updatePassword_result = $user->updatePassword($password_entry1, $password_entry2, $user_id);
+        //$user->updateUsername($email, $username_entry);
         echo $updatePassword_result;
-        echo "<p><a href='login.php'>Click here to go to the home page</a></p>";
+        echo "<h4><a href='login.php'>Click here to go to the home page</a></h4>";
         exit();
     }
 
@@ -50,9 +50,11 @@
 
         <form method="post" action="accountverify.php?e=<?php echo $_GET['e'] ?>">
             <div>
+            <!--
                 <label for="p">Choose a Username:</label>
                 <input type="text" name="username" id="username" /><br />
                 <br>
+            -->
                 <label for="p">Choose a Password:</label>
                 <input type="password" name="p" id="p" /><br />
                 <label for="r">Re-Type Password:</label>
