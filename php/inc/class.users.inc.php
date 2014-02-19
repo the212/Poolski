@@ -38,9 +38,8 @@ class SiteUser {
     public function GenerateVerification($email){
     	//generate a new random verification code for the given email
 	    $verification_code = substr(md5(uniqid(rand(), true)), 16, 16);
-	   	//display code on screen - this is just for testing purposes
 	    //add the new verification code to proper row in User database table.  the row corresponds to the email address passed to the function
-	    $verification_query = "UPDATE  `User` SET  `Verification` = '$verification_code' WHERE  `user`.`Email Address` = '$email'";
+	    $verification_query = "UPDATE  `User` SET  `Verification` = '$verification_code' WHERE  `Email Address` = '$email'";
     	mysqli_query($this->cxn,$verification_query)
     		or die("<br>Error: could not store verification code");
         return $verification_code;
