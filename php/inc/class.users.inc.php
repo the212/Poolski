@@ -106,7 +106,7 @@ class SiteUser {
                 //if we are able to find the user ID and verification code combination in DB:
                 if($verification_result['Account activated']==0){
                     //if the given account is not already activated:
-                    $activate_query = "UPDATE  `User` SET  `Account activated` =  '1' WHERE  `user`.`User ID` ='$user_id';";
+                    $activate_query = "UPDATE  `User` SET  `Account activated` =  '1' WHERE  `User ID` ='$user_id';";
                     mysqli_query($this->cxn,$activate_query)
                         or die("<br>Error: Could activate account");
                     $return_variable = array (6, "<h3>Verification successful!</h3>");
