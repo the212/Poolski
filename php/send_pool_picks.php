@@ -15,15 +15,17 @@ if(isset($_POST['element_id'])){
     $pool = new Pool();
     $input_value = $_POST['update_value']; //get input value from page - this is the pick that the user has input
     $pool_id = $_POST['pool_id']; //get the pool ID from the page
-    $pick_original_value = $_POST['original_html']; //get the value that was previously set as the pick value before user's latest input
-    //NOTE - AS OF 11:30 PM 11/13/13, USER_ID WILL BE THE USER'S EMAIL ADDRESS.  
-    //WE NEED TO MAKE SURE THIS GETS CONVERTED TO THE USER'S ID - CAN PROB DO THIS IN THE POOL CLASS FILE
-    $user_email = $_POST['user_id']; //get the user's ID from the page
-    if($_POST['element_id'] == "tie_breaker_input"){
-        //if user is entering in their tie breaker input:
-        $update_tie_breaker_answer = $pool->UpdateTieBreakerAnswer($user_email, $pool_id, $input_value);
-        //$update_tie_breaker_answer = "Test1";
-        echo $update_tie_breaker_answer;
+    $pick_original_value = $_POST['original_html']; //get the value that was previously set as the pick value before user's latest input 
+    $user_email = $_POST['user_id']; //get the user's ID from the page (as of 2/19/14, we expect this to be in email form)
+    if($_POST['element_id'] == "tie_breaker_input"){ //if user is entering in their tie breaker input:
+        if(isset($_POST['template']) && !is_numeric($input_value)) { //IF THE THIS IS A TEMPLATE AND THE TIE BREAKER INPUT VALUE IS NOT NUMERIC:
+            echo $original_value." <span style='font-style:italic; word-wrap:break-word; font-size:80%;'>Input must be a number - please click here to re-enter your choice</span>";
+            exit(); //AS OF 2/19/14, WE ONLY ALLOW NUMERIC TIE BREAKER INPUTS
+        }
+        else{ //we update the user's tie breaker input:
+            $update_tie_breaker_answer = $pool->UpdateTieBreakerAnswer($user_email, $pool_id, $input_value);
+            echo $update_tie_breaker_answer;
+        }
     }
     else{
         $category_id = substr($_POST['element_id'],18); //get last characters of element ID (element ID will be of the form:  category_n_span_## where ## is the category ID in the DB)

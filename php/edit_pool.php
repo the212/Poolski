@@ -247,7 +247,7 @@
                         </div> 
                     </div>
                     <div class="col-md-6">
-                        <h4>Pool Start Time:</h4>
+                        <h4>Pool Start Time: <span class="hint_subtext">(default time is midnight)<span></h4>
                         <div id="ST">
                             <div class="bfh-timepicker" id="edit_start_time" data-time='<?php echo $pool_start_time; ?>'>
                             </div>
@@ -264,7 +264,7 @@
                         </div> 
                     </div>
                     <div class="col-md-6">
-                        <h4>Pool End Time:</h4>
+                        <h4>Pool End Time: <span class="hint_subtext">(default time is midnight)<span></h4>
                         <div id="ET">
                             <div class="bfh-timepicker" id="edit_end_time" data-time='<?php echo $pool_end_time; ?>'>
                             </div>

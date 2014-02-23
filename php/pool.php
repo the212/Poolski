@@ -70,7 +70,7 @@
                     echo " <span class='label label-info'>Pool Ended.</span>";
                 }
                 else{
-                    echo " <span class='label label-info'>Pool Winner: ".$pool_winner_nickmane." </span>";
+                    echo " <span class='label label-primary'>Pool Winner: ".$pool_winner_nickmane." </span>";
                 }
             }
 ?>
@@ -101,7 +101,7 @@
 
 
         <div class="tab-pane fade in active" id="summary">
-            <div class="row" style="padding-left:10px;">   
+            <div class="row" style="padding-left:15px;">   
                 <h3>&#8220;<?php echo $pool_fetch_result['Description']; ?>&#8221;</h3>
             </div>
                     

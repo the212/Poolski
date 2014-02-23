@@ -54,7 +54,7 @@
                 You don't have to worry about anything except making your picks!</h4>
             <br><br>
         </div>
-        <h2 style="text-decoration:underline; padding-bottom:20px;">Available Templates:</h2>
+        <br>
         <div class="thumbnail" style="margin-left:15%; margin-right:15%;">
             <h2><a href="create_new_template.php?template_id=3">Academy Awards Pick 'em 2014</a></h2>
             <h4>Make your picks for who is taking home the golden statue.</h4>

@@ -33,7 +33,7 @@
                 <input type="submit" name="login" id="login" value="Login" class="button" />
             </div>
         </form><br><br>
-        <p><a href="/password.php">Did you forget your password?</a></p>
+        <p><a href="password.php">Did you forget your password?</a></p>
 <?php
         else:
             //if the login form was not submitted, then display the below HTML prompting user to login:
