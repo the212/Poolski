@@ -125,7 +125,7 @@ class Pool {
         switch ($setting_to_be_updated) {
             case 'SD': //if we are editing start date:
                 $new_start_timestamp = substr_replace($pool_fetch_result['Start Time'], $new_setting_value, 0, 10);
-                if($new_start_timestamp > $pool_fetch_result['End Time']){ //if input start info is AFTER existing end info:
+                if(!is_null($pool_fetch_result['End Time']) && $new_start_timestamp > $pool_fetch_result['End Time']){ //if input start info is AFTER existing end info and ending info exists:
                     $error_message = "Error: Start Date cannot be after End Date! Please check your settings.";
                     $original_value = substr($pool_fetch_result['Start Time'], 0, 10); //get original value for edited setting
                     return $error_message.",edit_start_date,".$original_value;
@@ -136,7 +136,7 @@ class Pool {
                 break;
             case 'ST': //if we are editing start time:
                 $new_start_timestamp = substr_replace($pool_fetch_result['Start Time'], $new_setting_value, 11);
-                if($new_start_timestamp > $pool_fetch_result['End Time']){ //if input start info is AFTER existing end info:
+                if(!is_null($pool_fetch_result['End Time']) && $new_start_timestamp > $pool_fetch_result['End Time']){ //if input start info is AFTER existing end info and ending info exists:
                     $error_message = "Error: Start Date cannot be after End Date! Please check your settings.";
                     $original_value = substr($pool_fetch_result['Start Time'], 11);
                     return $error_message.",edit_start_time,".$original_value; 
@@ -665,31 +665,46 @@ class Pool {
     **Accepts category id and choice id of correct choice as inputs
     **Updates "Category Choices" table so that "Correct?" field has "1" value for the given correct choice
     **Changes any "Correct?" values to 0's for category choices that are not being marked as correct
+
+    **HOW TO UNDO A TEMPLATE CATEGORY SCORE ONCE IT HAS BEEN DONE:
+        Change "Correct" fields for category ID in "Category Choices" table
+        Change "Category Correct Answer" field in "Pool Categories" Table  for category ID (FOR ALL POOLS with given category)
+        Change "Answer Correct?" field in "User Picks" table for category ID (for ALL USERS with given category ID)
     */
     public function ScoreTemplateChoice($category_id, $correct_choice_id){
         $reset_query = "UPDATE `Category Choices` SET `Correct?` = '0' WHERE `Category ID` = '$category_id';";
         $reset_result = mysqli_query($this->cxn, $reset_query);
-        $correct_query = "UPDATE `Category Choices` SET `Correct?` = '1' WHERE `Choice ID` = $correct_choice_id;";
-        $result2 = mysqli_query($this->cxn, $correct_query);
-
-        $correct_answer_query = "SELECT `Choice` FROM `Category Choices` WHERE `Choice ID` = $correct_choice_id";
-        $correct_answer_result = mysqli_query($this->cxn, $correct_answer_query);
-        $correct_answer_array = mysqli_fetch_assoc($correct_answer_result);
-        $correct_answer = $correct_answer_array['Choice'];
-        
+        if($correct_choice_id == "000NA000"){ //if we are resetting the category being correct/incorrect:
+            unset($correct_answer);
+        }
+        else{ //if we are marking an actual choice as correct for the category:
+            $correct_query = "UPDATE `Category Choices` SET `Correct?` = '1' WHERE `Choice ID` = $correct_choice_id;";
+            $result2 = mysqli_query($this->cxn, $correct_query);
+            $correct_answer_query = "SELECT `Choice` FROM `Category Choices` WHERE `Choice ID` = $correct_choice_id";
+            $correct_answer_result = mysqli_query($this->cxn, $correct_answer_query);
+            $correct_answer_array = mysqli_fetch_assoc($correct_answer_result);
+            $correct_answer = $correct_answer_array['Choice'];
+        }
         //UPDATE POOL CATEGORIES TABLE:
-            $mark_category_correct_query = "UPDATE `Pool Categories` SET `Category Correct Answer` = '$correct_answer' WHERE `Category ID` = $category_id";
+            if(!isset($correct_answer)) { //if we are resetting the category:
+                $mark_category_correct_query = "UPDATE `Pool Categories` SET `Category Correct Answer` = NULL WHERE `Category ID` = $category_id";
+            }
+            else{ //if we are marking a choice correct:
+                $mark_category_correct_query = "UPDATE `Pool Categories` SET `Category Correct Answer` = '$correct_answer' WHERE `Category ID` = $category_id";
+            }
             $result1 = mysqli_query($this->cxn, $mark_category_correct_query);
-
         //UPDATE USER PICKS TABLE:
             $answer_check_query = "SELECT `User ID`, `Answer for Main Category` FROM `User Picks` WHERE `Category ID` = '$category_id'";
             $answer_check_result = mysqli_query($this->cxn, $answer_check_query);
             while($row = mysqli_fetch_assoc($answer_check_result)) {
                 $user_id = $row['User ID'];
-                if($correct_answer == $row['Answer for Main Category']) {
+                if(!isset($correct_answer)){ //if we are resetting the category
+                    $mark_user_pick_query = "UPDATE `User Picks` SET  `Answer Correct?` = NULL WHERE  `User ID` = '$user_id' AND  `Category ID` = '$category_id';";
+                }
+                elseif($correct_answer == $row['Answer for Main Category']) { //if we are not resetting the category and the user's choice is correct
                     $mark_user_pick_query = "UPDATE `User Picks` SET `Answer Correct?` = '1' WHERE `User ID` = '$user_id' AND `Category ID` = '$category_id';";
                 }
-                else{
+                else{ //if the user's choice is not correct
                     $mark_user_pick_query = "UPDATE `User Picks` SET `Answer Correct?` = '0' WHERE `User ID` = '$user_id' AND `Category ID` = '$category_id';";
                 }
                 $mark_user_pick_result = mysqli_query($this->cxn, $mark_user_pick_query);
@@ -787,7 +802,7 @@ class Pool {
         //For each Pool
             while($row = mysqli_fetch_assoc($close_pool_result)) {
                 $pool_id = $row['Pool ID'];
-                $this->CalculatePoolScore($pool_id, 1);
+                $this->CalculatePoolScore($pool_id, 1); //finalize variable set to 1 means that we are closing out the pool
                 //UPDATE TIE BREAKER ANSWERS IN ALL ASSOCIATED POOLS:
                 $update_pool_tie_breaker_answer_query = "UPDATE `Pool` SET `Tie-Breaker Correct Answer` = '$correct_tie_breaker_answer' WHERE `Pool ID` = '$pool_id';";
                 mysqli_query($this->cxn, $update_pool_tie_breaker_answer_query);
@@ -849,6 +864,11 @@ class Pool {
     }
 
 
+    /*
+    **TIEBREAKER METHOD
+    **ACCEPTS POOL ID AND AN ARRAY CONTAINING THE POOL MEMBERS WHO TIED FOR THE HIGHEST SCORE
+    **CHOOSES A WINNER AND RETURNS THE WINNER'S USER ID
+    */
     public function TieBreaker($pool_id, $highest_scoring_users_array){
         $correct_tie_breaker_answer_query = "SELECT `Tie-Breaker Correct Answer` FROM `Pool` WHERE `Pool ID` = '$pool_id';";
         $correct_tie_breaker_answer_result = mysqli_query($this->cxn, $correct_tie_breaker_answer_query);
@@ -867,7 +887,7 @@ class Pool {
             }
             else{ //if tie breaker answer is not numeric:
                 if($correct_tie_breaker_answer == $user_tie_breaker_answer){ //if user's tie breaker answer was correct:
-                    $tie_breaker_result_array[$user_id] = 0;
+                    $tie_breaker_result_array[$user_id] = 0; //better to have a lower tie breaker number
                 }
                 else{ //if user's tie breaker answer was incorrect:
                     $tie_breaker_result_array[$user_id] = 1;

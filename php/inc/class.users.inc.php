@@ -174,7 +174,11 @@ class SiteUser {
         $ver = $this->GenerateVerification($email);
         //Send email to invitee:
         include 'send_mail.php'; //include email file
-        SendEmail($email, "Reset Password", "Click the following link to reset your password: ".DOMAIN."resetpassword.php?v=".$ver."&user_id=".$user_id);
+        SendEmail($email, "Reset Password", 
+            "Click the following link to reset your password: 
+            \n\n".DOMAIN."resetpassword.php?v=".$ver."&user_id=".$user_id."
+            \n\nIf clicking the link does not work, please copy and paste it into your browser."
+            );
     }
 
     //UPDATE USERNAME METHOD
@@ -267,8 +271,22 @@ class SiteUser {
         $query = "SELECT `Pool Invites` FROM  `User` WHERE  `Email Address` = '$email'"; 
         $result = mysqli_query($this->cxn, $query);
         $result_array = mysqli_fetch_assoc($result); 
-        if(isset($result_array)) {
-            //IF GIVEN EMAIL EXISTS IN DB:
+        if(!isset($result_array)) { //if the user is a new user:
+            $add_new_user_result = $this->addNewUser($email); //store user in DB as an unverified user
+            include 'send_mail.php'; //include email file
+            //send user email:
+            SendEmail($email, "You have been invited to a pool on Poolski.com!", "You have been invited to a pool by ".$inviter." on Poolski.com!  
+                \n\nClick here to create an account and join the pool: ".$add_new_user_result[2]." 
+                \nPlease copy and paste the entire URL into your browser if clicking on it doesn't work.
+                \n\nPoolski.com is a site that allows you to create betting pools with your friends online
+                \nUse Poolski to bet on anything from the Academy Awards or the outcome of your favorite TV show."
+                );
+            $append_value = $pool_id.","; //this is the value we will be appending to the original Pool Invites value
+            $append_query = "UPDATE `User` SET `Pool Invites` = '$append_value' WHERE `Email Address` = '$email';";
+            $result2 = mysqli_query($this->cxn, $append_query); //append given pool id into user's Pool Invites field in DB
+            return "\n\nInvite sent to ".$email."!";
+        }
+        else{ //if user is NOT a new user:
             $user_id = $this->GetUserIDFromEmail($email); //get given email's USER ID
             //check to see if given user is already a member of given pool:
             $check_pool_membership_query = "SELECT * FROM  `Pool Membership` WHERE `User ID` = '$user_id' AND `Pool ID` = '$pool_id'";
@@ -277,30 +295,27 @@ class SiteUser {
             if(!isset($membership_check_array)){ //if given user is NOT already a member of given pool:
                 $existing_pool_invites = $result_array['Pool Invites']; //store original Pool Invites value
                 //Check to make sure invitee does not already have an invite for this pool waiting:
-                    $existing_pool_invites_array = explode(',', $existing_pool_invites);
-                    if(in_array($pool_id, $existing_pool_invites_array)){
-                        return "\n\nInvite NOT sent to ".$email." because they have already been invited to the pool.";
-                        exit();
-                    }
-                //If invitee does not already have an invite pending for this pool:
-                    $append_value = $pool_id.","; //this is the value we will be appending to the original Pool Invites value
-                    $append_query = "UPDATE `User` SET `Pool Invites` = concat('$append_value', '$existing_pool_invites') WHERE `Email Address` = '$email';";
-                    $result2 = mysqli_query($this->cxn, $append_query); //append given pool id into user's Pool Invites field in DB
-                //Send email to invitee:
-                    include 'send_mail.php'; //include email file
-                    SendEmail($email, "You have been invited to a pool!", "You have been invited to a pool by ".$inviter."!  Click here to see the invite: ".DOMAIN."home.php");
-                
+                $existing_pool_invites_array = explode(',', $existing_pool_invites);
+                if(in_array($pool_id, $existing_pool_invites_array)){ //if user already has an invite pending for this pool:
+                    return "\n\nInvite NOT sent to ".$email." because they have already been invited to the pool.";
+                    exit();
+                }
+                //If invitee does NOT already have an invite pending for this pool:
+                $append_value = $pool_id.","; //this is the value we will be appending to the original Pool Invites value
+                $append_query = "UPDATE `User` SET `Pool Invites` = concat('$append_value', '$existing_pool_invites') WHERE `Email Address` = '$email';";
+                $result2 = mysqli_query($this->cxn, $append_query); //append given pool id into user's Pool Invites field in DB
+                include 'send_mail.php'; //include email file
+                SendEmail($email, "You have been invited to a pool!", "You have been invited to a pool by ".$inviter."!  Click here to see the invite: ".DOMAIN."home.php");
                 return "\n\nInvite sent to ".$email."!";
             }
             else{ //if the given user IS already a member of the given pool:
                 return "\n\nInvite NOT sent to ".$email." because they have already been invited to the pool.";
-            }     
-        }
-        else{
-            //IF GIVEN EMAIL DOES NOT EXIST IN DB (THIS NEEDS TO BE MODIFIED TO SEND EMAIL)
-            return "\n\nInvite NOT sent to ".$email." because they are not registered."; //NEED TO WRITE A FUNCTION TI SEND GIVEN EMAIL ADDRESS A WELCOME EMAIL ASKING THEM TO JOIN SITE
-        }
+            }
+        }  
     }
+          
+        //return "\n\nInvite NOT sent to ".$email." because they are not registered."; //NEED TO WRITE A FUNCTION TI SEND GIVEN EMAIL ADDRESS A WELCOME EMAIL ASKING THEM TO JOIN SITE        
+    
 
     /*REMOVE INVITE METHOD
     ACCEPTS THE USER ID AND THE POOL ID THAT WE ARE REMOVING THE INVITE FOR

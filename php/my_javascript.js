@@ -212,6 +212,7 @@
     });
 
 
+
     /*
     **Note - the make_live variable in the below ajax function has been encoded.  
     **It's value is set as 3 meaningless numbers, followed by the unique pool ID, followed by 4 more meaningless numbers (these will appear in HTML source in user's browser)
@@ -290,6 +291,17 @@
             $(".user_picks_container").css("display", "none");
         });
     }
+
+    //CODE FOR KEEPING "BACK" BUTTON STATIC WHEN SCROLLING WHILE VIEWING A GIVEN USER'S PICKS (POOL_MEMBERS.PHP)
+    $(window).scroll(function(e){ 
+        $el = $('#see_user_picks_back_button'); 
+        if ($(this).scrollTop() > 300 && $el.css('position') != 'fixed'){ 
+            $('#see_user_picks_back_button').css({'position': 'fixed', 'top': '-15px'}); 
+        }
+        if ($(this).scrollTop() < 300 && $el.css('position') != 'absolute'){ 
+            $('#see_user_picks_back_button').css({'position': 'absolute', 'top': '0px'}); 
+        } 
+    });
 
 
 //END OF POOL.PHP JAVASCRIPT

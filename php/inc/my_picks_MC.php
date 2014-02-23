@@ -14,8 +14,8 @@ All of the necessary php variables are defined on the pool.php page
         if(isset($tie_breaker_answer)){
             $tie_breaker_answer_display = $tie_breaker_answer;
         }
-        else{
-            $tie_breaker_answer_display = "**Enter your tie-breaker answer here!**";
+        else{ //if no tie breaker pick has been made
+            $tie_breaker_answer_display = 0; //as of 2/19/14 we assume that the tie breaker answers will be numeric for all pools
         }
 ?>
     <script>
@@ -33,7 +33,8 @@ All of the necessary php variables are defined on the pool.php page
         foreach($pool_category_fetch as $category_id => $category_info){
             $category_choices = $pool->GetCategoryChoices($category_id); //store all of the multiple choices for given category in $category_choices array
             if(isset($user_picks_fetch[$category_id])) {
-                $pick_label_class = "label label-primary";
+                $pick_label_class = "label label-primary"; 
+                $category_background_color = ""; //reset background color if a previous pick had changed it
                 //if a pick already exists for given category, we store it in the pick_display_value variable
                 $pick_display_array = explode('|', $user_picks_fetch[$category_id]); //separate out correct/incorrect status from pick if status is set (separated from pick value by | delimiter)
                 $pick_display_value = $pick_display_array[0];
@@ -98,13 +99,7 @@ All of the necessary php variables are defined on the pool.php page
                     </div>
                      <div class="col-md-2">
                         <h5>Correct Answer: </h5>
-<?php
-                        if($pool_fetch_result['Pool ended?']==1){ //only show correct answer span if pool has ended:
-?>
                         <span class="label label-primary" style="font-size:100%; white-space:normal; padding-left:0px; padding-right:0px;"><?php echo $category_correct_answer; ?></span>
-<?php
-                        }
-?>
                     </div>
                 </div><!--END OF ROW DIV FOR CATEGORY-->
             </div>
@@ -114,12 +109,21 @@ All of the necessary php variables are defined on the pool.php page
 ?>
     
     <div class="well well-sm">
-        <h3 style="margin-left:50px; text-decoration:underline">Tie breaker question:</h3>
-        <p style="margin-left:50px"><?php echo $pool_fetch_result['Tie-Breaker Question']; ?></p> 
-        <div id="tie-breaker" style="margin-left:50px;">
-            <h3 style="margin-left:50px;"><span class="label label-info"><span id="tie_breaker_input" class="<?php if($pool_fetch_result['Live?']==0){echo 'edit_pick'; } else {echo 'display_pick';} ?>" style="font-weight:bold;"><?php echo $tie_breaker_answer_display; ?></span></span></h3>
+        <h2 style="margin-left:50px; text-decoration:underline">Tie breaker question:</h2>
+        <h4 style="margin-left:50px"><?php echo $pool_fetch_result['Tie-Breaker Question']; ?></h4> 
+        <div id="tie-breaker" style="margin-left:50px;">            <!--  edit_tie_breaker_choice_template  -->
+            <h3><span class="label label-info" style="margin-left:62px">&nbsp;<span class="<?php if($pool_fetch_result['Live?']==0){echo 'edit_tie_breaker_choice_template'; } else {echo 'display_pick';} ?>" id="tie_breaker_input" style="margin-left:0px">&nbsp;<?php echo $tie_breaker_answer_display;; ?>&nbsp; </span>&nbsp;</span></h3>
         </div>
     </div>
 <?php
+
     //include 'inc/close.php';
+
+
+    /*
+    BELOW IS OLD TIE BREAKER INPUT (EDIT IN PLACE FUNCTIONALITY) - I REMOVED IT ON 2/19/14 IN ORDER TO FORCE THE USER TO ENTER A NUMBERIC INPUT
+    
+    <h3 style="margin-left:50px;"><span class="label label-info"><span id="tie_breaker_input" class="<?php if($pool_fetch_result['Live?']==0){echo 'edit_pick'; } else {echo 'display_pick';} ?>" style="font-weight:bold;"><?php echo $tie_breaker_answer_display; ?></span></span></h3>
+    
+    */
 ?>

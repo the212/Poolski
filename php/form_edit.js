@@ -37,6 +37,15 @@ $(document).ready(function(){
 		value_required: true
 	});
 
+	//Edit tie breaker (for pool participant) - TEMPLATES ONLY - my_picks_MC.php:
+	//as of 2/19/14, we expect the tie breaker value to be numeric
+	$(".edit_tie_breaker_choice_template").editInPlace({
+		url: 'send_pool_picks.php',
+		params: 'pool_id='+pool_id+'&user_id='+user_id+'&template=1',
+		show_buttons: true,
+		value_required: true
+	});
+
 	$(".edit_nickname").editInPlace({
 		url: 'send_pool_data.php',
 		params: 'pool_id='+pool_id+'&user_id='+user_id,

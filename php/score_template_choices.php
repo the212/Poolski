@@ -68,7 +68,7 @@ else {
             $category_choices = $pool->GetCategoryChoices($category_id); //store all of the multiple choices for given category in $category_choices array
             $correct_response = $pool->GetCorrectChoiceForTemplateCategory($category_id);
             if($correct_response == '0'){ //if the category has not yet been marked as correct:
-                $display_choice = 'No answer chosen';
+                $display_choice = '000NA000'; //if we pass this value to the ScoreTemplateChoice method, it will reset the category to be unscored
             }
             else{ //if category has been marked correct, display the saved correct value:
                 $display_choice = key($correct_response);
@@ -76,7 +76,7 @@ else {
             echo $category_info['Category Name'];
 ?>
             <div class="bfh-selectbox" id="TEMPLATE99_<?php echo $category_info['Category ID']; ?>" data-name="selectbox1" data-value="<?php echo $display_choice; ?>" data-filter="true">
-                <div data-value='No answer chosen'>**No answer chosen**</div> <!--default drop down choice when no answer has been previously selected-->
+                <div data-value='000NA000'>**No answer chosen**</div> <!--default drop down choice when no answer has been previously selected-->
 <?php
             foreach($category_choices as $choice_number => $choice){ //put all of the given category's multiple choices in the bfh-selectbox dropdown menu
 ?>

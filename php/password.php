@@ -14,7 +14,8 @@
             $user_id = $user->GetUserIDFromEmail($entryValue);
             if(isset($user_id)){ //if an account for the given email exists:
                 $reset_password_result = $user->ResetPassword($user_id, $entryValue); 
-                echo "<h5 style='color:#5cb85c; margin-left:20px;'>We have sent a link to reset your password to your email address.</h5>";
+                echo "<h4 style='color:#5cb85c; margin-left:20px;'>We have sent a link to reset your password to your email address.</h4>";
+                exit();
             }
             else { //if no account exists for this email:
                 echo "<p style='color:red; margin-left:20px;'>No account exists for that email address.  Please try again.</p>";

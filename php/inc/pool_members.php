@@ -87,7 +87,18 @@ else{ //if pool has not ended:
     } 
 ?>
     </table>
-<br><br><br>
+<br>
+
+<?php
+        if($pool_fetch_result['Pool ended?'] == 1) { //only display tie breaker correct answer if pool has ended:
+?>
+    <h3 style="text-decoration:underline;">Tie-Breaker correct answer:</h3>
+<?php
+            echo "<h4>".$pool_fetch_result['Tie-Breaker Question']."</h4>";
+            echo "<h4 style='margin-left:40px;'>Correct Answer: <span class='label label-info' style='font-size:110%;'>".$pool_fetch_result['Tie-Breaker Correct Answer']."</span></h4>";
+        }
+?>
+<br><br>
 </div> <!--END OF POOL MEMBERS CONTAINER-->
 
 <!--****************************************************-->
@@ -97,8 +108,9 @@ else{ //if pool has not ended:
 <?php
     if($pool_fetch_result['Live?']==1) { //only create the "user_picks_container" div if pool is live (we don't want to show user picks otherwise)
 ?>
-<div class="user_picks_container" style="position: relative; right:-100%; display:none; padding-left:25px; padding-right:25px;">
-    <h3><a href='JAVASCRIPT:hideUserPicks();'>Back</a></h3>
+
+<div class="user_picks_container" style="position: relative; right:-100%; display:none; padding-left:80px; padding-right:25px;">
+    <h2 id="see_user_picks_back_button"><a href='JAVASCRIPT:hideUserPicks();'>Back</a></h2>
     <h2><span class="user_for_user_picks"></span>'s Picks:</h2>
     <br>
     <h4><?php echo $pool_fetch_result['Overall Question']; ?></h4> 

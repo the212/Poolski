@@ -16,15 +16,8 @@
         $pool_public_status = $_POST['public_private']; //get pool public/private status
         //create new pool in database with inputs:
         $new_pool_result = $pool->CreateNewPool($_SESSION['Username'] , $pool_title , $pool_question, $pool_description, $tie_question, $pool_public_status);
-        //create pool URL with new pool ID:
-        $pool_url = "'edit_pool.php?pool_id=$new_pool_result[2]'";
-       //display the below HTML once pool has been created:
-
-?>
-        <p>Pool created successfully!</p>
-        <p><a href=<?php echo $pool_url; ?>>Click here to view your pool.</a></p>
-
-<?php
+        //send user to newly created pool page automatically:
+        header("Location: edit_pool.php?pool_id=$new_pool_result[2]");
     else:
         
     //display below HTML if page loads without any input:
@@ -61,16 +54,15 @@
             <br>
             <input type="text" name="pool_description" id="pool_description" size="100"/>
             <br><br>
-            <label for="pool_question">Overall Pool Question</label>
-            <span class="field_label">What are we betting on? &nbsp; E.g., "who will win each Academy Award?"</span>
+            <label for="pool_question">Overall Pool Topic</label>
+            <span class="field_label">What are we betting on? &nbsp; E.g., "who will win each Academy Award?", "what will happen on the new episode of Game of Thrones?", etc.</span>
             <br>
             <input type="text" name="pool_question" id="pool_question" size="100"/>
             <br><br>
             <label for="tie_question">Tie-Breaker Question</label>
             <span class="field_label">The answer to this question will be used if more than one person has the highest score.</span>
             <br>
-            <!--NOTE THE BELOW TEXTAREA ELEMENT MAY NOT WORK IN INTERNET EXPLORER-->
-            <textarea rows="4" cols="50" name="tie_question" id="tie_question" form="new_pool_form"></textarea>
+            <input type="text" name="tie_question" id="tie_question" size="100"/>
             <br>
             <br>
             <input type="radio" name="public_private" value="public" checked="checked"> Make Pool Public (Default - anyone can invite others)<br>

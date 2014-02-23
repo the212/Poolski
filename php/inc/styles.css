@@ -102,13 +102,18 @@ HOME.PHP STYLING
 	font-weight:bold;
 }
 
+#pool_invite_list {
+	margin-left:30px;
+}
+
 
 /*
 CREATE_POOL.PHP STYLING
 */
 
 .field_label {
-	margin-left:20px; font-style:italic;
+	margin-left:20px; 
+	font-style:italic;
 }
 
 /*
@@ -142,6 +147,11 @@ EDIT_POOL.PHP STYLING
 
 #public_private_instructions {
 	margin-left:20px; font-style:italic;
+}
+
+.hint_subtext {
+	font-size:65%;
+	font-style:italic;
 }
 
 
@@ -182,7 +192,6 @@ POOL.PHP CSS
 #show_invites_link {
 	font-weight:bold;
 	font-size:130%;
-	padding:5px;
 	color: white;
 }
 
@@ -207,4 +216,14 @@ POOL.PHP CSS
 	padding-left: 10px;
 	padding-right: 10px;
 }
+
+#see_user_picks_back_button{
+	margin-left:-80px; 
+	position: absolute;
+	margin-top: 35px;
+	z-index: 10;
+	background-color: white;
+}
+
+
 

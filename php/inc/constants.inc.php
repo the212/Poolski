@@ -26,7 +26,7 @@
 	//Define DOMAIN and BRAND constants for site:
 	define('DOMAIN', 'http://localhost/openshift_clone/php/php/');
 	define('BRAND_NAME', 'Poolski');
-	
-*/
+	*/
+
 ?>
 

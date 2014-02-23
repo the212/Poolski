@@ -34,22 +34,21 @@
     <div class="container">
         <div class="row" style="border-style:none">
             <div>
-                <div class="row">
+                <div class="row" style="padding-left:20px; padding-right:20px;">
 <?php
     include_once 'inc/class.users.inc.php';
     $user = new SiteUser(); 
     $current_user_id = $user->GetUserIDFromEmail($current_user);
     $pool_invites_result = $user->CheckPoolInvites($current_user);
     //BEGIN CHECK FOR POOL INVITES IF STATEMENT
-    if($pool_invites_result == "0"){ //if user does not have any invites, we don't display anything
-        echo ""; 
-    } 
-    else {
+    if($pool_invites_result <> "0"){ //if user has pool invites pending:
 ?>
-                    <h3><span class='label label-warning'><a id="show_invites_link" style="cursor:pointer;">You have been invited to a new pool!  Click here to see your list of invites.</a></span></h3>
+                    <br><br>
+                    <h2 style='text-decoration:underline; word-wrap:break-word;'>** You have been invited to a new pool! **</h2>
+                    <h4 style="margin-left: 20px;"><span class='label label-warning'><a id="show_invites_link" style="cursor:pointer;">Click here to see your list of invites.</a></span></h4>
                     <br>
                     <div id='pool_invite_list' style='display:none'>
-                        <h4>Pool invites:</h4>
+                        <h4 style='text-decoration:underline'>Pool invites:</h4>
 <?php
         foreach($pool_invites_result as $index => $pool_id){
             $given_pool_data = $pool->GetPoolData($pool_id);
@@ -59,8 +58,8 @@
             else{ //if we are able to find a pool for the given pool id:
 ?>
                         <span id="pool_span_<?php echo $pool_id; ?>"style="margin-left:30px; font-weight:bold;"><p><?php echo $given_pool_data['Title']; ?></p>
-                            <input class="accept_invite_button" type='button' onclick="accept_invite(<?php echo $current_user_id.", ".$given_pool_data['Pool ID']; ?>)" value='Accept'>
-                            <input type='button' onclick="decline_invite(<?php echo $current_user_id.", ".$given_pool_data['Pool ID']; ?>)" value='Decline'>
+                            <input class="accept_invite_button" type='button' onclick="accept_invite(<?php echo $current_user_id.", ".$given_pool_data['Pool ID']; ?>)" value='Join Pool'>
+                            <input type='button' onclick="decline_invite(<?php echo $current_user_id.", ".$given_pool_data['Pool ID']; ?>)" value='Decline Invite'>
                             <br>
                         </span>
 <?php
@@ -69,19 +68,14 @@
 ?>
                     <br>
                     </div>
+                    <br>
 <?php
     } //END OF CHECK FOR POOL INVITES IF STATEMENT
 
     //BEGIN USER'S POOL LIST
-    if($number_of_total_pools==0){
-        //if user doesn't have any pools:
-        echo "<br><h3 style='text-decoration:underline'>You do not currently have any active pools</h3>";
-        echo "<p>Perhaps you would like to <a href='new.php'>create a new one?</a></p>";
-    }
-    else {
-        //if user does have pools:       
+    if($number_of_total_pools<>0){ //if user has pools:      
 ?>
-                    <h3 style="text-decoration:underline">Your Active Pools</h3>
+                    <h2 style="text-decoration:underline">Your Active Pools</h2>
                     <table border="1" style="width:95%">
                         <tr>
                             <th class="pool_top_row">Pool</th>
@@ -111,7 +105,7 @@
             if($pool_info['Live?']==1 && $pool_info['Pool ended?'] ==1){
                 //if pool has ended:
                 $live_variable = "Pool has ended - Click to view pool results"; 
-                $status_styling = "color:#808080";
+                $status_styling = "color:black";
             }
             
             if($current_user == $pool_info['Leader ID']){
@@ -146,13 +140,17 @@
 ?>
                         </tr>
 <?php
-            
         }
 ?>
                     </table>
                     <br>
-                </div>
+                </div> <!--end of row div-->
 <?php
+    }
+    else{
+        //if user does NOT have any pools or pool invites pending:
+        echo "<br><h2 style='text-decoration:underline'>You do not currently have any active pools</h2>";
+        echo "<h4>Perhaps you would like to <a href='new.php'>create a new one?</a></h4>";
     } //END OF ACTIVE POOL LIST
 ?>
             </div> <!--END OF ACTIVE POOLS DIV-->
