@@ -69,7 +69,7 @@
         //if form was submitted but something was wrong with the inputs
         if(isset($_POST['form_sent'])){
             //If the user didn't fill in all the fields:
-            if(empty($_POST['username']) OR empty($_POST['p']) OR empty($_POST['r'])) {
+            if(empty($_POST['p']) OR empty($_POST['r'])) {
                 echo "<p style='color:red'>Please fill in all fields.</p>";
                 exit();
             }
@@ -79,10 +79,10 @@
             }
             //if the input password(s) are 7 characters or less:
             if(strlen($_POST['p'])<8){
-                echo "<p style='color:red'>Passwords must be at 8 characters.</p>";
+                echo "<p style='color:red'>Passwords must be at least 8 characters.</p>";
             }
         }
     }
     
-    //include_once 'common/close.php';
+    include_once 'inc/close.php';
 ?>

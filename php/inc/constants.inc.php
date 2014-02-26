@@ -12,12 +12,12 @@
     //Define DOMAIN and BRAND constants for site:
 	define('DOMAIN', 'http://www.poolski.com/');
 	define('BRAND_NAME', 'Poolski');
-    
+      
 
 
     //Below credentials are for localhost
-    /*
     
+    /*
     define('DB_HOST', 'localhost');
     define('DB_USER', 'root');
     define('DB_PASS', 'william88');

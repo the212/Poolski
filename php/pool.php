@@ -120,16 +120,6 @@
                 }
             }
             /*END INVITE BUTTON LOGIC*/
-            
-            //BEGIN POOL NICKNAME LOGIC
-            $user_nickname = $pool->GetNickname($_SESSION['Username'], $pool_id);
-            if ($pool_fetch_result['Live?']==0) {
-?>
-                <br>
-                <h4>Choose your nickname for this pool: <span class="label label-info"><span class='edit_nickname' id='update_nickname'><?php echo $user_nickname; ?></span></span><span style="margin-left:15px; font-style:italic; font-size:70%;">(Click to edit)</span></h4>
-<?php
-            }
-            //END POOL NICKNAME LOGIC
 
 ?>
             <div id="pool_summary_container">
@@ -139,7 +129,7 @@
                 /*BEGIN START TIME DISPLAY AND START POOL BUTTON LOGIC*/
                 if($pool_fetch_result['Start Time']!== NULL && $pool_fetch_result['Live?']==0) {  //if start time is set and pool is not yet live:
 ?>
-                    <br>
+                    
                     <div class="row" style="width:55%">
                         <div class="col-md-6">
                             <h4>Picks will be locked in at: </h4>

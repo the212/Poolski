@@ -106,7 +106,7 @@ class SiteUser {
                 //if we are able to find the user ID and verification code combination in DB:
                 if($verification_result['Account activated']==0){
                     //if the given account is not already activated:
-                    $activate_query = "UPDATE  `User` SET  `Account activated` =  '1' WHERE  `user`.`User ID` ='$user_id';";
+                    $activate_query = "UPDATE  `User` SET  `Account activated` =  '1' WHERE  `User ID` ='$user_id';";
                     mysqli_query($this->cxn,$activate_query)
                         or die("<br>Error: Could activate account");
                     $return_variable = array (6, "<h3>Verification successful!</h3>");
@@ -171,6 +171,8 @@ class SiteUser {
         $unverify_query = "UPDATE  `User` SET  `Account activated` =  '0' WHERE  `User ID` ='$user_id';";
         $unverify_result = mysqli_query($this->cxn, $unverify_query);
         //generate new verification code for given account
+        $unset_password_query = "UPDATE  `User` SET  `Password` =  NULL WHERE  `User ID` ='$user_id';";
+        $unset_password_result = mysqli_query($this->cxn, $unset_password_query);
         $ver = $this->GenerateVerification($email);
         //Send email to invitee:
         include 'send_mail.php'; //include email file

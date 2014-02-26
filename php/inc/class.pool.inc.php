@@ -2,6 +2,10 @@
 /*Class to handle pool actions within app*/
 /*By Evan Paul October 2013*/
 
+// Include the Autoloader for MailGun(see "Libraries" for install instructions)
+require '../vendor/autoload.php';
+use Mailgun\Mailgun;
+
 include_once "constants.inc.php";
 
 class Pool {
@@ -26,7 +30,12 @@ class Pool {
         else{ //if pool is anything else (default is public):
             $public_private_variable = 0;
         }
-        $pool_query = "INSERT INTO `Pool` (`Title`, `Leader ID`, `Description`, `Overall Question`, `Tie-Breaker Question`, `Private?`) VALUES ('$Pool_Title', '$Leader_ID', '$Description', '$Overall_Question', '$Tie_question', '$public_private_variable');";
+        //ESCAPE BAD CHARACTERS FROM STRING INPUTS:
+            $escaped_title = $this->escapeBadCharacters($Pool_Title); 
+            $escaped_overall_question = $this->escapeBadCharacters($Overall_Question); 
+            $escaped_description = $this->escapeBadCharacters($Description); 
+            $escaped_tie_question = $this->escapeBadCharacters($Tie_question); 
+        $pool_query = "INSERT INTO `Pool` (`Title`, `Leader ID`, `Description`, `Overall Question`, `Tie-Breaker Question`, `Private?`) VALUES ('$escaped_title', '$Leader_ID', '$escaped_description', '$escaped_overall_question', '$escaped_tie_question', '$public_private_variable');";
         if($result = mysqli_query($this->cxn, $pool_query)){
             //get ID from Pool table of Pool that was just created:
             $new_pool_id = mysqli_insert_id($this->cxn);
@@ -263,7 +272,7 @@ class Pool {
                 If X = "p" we want to update the category point value
             The number ("###") at the end of the ID tells us which category ID we are editing
         */
-        $escaped_input = $this->cxn->real_escape_string($input); //escape the input for special characters
+        $escaped_input = $this->escapeBadCharacters($input); //strip out bad characters from input
         $category_check = substr_compare(substr($pool_item,0,8),"category",0,8); //get first 8 characters of pool item id and check to see if they are "category" - if so, we are updating a category or a category's point value and need to write to the 'Pool Category' table
         if($category_check == 0){ 
             //if we are writing to the 'Pool Category' table:
@@ -289,8 +298,8 @@ class Pool {
 
     //ADD CATEGORY METHOD
     public function AddCategory($pool_id, $category_name, $category_pt_value){
-        $escaped_name_input = $this->cxn->real_escape_string($category_name);
-        $escaped_point_input = $this->cxn->real_escape_string($category_pt_value);
+        $escaped_name_input = $this->escapeBadCharacters($category_name); //strip out bad characters from input
+        $escaped_point_input = $this->escapeBadCharacters($category_pt_value); //strip out bad characters from input
         $query = "INSERT INTO `Pool Categories` (`Pool ID`, `Category Name`, `Category Point Value`) VALUES ('$pool_id', '$escaped_name_input', '$escaped_point_input');";
         $result = mysqli_query($this->cxn, $query);
     }
@@ -514,7 +523,7 @@ class Pool {
         else{ //if we are receiving the user's user id number:
             $user_id = $user_id_input;
         }
-        $escaped_nickname_input = $this->cxn->real_escape_string($new_nickname); //escape the input for special characters
+        $escaped_nickname_input = $this->escapeBadCharacters($new_nickname); //escape the input for special characters
         $nickname_query = "UPDATE  `Pool Membership` SET  `Pool Nickname` =  '$escaped_nickname_input' WHERE  `User ID` = '$user_id' AND  `Pool ID` = '$pool_id';";
         $nickname_result = mysqli_query($this->cxn, $nickname_query);
     }
@@ -567,7 +576,7 @@ class Pool {
         2 - IF CATEGORY DID NOT ALREADY EXIST AND DB INSERT WAS SUCCESSFUL
     */
     public function UpdateUserPick($user_email, $pool_id, $category_id, $pick_value){
-        $escaped_pick_input = $this->cxn->real_escape_string($pick_value); //escape the input for special characters
+        $escaped_pick_input = $this->escapeBadCharacters($pick_value); //strip out bad characters from pick input
         //find the given user's user id based on their email address:
         $user_id = $this->GetUserIDFromEmail($user_email);  
         //QUERY TO SEE IF CATEGORY PICK ALREADY EXISTS
@@ -608,7 +617,7 @@ class Pool {
     }
 
     public function UpdateTieBreakerAnswer($user_email, $pool_id, $input_value){
-        $escaped_input_value = $this->cxn->real_escape_string($input_value); //escape the input for special characters
+        $escaped_input_value = $this->escapeBadCharacters($input_value); //strip out bad characters from tie breaker input
         //find the given user's user id based on their email address:
         $user_id = $this->GetUserIDFromEmail($user_email);
         $tie_break_query = "UPDATE  `Pool Membership` SET  `Tie-Breaker Answer` = '$escaped_input_value' WHERE `User ID` = '$user_id' AND  `Pool ID` = '$pool_id';";
@@ -721,7 +730,7 @@ class Pool {
 
 
     public function UpdateTemplateTieBreakerAnswer($template_id, $correct_tie_breaker_answer){
-        $escaped_tie_breaker_input = $this->cxn->real_escape_string($correct_tie_breaker_answer);
+        $escaped_tie_breaker_input = $this->escapeBadCharacters($correct_tie_breaker_answer); //strip out bad characters from correct tie breaker input
         $update_tie_breaker_query = "UPDATE `Templates` SET `Tie-Breaker Correct Answer` = '$escaped_tie_breaker_input' WHERE `Template ID` = '$template_id';";
         $update_tie_breaker_result = mysqli_query($this->cxn, $update_tie_breaker_query);
         return "Tie breaker answer successfully stored!";
@@ -801,11 +810,11 @@ class Pool {
             $close_pool_result = mysqli_query($this->cxn, $close_pool_query);
         //For each Pool
             while($row = mysqli_fetch_assoc($close_pool_result)) {
-                $pool_id = $row['Pool ID'];
-                $this->CalculatePoolScore($pool_id, 1); //finalize variable set to 1 means that we are closing out the pool
                 //UPDATE TIE BREAKER ANSWERS IN ALL ASSOCIATED POOLS:
                 $update_pool_tie_breaker_answer_query = "UPDATE `Pool` SET `Tie-Breaker Correct Answer` = '$correct_tie_breaker_answer' WHERE `Pool ID` = '$pool_id';";
                 mysqli_query($this->cxn, $update_pool_tie_breaker_answer_query);
+                $pool_id = $row['Pool ID'];
+                $this->CalculatePoolScore($pool_id, 1); //finalize variable set to 1 means that we are closing out the pool (THIS SENDS POOL ENDING EMAILS)
             }     
         //END POOL-CLOSE-OUT CODE
         return $template_correct_array;
@@ -817,6 +826,7 @@ class Pool {
     **Accepts Pool ID and an optional Finalize variable.  If Finalize variable is set and equal to 1, it means we are calculating the final pool score 
     **Calculates scores and stores them in the User Picks table
     **Calculates a Pool winner and stores the result in the Pool Table if there is no tie for the pool
+    **Sends out emails to pool members telling them that the pool is over and results are in
     **Returns an $users_points_array where array key is user ID's and array values are each user's final point values
     */
     public function CalculatePoolScore($pool_id, $finalize = NULL){
@@ -859,6 +869,7 @@ class Pool {
             }
             $store_pool_winner_query = "UPDATE  `Pool` SET  `Pool Winner` =  '$pool_winner_id' WHERE  `Pool ID` ='$pool_id';";
             $store_winner_result = mysqli_query($this->cxn, $store_pool_winner_query); //store user ID of pool winner in pool table
+            $this->SendPoolEndingEmails($pool_id); //send pool ending emails
         }
         return $users_points_array; 
     }
@@ -990,6 +1001,26 @@ class Pool {
     }
 
 
+    public function SendPoolEndingEmails($pool_id) {
+        //get pool title:
+            $pool_title_query = "SELECT `Title` FROM  `Pool` WHERE `Pool ID` = '$pool_id';";
+            $title_result = mysqli_query($this->cxn, $pool_title_query);
+            $title_result_array = mysqli_fetch_assoc($title_result);
+            $pool_title = $title_result_array['Title'];
+        include 'send_mail.php'; //include email file
+        $pool_members_array = $this->GetPoolMembers($pool_id);
+        foreach($pool_members_array as $user_id => $user_info){
+            $email_query = "SELECT `Email Address` FROM  `User` WHERE  `User ID` =  '$user_id'";
+            $email_result = mysqli_query($this->cxn, $email_query);
+            $email_result_array = mysqli_fetch_assoc($email_result);
+            $email = $email_result_array['Email Address'];
+            SendEmail($email, "Pool has ended on ".BRAND_NAME.".com!", 
+                "The pool ".$pool_title." has ended and the results are in!  
+                \n\nGo to ".DOMAIN." to see the results!"
+                );
+        }
+    }
+
 //*************************************************************************************
 
 
@@ -1022,6 +1053,17 @@ class Pool {
             $timestamp = substr_replace($timestamp, " AM", -3); //append AM and get rid of the seconds
         }
         return $timestamp;
+    }
+
+
+    /*escapeBadCharacters method
+    **ACCEPTS A STRING INPUT AND REMOVES BAD CHARACTERS FROM IT
+    **RETURNS STRING WITH GOOD CHARACTERS
+    */
+    public function escapeBadCharacters($string) {
+        $new_string1 = preg_replace('~[\\\\/:*?"<>|]~',"", $string); //filter #1
+        $new_string2 = str_replace(array("%", "\\", "#", " - ", "&", "'", "$", "^", "(", ")"),"", $new_string1); //filter #2
+        return $new_string2;
     }
 
 }
