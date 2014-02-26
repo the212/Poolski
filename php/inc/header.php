@@ -83,6 +83,7 @@
 
                         <ul class="nav navbar-nav navbar-right">
                             <li><a><?php echo $_SESSION['Username']; ?></a></li>
+                            <!--<li><a href="mailto:contact@poolski.com?Subject=Hello">Contact us</a></li>-->
                             <li><a href="logout.php">Log out</a></li>
                         </ul>
 <?php else: ?>

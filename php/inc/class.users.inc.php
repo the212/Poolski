@@ -171,6 +171,8 @@ class SiteUser {
         $unverify_query = "UPDATE  `User` SET  `Account activated` =  '0' WHERE  `User ID` ='$user_id';";
         $unverify_result = mysqli_query($this->cxn, $unverify_query);
         //generate new verification code for given account
+        $unset_password_query = "UPDATE  `User` SET  `Password` =  NULL WHERE  `User ID` ='$user_id';";
+        $unset_password_result = mysqli_query($this->cxn, $unset_password_query);
         $ver = $this->GenerateVerification($email);
         //Send email to invitee:
         include 'send_mail.php'; //include email file

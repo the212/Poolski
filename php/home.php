@@ -84,6 +84,7 @@
                         </tr>
 <?php
         foreach($all_pools as $pool_id => $pool_info){
+            $active_pool_data = $pool->GetPoolData($pool_id); //this is only here so that the pool will begin if it is past the start date (GetPoolData method has a check to see if current time is past pool start time)
             $pool_url = "pool.php?pool_id=$pool_id"; //set pool URL - this is the default and will be overridden if necessary depending on what state the pool is in
             if($pool_info['Ready for invites?']==0){ //if pool is still in edit mode and hasn't been finalized:
                 if($current_user == $pool_info['Leader ID']){ //check to make sure user is leader of the pool:
