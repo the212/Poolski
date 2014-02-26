@@ -99,6 +99,7 @@ class Pool {
             if(!is_null($pool_data['End Time'])){ //only define pool_end_time variable if a pool end time is non-null in DB
                 $pool_end_time = strtotime($pool_data['End Time']); //convert pool end timestamp to unix timestamp
             }
+            date_default_timezone_set('America/New_York'); //set timezone for getting the current time to be EST
             $current_time = time(); //get current time (unix timestamp) - this should be based on the server's timezone rather than the user's?
             if(isset($pool_start_time) AND ($current_time-$pool_start_time) > 0) { //if it is past the pool start time:
                 if($pool_data['Live?'] <> 1) { //if pool is not already live
