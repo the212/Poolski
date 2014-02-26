@@ -7,6 +7,7 @@ require '../vendor/autoload.php';
 use Mailgun\Mailgun;
 
 include_once "constants.inc.php";
+date_default_timezone_set('America/New_York'); //set timezone for getting the current time to be EST
 
 class Pool {
 
@@ -99,8 +100,7 @@ class Pool {
             if(!is_null($pool_data['End Time'])){ //only define pool_end_time variable if a pool end time is non-null in DB
                 $pool_end_time = strtotime($pool_data['End Time']); //convert pool end timestamp to unix timestamp
             }
-            date_default_timezone_set('America/New_York'); //set timezone for getting the current time to be EST
-            $current_time = time(); //get current time (unix timestamp) - this should be based on the server's timezone rather than the user's?
+            $current_time = time(); //get current time (unix timestamp) - this should be based on the timezone specified for the date_default_timezone_set() function at the top of this file
             if(isset($pool_start_time) AND ($current_time-$pool_start_time) > 0) { //if it is past the pool start time:
                 if($pool_data['Live?'] <> 1) { //if pool is not already live
                     $pool_start_query = "UPDATE  `Pool` SET `Live?` =  '1' WHERE  `Pool ID` ='$pool_id';"; //make pool live
