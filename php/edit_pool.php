@@ -186,7 +186,7 @@
                     <div class="well well-sm">
                         <div class="row">
                             <div class="col-md-5">
-                                <h3 class="edit_pool_heading">Overall Pool Question: </h3> </div>
+                                <h3 class="edit_pool_heading">Overall Pool Topic: </h3> </div>
                             <div class="col-md-7">
                                 <h3><span class="label label-info"><span class="edit_pool_field" id="Overall Question"><?php echo $pool_fetch_result['Overall Question']; ?></span></span></h3>
                             </div>
