@@ -19,9 +19,9 @@ All of the necessary php variables are defined on the pool.php page
         }
 ?>
     <script>
-        //make the page reload every 7 min so that it will eventually become live automatically when the start time passes (if start time is set)
+        //make the page reload every 5 min so that it will eventually become live automatically when the start time passes (if start time is set)
         //this will prevent someone from sitting on the mypicks page and editing their picks after the pool goes live
-        setInterval('window.location.reload()', 420000);
+        setInterval('window.location.reload()', 300000);
     </script>
 
     <h3 style="text-decoration:underline"><?php echo $pool_fetch_result['Overall Question']; ?></h3> 

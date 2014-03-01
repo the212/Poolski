@@ -353,15 +353,20 @@
 
     function invite_people(pool_id, inviter){
         //when inviter clicks "invite" button:
-        $.ajax({
-                type: "POST",
-                url: "invite_people.php",
-                data: {invitees_array : invitees, invite : "1", pool_id : pool_id, inviter : inviter} //send the invitee array, an invite value of 1, and the inviter's email/username to invite_people.php
-            })
-                .done(function(html){ //when ajax request completes
-                    alert(html);
-                    window.location.href = 'pool.php?pool_id='+pool_id; //return user to pool page
-                });
+        if(invitees.length > 0){
+            $.ajax({ //if invites were specified at submission:
+                    type: "POST",
+                    url: "invite_people.php",
+                    data: {invitees_array : invitees, invite : "1", pool_id : pool_id, inviter : inviter} //send the invitee array, an invite value of 1, and the inviter's email/username to invite_people.php
+                })
+                    .done(function(html){ //when ajax request completes
+                        alert(html);
+                        window.location.href = 'pool.php?pool_id='+pool_id; //return user to pool page
+                    });
+        }
+        else { //if no invites were specified at submission:
+            alert("Please type in an email and click 'Add to Invite List' before submitting");
+        }
     }
 
 //END OF INVITE_POOL.PHP JAVASCRIPT

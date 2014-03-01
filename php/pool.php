@@ -58,7 +58,7 @@
             <h1 style="position:relative;">
 <?php
             if($pool_fetch_result['Live?']==0){ //if pool is not yet live:
-                echo " <span class='label label-warning'>Pool is unlocked - make your picks!</span>";
+                echo "<span class='label label-warning'>Pool is unlocked - make your picks!</span>";
             }
             elseif($pool_fetch_result['Pool ended?']==0) { //if pool is live:
                 echo " <span class='label label-success'>Live! Picks are Locked</span>";

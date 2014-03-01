@@ -759,14 +759,15 @@ class Pool {
 
 
     /*FinalizeTemplateScores Method
-    **Accepts the template ID which we are finalizing
+    **Accepts the template ID which we are finalizing and an option no_email variable
+    **If the no_email variable is not null, then we tell the CalculatePoolScore method to not send any emails to pool members
     **Checks to make sure all of the template's categories have correct answers marked, if not, we display an error and exit
     **If all template categories have correct answers, we update the "answer correct?" field in the Pool Categories table with the correct answer for the given category
     **We then update the User Picks table with 1's for each user pick that was correct and 0's for each user pick that was incorrect for the given categories
     **NOTE - THIS METHOD CAN BE CALLED REPEATEDLY FOR THE SAME TEMPLATE ID - IT WILL RESET ALL PREVIOUS RECORDS WITH ANY NEW ONES
     **Returns an array containing the correct answers as values and the appropriate category IDs as the array keys ($template_correct_array)
     */
-    public function FinalizeTemplateScores($template_id){
+    public function FinalizeTemplateScores($template_id, $no_email = NULL){
         $template_category_array = $this->GetTemplateCategories($template_id);
         $template_correct_array = array();
         foreach($template_category_array as $category_id => $category_info) { //this FOREACH statement checks to make sure each category has a correct answer marked
@@ -811,11 +812,16 @@ class Pool {
             $close_pool_result = mysqli_query($this->cxn, $close_pool_query);
         //For each Pool
             while($row = mysqli_fetch_assoc($close_pool_result)) {
+                $pool_id = $row['Pool ID'];
                 //UPDATE TIE BREAKER ANSWERS IN ALL ASSOCIATED POOLS:
                 $update_pool_tie_breaker_answer_query = "UPDATE `Pool` SET `Tie-Breaker Correct Answer` = '$correct_tie_breaker_answer' WHERE `Pool ID` = '$pool_id';";
                 mysqli_query($this->cxn, $update_pool_tie_breaker_answer_query);
-                $pool_id = $row['Pool ID'];
-                $this->CalculatePoolScore($pool_id, 1); //finalize variable set to 1 means that we are closing out the pool (THIS SENDS POOL ENDING EMAILS)
+                if(is_null($no_email)){ //IF WE WANT TO SEND POOL ENDING EMAILS
+                    $this->CalculatePoolScore($pool_id, 1); //finalize variable set to 1 means that we are closing out the pool (THIS SENDS POOL ENDING EMAILS)
+                }
+                else{ //IF WE DO NOT WANT TO SEND POOL ENDING EMAILS
+                    $this->CalculatePoolScore($pool_id, 1, 1); //no_email variable set to 1 means that we are closing out the pool (THIS DOES NOT SEND POOL ENDING EMAILS)
+                }
             }     
         //END POOL-CLOSE-OUT CODE
         return $template_correct_array;
@@ -824,13 +830,15 @@ class Pool {
 
     /*
     **CalculatePoolScore method
-    **Accepts Pool ID and an optional Finalize variable.  If Finalize variable is set and equal to 1, it means we are calculating the final pool score 
+    **Accepts Pool ID and the optional Finalize and No_email variables.  
+    **If Finalize variable is set and equal to 1, it means we are calculating the final pool score 
+    **If No_email is set at all (i.e., not null), we will not send out any emails to the pool members
     **Calculates scores and stores them in the User Picks table
     **Calculates a Pool winner and stores the result in the Pool Table if there is no tie for the pool
-    **Sends out emails to pool members telling them that the pool is over and results are in
+    **Sends out emails to pool members telling them that the pool is over and results are in (if no_email is set to null)
     **Returns an $users_points_array where array key is user ID's and array values are each user's final point values
     */
-    public function CalculatePoolScore($pool_id, $finalize = NULL){
+    public function CalculatePoolScore($pool_id, $finalize = NULL, $no_email = NULL){
         $pool_members_array = $this->GetPoolMembers($pool_id); //get list of members for given pool
         foreach($pool_members_array as $user_id => $user_info){ //run through array of users and calculate their point values for the pool:
             $get_user_correct_answers_query = "SELECT * FROM  `User Picks` WHERE `User ID` = '$user_id' AND `Pool ID` = '$pool_id' AND `Answer Correct?` = '1';";
@@ -870,7 +878,9 @@ class Pool {
             }
             $store_pool_winner_query = "UPDATE  `Pool` SET  `Pool Winner` =  '$pool_winner_id' WHERE  `Pool ID` ='$pool_id';";
             $store_winner_result = mysqli_query($this->cxn, $store_pool_winner_query); //store user ID of pool winner in pool table
-            $this->SendPoolEndingEmails($pool_id); //send pool ending emails
+            if(is_null($no_email)){ //IF WE WANT TO SEND POOL ENDING EMAILS
+                $this->SendPoolEndingEmails($pool_id); //send pool ending emails
+            }
         }
         return $users_points_array; 
     }

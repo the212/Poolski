@@ -12,8 +12,15 @@ if($_GET['finalize_template'] == 998) {
     if($current_user_id == 1){ 
         include_once 'inc/class.pool.inc.php';
         $pool = new Pool(); //new instance of the Pool class
-        $finalize_template_result = $pool->FinalizeTemplateScores($_GET['template_id']);
+        if($_GET['no_email'] == 1){
+            $finalize_template_result = $pool->FinalizeTemplateScores($_GET['template_id'], 1);
+        }
+        else {
+            $finalize_template_result = $pool->FinalizeTemplateScores($_GET['template_id']);
+        }
         echo "<h2>Pool Results Stored.</h2><br>";
+        /*echo "<br>";
+        print_r($finalize_template_result);*/
     }
     else{ //IF USER IS ANYONE BESIDES USER ID #1
         header("Location: home.php");
