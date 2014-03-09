@@ -236,8 +236,7 @@
 ?>
                 <br>
                 <p class="field_label">Click on a setting to edit it</p>
-                <p class="field_label">Start/End Dates and Times are optional.  If you set times and dates, the pool will automatically begin at the specified time.</p>
-                <br>
+                <p class="field_label">Start/End Dates and Times are optional.</p>
                 <div class="row">
                     <div class="col-md-6">
                         <h4>Pool Start Date:</h4>
@@ -254,7 +253,7 @@
                         </div> 
                     </div>
                 </div>
-                <br>
+                <p class="field_label">If you set a start time, all user's picks will be locked at the specified time.</p>
                  <div class="row">
                     <div class="col-md-6">
                         <h4>Pool End Date:</h4>
@@ -271,7 +270,8 @@
                         </div> 
                      </div>
                 </div>
-                <br><br>
+                <p class="field_label">If you set an end time,the pool will automatically end at the specified time.</p>
+                <br>
                 <h4>Make Pool Public or Private?</h4>
                 <div id="public_private">
                     <div class="bfh-selectbox" id="public_private_selector" data-name="selectbox1" data-value='<?php echo $pool_fetch_result['Private?']; ?>'>

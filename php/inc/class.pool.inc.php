@@ -369,14 +369,37 @@ class Pool {
         }
     }
 
+
+    //GET INACTIVE POOL METHOD
+    //ACCEPTS USER'S ID AS INPUT
+    //RETURNS AN ARRAY CONTAINING THE ID'S OF A USER'S INACTIVE POOLS AS ARRAY KEYS AND ARRAYS CONSISTING OF THE POOL'S INFO AS VALUES
+    //INACTIVE POOLS ARE POOLS WHERE "READY FOR INVITES" EQUALS 0 I.E., THE LEADER IS STILL EDITING THE POOL CATEGORIES AND SETTINGS
+    public function GetInactivePools($user_id){
+        //get the IDs of all of the current user's inactive pools
+        $pool_query = "SELECT `Pool Membership`.`Pool ID` FROM  `Pool Membership` INNER JOIN `Pool` ON `Pool Membership`.`Pool ID`=`Pool`.`Pool ID` WHERE `Pool Membership`.`User ID` = '$user_id' AND `Pool`.`Ready for invites?` = '0';";
+        $result2 = mysqli_query($this->cxn, $pool_query);
+        //create blank array to store the pool ID(s)
+        $inactive_pools = array();
+        //store all of the found pool's info in inactive_pools array:
+        while($row = mysqli_fetch_assoc($result2)){
+            $pool_id = $row['Pool ID'];
+            //get info of pool for given pool id
+            $pool_title_query = "SELECT * FROM  `Pool` WHERE `Pool ID` = '$pool_id'";
+            $result3 = mysqli_query($this->cxn, $pool_title_query);
+            $result3_array = mysqli_fetch_assoc($result3);
+            //store pool info into the inactive_pools array
+            $inactive_pools[$pool_id] = $result3_array;
+        }
+        return $inactive_pools;
+    }
+
     //GET ACTIVE POOL METHOD
     //ACCEPTS USER'S EMAIL ADDRESS AS INPUT
     //RETURNS AN ARRAY CONTAINING THE ID'S OF A USER'S ACTIVE POOLS AS ARRAY KEYS AND ARRAYS CONSISTING OF THE POOL'S INFO AS VALUES
-    public function GetActivePool($email){
-        //find user id of current user
-        $user_id = $this->GetUserIDFromEmail($email);
+    //ACTIVE POOLS ARE POOLS WHERE "READY FOR INVITES" EQUALS 1 BUT "POOL ENDED?" EQUALS 0
+    public function GetActivePool($user_id){
         //get the IDs of all of the current user's active pools
-        $pool_query = "SELECT `Pool Membership`.`Pool ID` FROM  `Pool Membership` INNER JOIN `Pool` ON `Pool Membership`.`Pool ID`=`Pool`.`Pool ID` WHERE `Pool Membership`.`User ID` = '$user_id' AND `Pool`.`Ready for invites?` = '1'";
+        $pool_query = "SELECT `Pool Membership`.`Pool ID` FROM  `Pool Membership` INNER JOIN `Pool` ON `Pool Membership`.`Pool ID`=`Pool`.`Pool ID` WHERE `Pool Membership`.`User ID` = '$user_id' AND `Pool`.`Ready for invites?` = '1' AND `Pool`.`Pool ended?` = '0';";
         $result2 = mysqli_query($this->cxn, $pool_query);
         //create blank array to store the pool ID(s)
         $active_pools = array();
@@ -393,6 +416,29 @@ class Pool {
         return $active_pools;
     }
 
+
+    //GET COMPLETED POOLS METHOD
+    //ACCEPTS USER'S ID AS INPUT
+    //RETURNS AN ARRAY CONTAINING THE ID'S OF A USER'S COMPLETED POOLS AS ARRAY KEYS AND ARRAYS CONSISTING OF THE POOL'S INFO AS VALUES
+    //COMPLETED POOLS ARE POOLS WHERE "POOL ENDED?" EQUALS 1
+    public function GetCompletedPools($user_id){
+        //get the IDs of all of the current user's completed pools
+        $pool_query = "SELECT `Pool Membership`.`Pool ID` FROM  `Pool Membership` INNER JOIN `Pool` ON `Pool Membership`.`Pool ID`=`Pool`.`Pool ID` WHERE `Pool Membership`.`User ID` = '$user_id' AND `Pool`.`Pool ended?` = '1';";
+        $result2 = mysqli_query($this->cxn, $pool_query);
+        //create blank array to store the pool ID(s)
+        $completed_pools = array();
+        //store all of the found pool's info in completed_pools array:
+        while($row = mysqli_fetch_assoc($result2)){
+            $pool_id = $row['Pool ID'];
+            //get info of pool for given pool id
+            $pool_title_query = "SELECT * FROM  `Pool` WHERE `Pool ID` = '$pool_id'";
+            $result3 = mysqli_query($this->cxn, $pool_title_query);
+            $result3_array = mysqli_fetch_assoc($result3);
+            //store pool info into the completed_pools array
+            $completed_pools[$pool_id] = $result3_array;
+        }
+        return $completed_pools;
+    }
 
 
     //GET ALL POOLS METHOD

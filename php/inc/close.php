@@ -11,5 +11,5 @@
 </div> <!--end of full_container div-->
 
 
-<body>
+</body>
 </html>
