@@ -26,6 +26,7 @@ else {
 
 //*************************************BEGIN NON-MULTIPLE CHOICE SECTION*********************************
 ?>
+        <span id="pool_id_span" style="display:none"><?php echo $pool_id; ?></span>
         <h2 style="text-decoration:underline">Tally Pool Score</h2> 
         <p>Choose either "Correct" or "Incorrect" for each participant's picks in order to tally the scores.  Picks that were not made by a participant are automatically counted as "Incorrect"</p>
         <br>
@@ -37,6 +38,27 @@ else {
                 <h4><input type="button" id="score_pool_button" class="btn btn-warning btn-lg" value="Finish and Calculate Pool Score" onclick="JAVASCRIPT:CalculatePoolScoreValidate(<?php echo $pool_id; ?>, 1);" /></h4>
             </div>
         </div>
+        <br>
+
+        <!--BEGIN TIE BREAKER INPUT-->
+        <div class="well well-sm">
+            <h3 style="margin-left:50px; text-decoration:underline">Set correct tie breaker value here::</h3>
+            <p style="margin-left:50px"><?php echo $template_fetch_result['Tie Breaker Question']; ?></p> 
+            <div id="tie-breaker" style="margin-left:50px;">
+<?php
+    $custom_pool_tie_breaker_answer = $pool->GetCustomPoolTieBreakerAnswer($pool_id);
+    if(isset($custom_pool_tie_breaker_answer)){
+        $tie_breaker_answer_display = $custom_pool_tie_breaker_answer;
+    }
+    else{
+        $tie_breaker_answer_display = "**Enter correct tie-breaker value here**";
+    }
+?>
+                <h3 style="margin-left:50px;"><span class="label label-primary"><span id="tie_breaker_input" class="edit_custom_pool_tie_breaker" style="font-weight:bold;"><?php echo $tie_breaker_answer_display; ?></span></span></h3>
+            </div>
+        </div>
+        <br>
+        <!--END TIE BREAKER INPUT-->
 
 <?php
         foreach ($pool_members_id_array_keys as $each_user => $user_id){ //generate list of user picks for each user in the pool ($each_user is the key of the pool_members_id_array_keys array and starts at 0)
@@ -106,7 +128,7 @@ else {
                         </div>
                         <div class="col-md-4">
 
-                            <h2><span class="<?php echo $display_pick_span_class; ?>" id="pick_<?php echo $category_info['Category ID']; ?>_<?php echo $user_id; ?>"><span class="display_pick" id="user<?php echo $user_id; ?>_pick_for_category_<?php echo $category_info['Category ID']; ?>" style="font-weight:bold;"><?php echo $pick_display_value ?></span></span>
+                            <h2><span class="<?php echo $display_pick_span_class; ?>" id="pick_<?php echo $category_info['Category ID']; ?>_<?php echo $user_id; ?>"><span class="display_pick" id="user<?php echo $user_id; ?>_pick_for_category_<?php echo $category_info['Category ID']; ?>" style="font-weight:bold; white-space:pre-line;"><?php echo $pick_display_value ?></span></span>
                             </h2>
 
                         </div>
@@ -131,6 +153,8 @@ else {
 <?php 
             $category_counter++;
             } //END OF FOREACH STATEMENT WHICH POPULATES GIVEN USER'S PICKS
+
+
 
 
             /* PROBABLY DON'T NEED THE TIE BREAKER PICK TO BE DISPLAYED AT THIS POINT (ONLY MAKE IT APPEAR IF THERE IS A TIE) SO I'VE COMMENTED IT OUT (12/18/13)

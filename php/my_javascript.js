@@ -379,15 +379,28 @@
 
     function CalculatePoolScoreValidate(pool_id, finalize){
         if(confirm("Are you sure you are finished tallying the picks? \n\nYou will not be able to change the tally after calculation completes.")){
-            $.ajax({
-                    type: "POST",
-                    url: "send_pool_score.php",
-                    data: {calculate_score : 1, pool_id : pool_id, finalize: finalize} 
-                })
-                    .done(function(html){ //when ajax request completes
-                        //alert(html);
-                        window.location.href = 'pool.php?pool_id='+pool_id; //return user to pool page
-                    });
+            if(confirm("Click OK to send email notifications to pool members \n\nClick CANCEL to calculate the scores without sending emails")){
+                $.ajax({ //if we want to send emails:
+                        type: "POST",
+                        url: "send_pool_score.php",
+                        data: {calculate_score : 1, pool_id : pool_id, finalize: finalize, no_email: 0} 
+                    })
+                        .done(function(html){ //when ajax request completes
+                            //alert(html);
+                            window.location.href = 'pool.php?pool_id='+pool_id; //return user to pool page
+                        });
+            }
+            else{
+                $.ajax({ //if we do NOT want to send emails:
+                        type: "POST",
+                        url: "send_pool_score.php",
+                        data: {calculate_score : 1, pool_id : pool_id, finalize: finalize, no_email: 1} 
+                    })
+                        .done(function(html){ //when ajax request completes
+                            //alert(html);
+                            window.location.href = 'pool.php?pool_id='+pool_id; //return user to pool page
+                        });
+            }
         }
     }
 

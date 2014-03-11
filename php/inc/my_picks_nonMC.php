@@ -81,7 +81,7 @@ All of the necessary php variables are defined on the pool.php page
                     }
                     else { //if pool is live, do not display editable pick:
 ?>
-                        <h2><span class="<?php echo $pick_label_class; ?>"><span class="display_pick" id="pick_for_category_<?php echo $category_info['Category ID']; ?>" style="font-weight:bold;"><?php echo $pick_display_value ?></span></span></span></h2>
+                        <h2><span class="<?php echo $pick_label_class; ?>"><span class="display_pick" id="pick_for_category_<?php echo $category_info['Category ID']; ?>" style="font-weight:bold; white-space:pre-line;"><?php echo $pick_display_value ?></span></span></span></h2>
 <?php
                     }
 ?>
