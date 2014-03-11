@@ -202,6 +202,12 @@
                 }
                 else { //if pool HAS been scored:
                     $pool_rankings_array = $pool->GetFinalPoolRankings($pool_id); //generate pool rankings array
+                    include_once 'inc/class.users.inc.php';
+                    $user = new SiteUser();
+                    $current_user_id = $user->GetUserIDFromEmail($_SESSION['Username']);
+                    if($current_user_id == 1) { //as of 3/10/14, we only allow admin to edit a scored pool's scores
+                        echo "<h4><a href='score_pool_manual.php?pool_id=".$pool_id."'>Click here to edit the pool's score</a></h4>";
+                    }
                     //include_once "inc/final_pool_rankings.php"; //show pool ranking list
                     include_once "inc/pool_members.php";
                 }  

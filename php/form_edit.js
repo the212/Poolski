@@ -62,6 +62,15 @@ $(document).ready(function(){
 		value_required: true
 	});
 
+	//Set Tie breaker answer for custom pool 
+	//(Called from score_pool_manual.php)
+	$(".edit_custom_pool_tie_breaker").editInPlace({
+		url: 'send_pool_score.php',
+		params: 'pool_id='+pool_id+'&custom_pool_tie_breaker_answer=1',
+		show_buttons: true,
+		value_required: true
+	});
+
 
 
 

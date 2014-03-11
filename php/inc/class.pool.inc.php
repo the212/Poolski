@@ -704,6 +704,20 @@ class Pool {
         $result = mysqli_query($this->cxn, $query);
     }
 
+    public function UpdateCustomPoolTieBreakerAnswer($pool_id, $correct_tie_breaker_answer){
+        $escaped_tie_breaker_input = $this->escapeBadCharacters($correct_tie_breaker_answer); //strip out bad characters from correct tie breaker input
+        $update_tie_breaker_query = "UPDATE  `Pool` SET  `Tie-Breaker Correct Answer` = '$escaped_tie_breaker_input' WHERE  `Pool ID` = '$pool_id';";
+        $update_tie_breaker_result = mysqli_query($this->cxn, $update_tie_breaker_query);
+        return "Tie breaker answer successfully stored!";
+    }
+
+    public function GetCustomPoolTieBreakerAnswer($pool_id){
+        $get_custom_pool_tie_breaker_query = "SELECT `Tie-Breaker Correct Answer` FROM `Pool` WHERE `Pool ID` = '$pool_id';";
+        $result = mysqli_query($this->cxn, $get_custom_pool_tie_breaker_query);
+        $result_array = mysqli_fetch_assoc($result);
+        return $result_array['Tie-Breaker Correct Answer'];
+    }
+
 
     /*GetCorrectChoiceForPoolCategory method
     **Accepts category ID
