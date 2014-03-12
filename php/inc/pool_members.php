@@ -17,7 +17,7 @@ if($pool_fetch_result['Pool ended?']==1){ //if pool has ended:
 }
 else{ //if pool has not ended:
     $pool_members_array_for_table = $pool_members_id_array; 
-    $pool_member_table_rank_style = "display:none"; //don't show rank column in table
+    $pool_member_table_rank_style = "text-decoration:underline; width:8%"; //show rank column in table
     $pool_member_table_score_style = "text-decoration:underline; width:15%;"; //give score column in table full 15% width since it doesn't share with rank column
 }
 ?>
@@ -46,8 +46,19 @@ else{ //if pool has not ended:
             <th class="pool_member_table_score" style="<?php echo $pool_member_table_score_style; ?>">Score</th>
         </tr>
 <?php
-    $counter = 0; //define this so we know which iteration of the below foreach statement we are in
-    foreach($pool_members_array_for_table as $user_id => $tie_breaker_answer){
+    $pool_scores_result = $pool->CalculatePoolScore($pool_id); //generate current pool scores (this comes as sorted from highest scorer to lowest)
+    $counter = 0; //define this so we know which iteration of the below foreach statement we are in 
+    $counter_interval = 0; //we use this to keep track of the number of users tied in a given position.  
+        //for instance, if 3 users all have the same score, this value will become 3 as we go thru each of the 3 tied users' ranks
+        //this way, when we get to the next user after the 3 tied users, we can make that users rank 3 more than the tied users' rank
+    $pool_sorting_array = array();
+    //below foreach will sort the array of pool members according to their score:
+    foreach($pool_scores_result as $user_id => $user_score){ 
+        $pool_sorting_array[$user_id] = $pool_members_array_for_table[$user_id];
+    }
+    $pool_sorting_array_keys = array_keys($pool_sorting_array);
+    //now that we have the pool members sorted based on their score, let's create the pool members table:
+    foreach($pool_sorting_array as $user_id => $tie_breaker_answer){
         $user_info = $user->GetUserInfo($user_id); //get the given user's username and email address and store them in the user_info array
         if($pool_members_id_array[$user_id]['Nickname'] == "no_nickname"){
             $nickname = $user_info['Email Address'];
@@ -83,7 +94,7 @@ else{ //if pool has not ended:
             </td>
             <td class="pool_member_table_score">
 <?php      
-            $pool_scores_result = $pool->CalculatePoolScore($pool_id); //generate current pool scores
+            
             if($pool_fetch_result['Pool ended?'] == 1) { //if pool has ended and has been scored, display user's score:
                 echo $pool_rankings_array[$user_id];
             }
@@ -93,8 +104,29 @@ else{ //if pool has not ended:
 ?>
             </td>
         </tr>
-<?php 
-        $counter++;
+<?php
+        //BEGIN LOGIC FOR CREATING NEXT RANK IN TABLE:
+        $current_key = array_search($user_id, $pool_sorting_array_keys); //get the number in the pool_sorting_array_keys array associated with the given user ID
+        $next_user_key = $current_key + 1; //add one to the number (this gives us the key for the next user in the pool_sorting_array)
+        $next_user_id = $pool_sorting_array_keys[$next_user_key]; //get the user ID of the user who is next up in the foreach statement
+        $next_user_score = $pool_scores_result[$next_user_id]; //get the score of the user who is next up in the foreach statement
+        if($pool_scores_result[$user_id] == $next_user_score){ //if the score of the user who is next up in the foreach statement is equal to the current user's (meaning they are tied):
+            $counter_interval++; 
+                //we do not change the $counter value, instead add one to the counter_interval value
+                //e.g., if the 1st place user is tied with the 2nd place user, we make $counter_interval equal to 1
+                //if the 2nd place user is tied with the 3rd place user (meaning the top 3 users are all tied), $counter_interval becomes 2
+                //if 3rd place user is tied with top 3 users, $counter_interval becomes 3, and so on
+        }
+        else{ //if the score of the user who is next up in the foreach array is NOT equal to the current user's score
+            if($counter_interval <> 0){ //if we are coming off tying ranks, add the counter_interval to counter variable to get appropriate rank for next user:
+                $counter = $counter + $counter_interval;
+                $counter_interval = 0; //reset $counter_interval to 0 since we are done with the tying ranks for now
+            }
+            else{ //if we are not coming off tying ranks, simply increase the counter by 1:
+                $counter++;
+            }
+        }
+        //END LOGIC FOR CREATING NEXT RANK IN TABLE
     } 
 ?>
     </table>

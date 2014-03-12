@@ -79,7 +79,7 @@
 <?php
         if(count($active_pools) > 0){ //if the user has active pools
 ?>
-                    <h2 style="text-decoration:underline">Your Active Pools</h2>
+                    <h3 style="text-decoration:underline">Your Active Pools</h3>
                     <table border="1" style="width:95%">
                         <tr>
                             <th class="pool_top_row pool_column">Pool</th>
@@ -148,7 +148,7 @@
             } //END OF ALLPOOLS FOREACH STATEMENT
 ?>
                     </table> 
-                    <br><br>
+                    <br>
 <?php
         } //END OF INACTIVE POOLS IF STATEMENT
 ?>
@@ -159,7 +159,7 @@
 <?php
         if(count($inactive_pools) > 0){ //if the user has inactive pools
 ?>
-                    <h2 style="text-decoration:underline">Your pools that still need to be finalized</h2>
+                    <h3 style="text-decoration:underline">Your pools that still need to be finalized</h3>
                     <table border="1" style="width:95%">
                         <tr>
                             <th class="pool_top_row pool_column">Pool</th>
@@ -206,7 +206,7 @@
             } //END OF INACTIVE POOLS FOREACH STATEMENT
 ?>
                     </table> 
-                    <br><br>
+                    <br>
 <?php
         } //END OF INACTIVE POOLS IF STATEMENT
 ?>
@@ -217,7 +217,7 @@
 <?php
         if(count($completed_pools) > 0){ //if the user has completed pools
 ?>
-                    <h2 style="text-decoration:underline">Your Completed Pools</h2>
+                    <h3 style="text-decoration:underline">Your Completed Pools</h3>
                     <table border="1" style="width:95%">
                         <tr>
                             <th class="pool_top_row pool_column">Pool</th>
@@ -267,7 +267,7 @@
             } //END OF COMPLETED POOLS FOREACH STATEMENT
 ?>
                     </table> 
-                    <br><br>
+                    <br>
 <?php
         } //END OF COMPLETED POOLS IF STATEMENT
 ?>
