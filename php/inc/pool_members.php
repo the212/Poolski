@@ -111,15 +111,16 @@ else{ //if pool has not ended:
         $next_user_id = $pool_sorting_array_keys[$next_user_key]; //get the user ID of the user who is next up in the foreach statement
         $next_user_score = $pool_scores_result[$next_user_id]; //get the score of the user who is next up in the foreach statement
         if($pool_scores_result[$user_id] == $next_user_score){ //if the score of the user who is next up in the foreach statement is equal to the current user's (meaning they are tied):
-            $counter_interval++; 
-                //we do not change the $counter value, instead add one to the counter_interval value
-                //e.g., if the 1st place user is tied with the 2nd place user, we make $counter_interval equal to 1
-                //if the 2nd place user is tied with the 3rd place user (meaning the top 3 users are all tied), $counter_interval becomes 2
-                //if 3rd place user is tied with top 3 users, $counter_interval becomes 3, and so on
+            if($counter_interval == 0){ //if this is the first user in a set of tying users:
+                $counter_interval = $counter + 1; //e.g., if two people tie for 2nd, we make counter_interval equal to 3 for the foreach loop for the 2nd of the two tied users
+            } 
+            $counter_interval++;
+                //e.g., if the 1st place user is tied with the 2nd place user, we make $counter_interval equal to 2 initially and then add 1 to it to get 3 when we go thru the 2nd user's foreach loop
+                //if the 2nd place user is tied with the 3rd place user (meaning the top 3 users are all tied), $counter_interval becomes 4 when going thru the 3rd user's foreach loop
         }
         else{ //if the score of the user who is next up in the foreach array is NOT equal to the current user's score
             if($counter_interval <> 0){ //if we are coming off tying ranks, add the counter_interval to counter variable to get appropriate rank for next user:
-                $counter = $counter + $counter_interval;
+                $counter = $counter_interval;
                 $counter_interval = 0; //reset $counter_interval to 0 since we are done with the tying ranks for now
             }
             else{ //if we are not coming off tying ranks, simply increase the counter by 1:
