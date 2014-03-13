@@ -30,6 +30,21 @@
         $pool_end_time = substr($pool_fetch_result['End Time'], 11);
         $pool_end_time = $pool->timestampTo12HourConversion($pool_end_time); //convert pool start time into appropriate time
         $user_is_leader = 0; //set user is leader variable to 0 initially
+        include_once 'inc/class.users.inc.php';
+        $user = new SiteUser();
+        $current_user_id = $user->GetUserIDFromEmail($_SESSION['Username']); //get current user id
+        $pool_members_id_array = $pool->GetPoolMembers($pool_id); //generate array of pool members
+        //BEGIN CHECK TO SEE IF GIVEN USER IS A MEMBER OF THE POOL:
+        $user_is_pool_member_check = 0; //we use this variable to check whether the given user is a member of the pool 
+        foreach($pool_members_id_array as $user_id => $user_info){ //run thru pool member array - if the given user's ID is present in the array, we make the is_user_pool_member variable equal to 1, if not it remains as 0
+            if($user_id == $current_user_id){ //if current user is a member of the pool:
+                $user_is_pool_member_check = 1;
+            }
+        }
+        if($user_is_pool_member_check == 0){ //if user is not a pool member, return the user to the homepage:
+            header("Location: home.php");
+        }
+        //END CHECK TO SEE IF GIVEN USER IS A MEMBER OF POOL
     }
 
     $pageTitle = $pool_fetch_result['Title'];
@@ -64,7 +79,6 @@
                 echo " <span class='label label-success'>Live! Picks are Locked</span>";
             }
             else{ //if pool has ended:
-                $pool_members_id_array = $pool->GetPoolMembers($pool_id);
                 $pool_winner_nickmane = $pool_members_id_array[$pool_fetch_result['Pool Winner']]['Nickname'];
                 if(!isset($pool_winner_nickmane)){
                     echo " <span class='label label-info'>Pool Ended.</span>";
