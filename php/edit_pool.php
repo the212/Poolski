@@ -1,8 +1,6 @@
 <?php
     /*
-    TO DO AS OF 9:45 PM ON 12/2:
-        -CREATE "SUBMIT POOL" FUNCTIONALITY
-        -START AND END TIMES NEED TO BE ADJUSTED FOR TIMEZONES
+    TO DO AS OF 9:45 PM ON 3/12:
         -CREATE "SORTING" FUNCTIONALITY (ALLOW USERS TO SORT CATEGORIES) - NEXT RELEASE?
         -ADD INSTRUCTION TEXT ON PAGE FOR EDITING FIELDS 
     */
@@ -84,7 +82,6 @@
                 $("#"+div_id).replaceWith('<div id="new_category_goes_here"><input type="button" onclick="add_category()" value="Add new category"></div>'); //remove new category div and replace it with the original add_category button and its enclosing new_Category_goes_here div:
             }
             else{ //if category_div_id was set, it means we are removing an existing category from the DB
-            
                 //fade out and remove the category div from the html of the page:
                 $("#category_"+category_div_id).fadeOut(500, function(){
                    //AJAX call to send_pool_data.php with the "remove_category" variable set in URL - send_pool_data.php will run the remove category method
@@ -144,11 +141,11 @@
 
     <div id="content">
         <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-            <li class="active"><a href="#pool_info" data-toggle="tab">Edit Pool Info</a></li>
+            <li><a href="#pool_info" data-toggle="tab">Edit Pool Info</a></li>
 <?php
     if(!isset($pool_fetch_result['Template ID'])){ //only display the edit categories tab if this is NOT a template
 ?>
-            <li><a href="#pool_categories" data-toggle="tab">Edit Categories</a></li>
+            <li class="active"><a href="#pool_categories" data-toggle="tab">Edit Categories</a></li>
 <?php
     }
 ?>
@@ -157,7 +154,7 @@
         <div id="pool_tab_content" class="tab-content">
 
             <!--EDIT POOL INFO DIV -->
-            <div class="tab-pane fade in active" id="pool_info">
+            <div class="tab-pane fade in" id="pool_info">
                 <br><h4 class="field_label">Click on an item to edit it</h4>
                 <div id="pool_info_container">
                     <div class="well well-sm">
@@ -214,7 +211,7 @@
     if(!isset($pool_fetch_result['Template ID'])){ //only display the edit categories tab if this is NOT a template
 ?>
             <!--EDIT POOL CATEGORIES DIV -->
-            <div class="tab-pane fade in" id="pool_categories">
+            <div class="tab-pane fade in active" id="pool_categories">
                 <div id="category_space" style="width:80%">
                     <h3 class="edit_pool_heading" style="text-decoration:underline">Categories</h3>            
                     <?php include_once "inc/edit_pool_categories_nonMC.php"; ?> <!--NON MULTIPLE CHOICE EDIT CATEGORIES FILE -->
@@ -235,8 +232,7 @@
         //IF POOL IS NOT A TEMPLATE:
 ?>
                 <br>
-                <p class="field_label">Click on a setting to edit it</p>
-                <p class="field_label">Start/End Dates and Times are optional.</p>
+                <h4 class="edit_settings_instruction">Click on a setting to edit it. &nbsp;Start/End Dates and Times are optional.</h4>
                 <div class="row">
                     <div class="col-md-6">
                         <h4>Pool Start Date:</h4>
@@ -254,7 +250,8 @@
                     </div>
                 </div>
                 <p class="field_label">If you set a start time, all user's picks will be locked at the specified time.</p>
-                 <div class="row">
+                <br>
+                <div class="row">
                     <div class="col-md-6">
                         <h4>Pool End Date:</h4>
                         <div id="ED">
@@ -271,7 +268,7 @@
                      </div>
                 </div>
                 <p class="field_label">If you set an end time,the pool will automatically end at the specified time.</p>
-                <br>
+                <br><br>
                 <h4>Make Pool Public or Private?</h4>
                 <div id="public_private">
                     <div class="bfh-selectbox" id="public_private_selector" data-name="selectbox1" data-value='<?php echo $pool_fetch_result['Private?']; ?>'>

@@ -137,16 +137,23 @@ function Update_Category_List($pool_categories){
             <div id="category_{$category_counter}">
                 <div style="margin-left:50px" class="well well-sm"> 
                     <div class="row">
+                        <div class="col-md-2">
+                            <h4> Category name: &nbsp; </h4>
+                        </div>
                         <div class="col-md-5">
-                            <h4> Category name: &nbsp; 
-                                <span class="label label-info"><span class="edit_pool_field" id="category_n_span{$category_info['Category ID']}" style="margin-left:0px;">{$category_info['Category Name']}</span></span>
+                            <h4>
+                                <span class="label label-info"><span class="edit_pool_field" id="category_n_span{$category_info['Category ID']}" style="margin-left:0px; white-space:pre-line;">{$category_info['Category Name']}</span></span>
                             </h4>
                         </div>
-                        <div class="col-md-7">
+                        <div class="col-md-3">
                             <h4>
-                                <span style="margin-left:20px;">Point Value: <span class="label label-info" style="margin-left:62px">&nbsp;<span class="edit_pool_field" id="category_p_span{$category_info['Category ID']}" style="margin-left:0px">&nbsp;{$category_info['Category Point Value']}&nbsp;</span>&nbsp;</span></span>
+                                Point Value: <span class="label label-info">&nbsp;<span class="edit_pool_field" id="category_p_span{$category_info['Category ID']}">&nbsp;{$category_info['Category Point Value']}&nbsp; </span>&nbsp;</span>
+                            </h4>  
+                        </div>
+                        <div class="col-md-2"> 
+                            <h5> 
                                 <input type="button" onclick="remove_category({$category_counter}, {$category_info['Category ID']})" value="Remove category"> 
-                            </h4>
+                            </h5>
                         </div>
                     </div>
                 </div>

@@ -125,6 +125,11 @@ HOME.PHP STYLING
 CREATE_POOL.PHP STYLING
 */
 
+.edit_settings_instruction{
+	margin-left:5px;
+	font-style:italic;
+}
+
 .field_label {
 	margin-left:20px; 
 	font-style:italic;
