@@ -68,6 +68,9 @@
                 $("#new_category_goes_here").replaceWith('<div id="new_category_div" style="display:none"><li style="margin-left:50px"><div id="new_category_form"><form action="javascript:save_new_category();" method="post"><input type="text" name="new_category" id="new_category" class="category_name" size="75" required><label  style="margin-left:50px" for="new_category_points">Point Value </label><input type="number" name="new_category_points" id="new_category_points" class="category_points" size="4" value="1"><input type="submit" value="Submit"><input type="button" id="remove_category_button" onclick="remove_category()" value="Cancel"></form></div></li></div>');
                 $("#new_category_div").fadeIn(200);
             });
+            $("#add_category_instruction").fadeOut(200, function(){
+                $("#add_category_instruction").replaceWith('');
+            });
         }
 
         var edit_pool_settings_error = 0; //this variable should stay at 0 until an error occurs while editing pool

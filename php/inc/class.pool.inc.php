@@ -156,7 +156,12 @@ class Pool {
                 }
                 break;
             case 'ED': //if we are editing end date:
-                $new_end_timestamp = substr_replace($pool_fetch_result['End Time'], $new_setting_value, 0, 10);
+                if($pool_fetch_result['End Time'] == NULL){ //if end date is not previously set:
+                    $new_end_timestamp = $new_setting_value." 00:00:00"; //we add this here so that setting a start and end date on the same day without setting any end time does not result in an error
+                }
+                else{ //if an end date already exists in DB:
+                    $new_end_timestamp = substr_replace($pool_fetch_result['End Time'], $new_setting_value, 0, 10);
+                }
                 if($new_end_timestamp < $pool_fetch_result['Start Time']){ //if input end info is BEFORE existing start info:
                     $error_message = "Error: End Date cannot be before Start Date! Please check your settings.";
                     $original_value = substr($pool_fetch_result['End Time'], 0, 10);
