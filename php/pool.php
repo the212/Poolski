@@ -182,7 +182,11 @@
                     }
                 }
         /*END END TIME DISPLAY AND END POOL BUTTON LOGIC*/
-                include_once "inc/pool_members.php";
+                //BELOW IS BUTTON FOR MARKING POOL PICKS AS CORRECT/INCORRECT WHILE POOL IS STILL LIVE
+                if($user_is_leader == 1 && !isset($pool_fetch_result['Template ID'])) { //if user is the leader of the pool and pool was customized from scratch (i.e. not a template), we let them tally the pool's score before pool has ended:
+                    echo "<br><h4><form method='post' action='score_pool_manual.php?pool_id=".$pool_id."'><input type='submit' value='You are the pool leader.  Click here to mark pool member picks as correct/incorrect'></form></h4>";
+                }
+                include_once "inc/pool_members.php"; //pool member rank table and links to see pool members' picks
             } //END "IF POOL HAS NOT ENDED" LOGIC
 
         /*BEGIN "IF POOL HAS ENDED" LOGIC*/

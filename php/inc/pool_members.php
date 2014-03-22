@@ -181,14 +181,14 @@ else{ //if pool has not ended:
                 <h3><span class="label label-primary"><span class="display_user_pick" id="display_user_pick_for_category_<?php echo $category_info['Category ID']; ?>" style="font-weight:bold; white-space: normal;"><?php echo "**No Pick**" ?></span></span></h3>
             </div>
 <?php
-        if(isset($pool_fetch_result['Template ID'])){
+            if(isset($pool_fetch_result['Template ID'])){
 ?>
             <div class="col-md-2">
                 <h5>Correct Answer: </h5>
                 <span class="label label-primary" style="white-space:normal; padding-left:0px; padding-right:0px"><?php echo $category_correct_answer; ?></span>
             </div>
 <?php
-        }
+            }
 ?>
         </div>
     </div>
