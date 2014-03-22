@@ -291,6 +291,7 @@
                 //$(".well-sm").css("background-color", "transparent"); //reset pick background colors
             $(".see_picks").attr("class", "label label-primary"); //reset see_picks labels (this ensures that only the labels on the pool_members page get changed and all other labels in pool.php remain untouched)
             $('.display_user_pick').html("**No Pick**"); //reset user picks page values
+            $('.display_user_pick').parents().css("background-color", ""); //reset background color - NOTE: this currently sets pretty much everything on the page to not have a background color - seems to work as of 3/20/14:/
             $(".user_picks_container").css("display", "none");
         });
     }

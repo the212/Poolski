@@ -7,13 +7,17 @@ include_once "inc/header.php";
 
 
 if(isset($_GET['pool_id'])) { //if a pool ID is specified in URL:
-    //NOTE: ADD CHECK HERE TO MAKE SURE THE GIVEN USER IS THE LEADER OF THE POOL AND THAT POOL HAS ENDED
     include_once 'inc/class.pool.inc.php';
     include_once 'inc/class.users.inc.php';
     $pool = new Pool(); //new instance of the Pool class
     $user = new SiteUser();
     $pool_id = $_GET['pool_id']; //get pool ID from URL
     $pool_fetch_result = $pool->GetPoolData($pool_id);
+    $pool_leader_id = $pool->GetUserIDFromEmail($pool_fetch_result['Leader ID']);
+    $current_user_id = $pool->GetUserIDFromEmail($_SESSION['Username']);
+    if($pool_leader_id !== $current_user_id){
+        header("Location: home.php");
+    }
     $pool_category_fetch = $pool->GetPoolCategoryData($pool_id); //get pool category data
     $pool_members_id_array = $pool->GetPoolMembers($pool_id); //store all of the user_id's of the pool member's in pool_member_id_array
     $pool_members_id_array_keys = array_keys($pool_members_id_array); //store pool member id's into the pool_members_id_array_keys array
@@ -35,7 +39,13 @@ else {
                 <h4 style="text-decoration:underline"><?php echo $pool_fetch_result['Overall Question']; ?></h4> 
             </div>
             <div class="col-md-7">
+<?php
+        if($pool_fetch_result['Pool ended?'] == 1){ //only show "finish and calculate" button if pool has ended
+?>
                 <h4><input type="button" id="score_pool_button" class="btn btn-warning btn-lg" value="Finish and Calculate Pool Score" onclick="JAVASCRIPT:CalculatePoolScoreValidate(<?php echo $pool_id; ?>, 1);" /></h4>
+<?php
+        }
+?>
             </div>
         </div>
         <br>
@@ -63,11 +73,11 @@ else {
 <?php
         foreach ($pool_members_id_array_keys as $each_user => $user_id){ //generate list of user picks for each user in the pool ($each_user is the key of the pool_members_id_array_keys array and starts at 0)
             $user_info = $user->GetUserInfo($user_id); //get the given user's username and email address and store them in the user_info array
-            if($pool_members_id_array[$user_id]['Nickname'] == "no_nickname"){ 
-                $nickname = $user_info['Username'];
+            if($pool_members_id_array[$user_id]['Nickname'] == "no_nickname"){ //if user does not have a nickname for the pool
+                $nickname = $user_info['Email Address']; //set user's display name to be their email address is they have no nickname
             }
-            else{
-                $nickname = $pool_members_id_array[$user_id]['Nickname'];
+            else{ //if user does have a nickname for the pool
+                $nickname = $pool_members_id_array[$user_id]['Nickname']; 
             }
             $user_picks_fetch = $pool->GetUserPicks($user_id, $pool_id); //get the given user's picks
             $category_counter = 1;
@@ -75,6 +85,7 @@ else {
             <h3><?php echo $nickname; ?>'s Picks:</h3>
 <?php
             foreach($pool_category_fetch as $category_id => $category_info){ //generate list of categories for pool and populate the given user's picks for each category
+                $incorrect_by_default = 0; //reset incorrect_by_default variable if it was previously equal to 1
                 if(isset($user_picks_fetch[$category_id])) { //if a pick already exists for given category, we store it in the pick_display_value variable
                     $user_pick_explode_array = explode('|', $user_picks_fetch[$category_id]);
                     $pick_display_value = $user_pick_explode_array[0];
@@ -86,6 +97,7 @@ else {
                     $incorrect_by_default = 1; //set incorrect_by_default variable to 1 - this signifies that we are marking the user's lack of answer as "incorrect"
                     $answer_correct = 0;
                     $category_div_background_color = "#d9534f"; //set div background color to be red by default if no pick was made
+                    //$pool->ScorePickManually($category_id, $user_id, $pool_id, 0);
                 }
 
                 //BEGIN CODE FOR CORRECT VS. INCORRECT DISPLAYS ON PAGE

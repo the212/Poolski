@@ -31,6 +31,7 @@ All of the necessary php variables are defined on the pool.php page
         $category_counter = 1;
         //create list of saved pool categories and user's picks for given pool by walking through pool_categories array:
         foreach($pool_category_fetch as $category_id => $category_info){
+            $category_background_color = ""; //reset background color for pick if a previous pick had changed it
             if(isset($user_picks_fetch[$category_id])) {
                 $pick_label_class = "label label-primary";
                 //if a pick already exists for given category, we store it in the pick_display_value variable
