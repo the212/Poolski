@@ -21,7 +21,7 @@
     define('DB_HOST', 'localhost');
     define('DB_USER', 'root');
     define('DB_PASS', 'william88');
-    define('DB_NAME', 'poolapptest1');
+    define('DB_NAME', 'poolapptest20140320');
 	
 	//Define DOMAIN and BRAND constants for site:
 	define('DOMAIN', 'http://localhost/openshift_clone/php/php/');

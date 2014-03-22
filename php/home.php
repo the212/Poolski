@@ -38,7 +38,25 @@
     $active_pools = $pool->GetActivePool($current_user_id); //this stores all of a user's pools that are "ready for invites" but have not yet ended
     $inactive_pools = $pool->GetInactivePools($current_user_id); //this stores all of a user's pools where "ready for invites" equals 0
     $completed_pools = $pool->GetCompletedPools($current_user_id);  //this stores all of a user's pools where "pool ended?" equals 1
-    $pool_invites_result = $user->CheckPoolInvites($current_user);
+    $pool_invites_result_pre = $user->CheckPoolInvites($current_user); //get initial pool invites for a user if they exist - these may include pools which are live that we don't want the user to join, so we do a check for live pool invites below and remove the invite if the pool is live:
+    //BEGIN CHECK TO SEE IF ANY OF THE USER'S INVITE POOLS ARE LIVE ALREADY:
+    foreach($pool_invites_result_pre as $index => $pool_id){ //for each pool ID in the user's invite list:
+        if($pool_id !== ""){ //if we have NOT yet reached the end of the pool invite list for the given user:
+            $given_pool_data = $pool->GetPoolData($pool_id); //get given pool data
+            if($given_pool_data == 0){ //if pool id doesn't exist in DB:
+                $user->RemoveInvite($current_user_id, $pool_id); //remove pool invite entry if pool doesn't exist
+            }
+            else{ //if we are able to find a pool for the given pool id:
+                if($given_pool_data['Live?'] == 1){ //if pool is already live, we erase the user's invite (user can't join a pool once its live):
+                    $user->RemoveInvite($current_user_id, $pool_id); //remove pool invite for given user
+                }
+            }
+        }
+    }
+    //END CHECK TO SEE IF ANY OF THE USER'S INVITE POOLS ARE LIVE ALREADY
+
+    $pool_invites_result = $user->CheckPoolInvites($current_user); //get pool invites for a user if they exist after "Live?" check - this ensures that we are only fetching pool invites that are not live for a user
+
     //BEGIN CHECK FOR POOL INVITES IF STATEMENT
     if($pool_invites_result <> "0"){ //if user has pool invites pending:
 ?>
