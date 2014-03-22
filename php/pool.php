@@ -156,7 +156,7 @@
                 }
                 else { //if pool does not have any start date defined, we allow the leader to start the pool manually:
                     if($user_is_leader == 1 && $pool_fetch_result['Live?']==0) { //if no start date defined, and user is leader, and the pool is NOT live:
-                        echo "<span style='margin-left:30px'><form method='post' action='JAVASCRIPT:makePoolLive($pool_id);'><input type='submit' value='Click here to make pool live!'></form></span>";
+                        echo "<h4><span style='margin-left:30px'><form method='post' action='JAVASCRIPT:makePoolLive($pool_id);'><input type='submit' value='Click here to make pool live!'></form></span></h4>";
                     }
                 }
         /*END START TIME DISPLAY AND START POOL BUTTON LOGIC*/
@@ -183,7 +183,7 @@
                 }
         /*END END TIME DISPLAY AND END POOL BUTTON LOGIC*/
                 //BELOW IS BUTTON FOR MARKING POOL PICKS AS CORRECT/INCORRECT WHILE POOL IS STILL LIVE
-                if($user_is_leader == 1 && !isset($pool_fetch_result['Template ID'])) { //if user is the leader of the pool and pool was customized from scratch (i.e. not a template), we let them tally the pool's score before pool has ended:
+                if($user_is_leader == 1 && !isset($pool_fetch_result['Template ID']) && $pool_fetch_result['Live?']== 1) { //if user is the leader of the pool, the pool was customized from scratch (i.e. not a template), and the pool is live, we let them tally the pool's score before pool has ended:
                     echo "<br><h4><form method='post' action='score_pool_manual.php?pool_id=".$pool_id."'><input type='submit' value='You are the pool leader.  Click here to mark pool member picks as correct/incorrect'></form></h4>";
                 }
                 include_once "inc/pool_members.php"; //pool member rank table and links to see pool members' picks
