@@ -8,6 +8,7 @@ use Mailgun\Mailgun;
 
 include_once "constants.inc.php";
 date_default_timezone_set('America/New_York'); //set timezone for getting the current time to be EST
+include_once 'inc/class.db_queries.inc.php';
 
 class Pool {
 
@@ -547,16 +548,13 @@ class Pool {
         else{ //if we are receiving the user's user id number:
             $user_id = $user_id_input;
         }
-        $nickname_query = "SELECT `Pool Nickname` FROM  `Pool Membership` WHERE `User ID` = '$user_id' AND `Pool ID` = '$pool_id';";
-        $nickname_result = mysqli_query($this->cxn, $nickname_query);
-        $nickname_result_array = mysqli_fetch_assoc($nickname_result);
+        $query = new DB_Queries(); 
+        $nickname_result_array = $query->SelectFromDB('Pool Nickname', 'Pool Membership', 'User ID', $user_id, 'Pool ID', $pool_id);
         if(isset($nickname_result_array['Pool Nickname'])) {
             return $nickname_result_array['Pool Nickname'];
         }
         else{
-            $no_nickname_query = "SELECT `Email Address` FROM  `User` WHERE `User ID` = '$user_id';";
-            $no_nickname_result = mysqli_query($this->cxn, $no_nickname_query);
-            $no_nickname_result_array = mysqli_fetch_assoc($no_nickname_result);
+            $no_nickname_result_array = $query->SelectFromDB('Email Address', 'User', 'User ID', $user_id);
             return $no_nickname_result_array['Email Address'];
         }
     }
@@ -640,14 +638,13 @@ class Pool {
             //if pick already exists in DB for this user:
             $existing_pick_query = "UPDATE  `User Picks` SET  `Answer for main category` =  '$escaped_pick_input' WHERE  `User ID` = '$user_id' AND  `Pool ID` = '$pool_id' AND  `Category ID` = '$category_id';";
             $result = mysqli_query($this->cxn, $existing_pick_query);
-            return $escaped_pick_input;
         }
         else{
             //if pick does not already exist in DB for this user:
             $new_pick_query = "INSERT INTO `User Picks` (`User ID`, `Pool ID`, `Category ID`, `Answer for main category`) VALUES ('$user_id', '$pool_id', '$category_id', '$escaped_pick_input');";
             $result = mysqli_query($this->cxn, $new_pick_query);
-            return $escaped_pick_input;
         }
+        return $pick_value; //NOTE - AS OF 3/22/14, THIS RETURN VALUE ONLY GOES TO THE EDITINPLACE FORMS FOR USER PICKS FOR DISPLAY PURPOSES.  THIS VALUE IS NOT ESCAPED!
     }
 
     /*GetTieBreakerAnswer Method
@@ -1138,8 +1135,9 @@ class Pool {
     */
     public function escapeBadCharacters($string) {
         $new_string1 = preg_replace('~[\\\\/:*?"<>|]~',"", $string); //filter #1
-        $new_string2 = str_replace(array("%", "\\", "#", " - ", "&", "'", "$", "^", "(", ")"),"", $new_string1); //filter #2
-        return $new_string2;
+        $new_string2 = str_replace(array("%", "\\", "#", " - ", "&", "$", "^", "(", ")"),"", $new_string1); //filter #2
+        $new_string3 = addcslashes($new_string2, "'");
+        return $new_string3;
     }
 
 }

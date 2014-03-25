@@ -27,7 +27,7 @@ else{ //if pool has not ended:
     <h1>Pool Members</h1>
 <?php
             //BEGIN POOL NICKNAME LOGIC
-            $user_nickname = $pool->GetNickname($_SESSION['Username'], $pool_id);
+            $user_nickname = $pool->GetNickname($current_user_id, $pool_id);
             if ($pool_fetch_result['Live?']==0) {
 ?>
                 <h4>Choose your nickname for this pool: <span class="label label-info"><span class='edit_nickname' id='update_nickname'><?php echo $user_nickname; ?></span></span><span style="margin-left:15px; font-style:italic; font-size:70%;">(Click to edit)</span></h4>
