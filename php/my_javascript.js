@@ -63,13 +63,24 @@
 
 
 //BEGINNING OF EDIT_POOL.PHP JAVASCRIPT
-        function add_category(){
+        function add_category(multiple_choice){
+            multiple_choice = multiple_choice || 0; //set multiple_choice variable if it is passed (default is 0 which means category is NOT multiple choice)
             $("#new_category_goes_here").fadeOut(200, function(){
-                $("#new_category_goes_here").replaceWith('<div id="new_category_div" style="display:none"><li style="margin-left:50px"><div id="new_category_form"><form action="javascript:save_new_category();" method="post"><input type="text" name="new_category" id="new_category" class="category_name" size="75" required><label  style="margin-left:50px" for="new_category_points">Point Value </label><input type="number" name="new_category_points" id="new_category_points" class="category_points" size="4" value="1"><input type="submit" value="Submit"><input type="button" id="remove_category_button" onclick="remove_category()" value="Cancel"></form></div></li></div>');
+                $("#new_category_goes_here").replaceWith('<div id="new_category_div" style="display:none; margin-left:50px;"><h4>New Category:</h4><div id="new_category_form"><form action="javascript:save_new_category('+multiple_choice+');" method="post"><input type="text" name="new_category" id="new_category" class="category_name" size="75" required><label  style="margin-left:50px" for="new_category_points">Point Value </label><input type="number" name="new_category_points" id="new_category_points" class="category_points" size="4" value="1"><input type="submit" value="Submit"><input type="button" id="remove_category_button" onclick="remove_category()" value="Cancel"></form></div></div>');
                 $("#new_category_div").fadeIn(200);
             });
             $("#add_category_instruction").fadeOut(200, function(){
                 $("#add_category_instruction").replaceWith('');
+            });
+        }
+
+        function add_category_choice(category_id){
+            $("#new_category"+category_id+"_choice_goes_here").fadeOut(200, function(){
+                $("#new_category"+category_id+"_choice_goes_here").replaceWith('<div id="new_category_choice_div_'+category_id+'" style="display:none"><span style="margin-left:60px"><div id="new_category'+category_id+'_choice_form"><form action="javascript:save_new_category_choice('+category_id+');" method="post"><input type="text" name="new_category'+category_id+'_choice" id="new_category'+category_id+'_choice" class="category_choice_name" size="75" required><input type="submit" value="Submit"><input type="button" id="remove_category_choice_button_'+category_id+'" onclick="remove_category_choice('+category_id+')" value="Cancel"></form></div></span></div>');
+                $("#new_category_choice_div_"+category_id).fadeIn(200);
+            });
+            $("#add_category_choice_instruction").fadeOut(200, function(){
+                $("#add_category_choice_instruction").replaceWith('');
             });
         }
 

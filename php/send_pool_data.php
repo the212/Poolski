@@ -9,6 +9,7 @@ THIS FUNCTION RECEIVES ARGUMENTS VIA EITHER POST OR GET.  DEPENDING ON THE ARGUM
 
 include_once "inc/constants.inc.php";
 include_once 'inc/class.pool.inc.php';
+include_once 'inc/update_categories_list.php';
 
 //IF _POST['element_id'] IS PASSED VIA POST, IT MEANS THAT THE EDIT IN PLACE FUNCTION IS BEING CALLED AND WE ARE UPDATING AN ALREADY SAVED POOL VALUE:
 if(isset($_POST['element_id'])){ 
@@ -17,8 +18,10 @@ if(isset($_POST['element_id'])){
     $input_id = $_POST['element_id']; //get the element ID from the page.  The element IDs of each input on the page are the same as the fields in the DB
     $pool_id = $_POST['pool_id']; //get the pool ID from the page
     $original_value = $_POST['original_html'];
-    
+
+    //BEGIN INPUT CHECKS
     $category_check = substr_compare(substr($input_id,0,8),"category",0,8); //get first 8 characters of pool item id and check to see if they are "category" - if so, we are updating a category or a category's point value and need to write to the 'Pool Category' table
+    $choice_check = substr_compare(substr($input_id,0,6),"choice",0,6);
     //BELOW SEQUENCE OF IF'S IS TO VALIDATE CATEGORY POINT INPUTS (THEY MUST BE NUMERIC IN DB)
     if($category_check == 0){ //if we have been sent a category related update:
         $category_item = $input_id[9]; //CHECK TO SEE WHAT CATEGORY ITEM IS BEING EDITED 
@@ -29,13 +32,22 @@ if(isset($_POST['element_id'])){
             }
         }
     }
-    if($input_id == "update_nickname") { //if we are updating a user's pool nickname:
+    //END INPUT CHECKS
+
+    //BEGIN INPUT COMMANDS:
+    if($input_id == "update_nickname") { //UPDATE POOL NICKNAME
         $new_nickname_result = $pool->UpdateNickname($_POST['user_id'], $pool_id, $input_value);
         echo $new_nickname_result;
     }
-    else { //if we are not updating a user's pool nickname:
+    elseif($choice_check == 0){ //UPDATE CATEGORY CHOICE NAME:
+        $choice_id = substr($input_id,11);
+        $new_category_choice_result = $pool->UpdateCategoryChoice($choice_id, $input_value);
+    }
+    else{ //UPDATE CATEGORY NAME:
         $new_pool_result = $pool->UpdatePoolData($pool_id, $input_id, $input_value);
     }
+    //END INPUT COMMANDS
+
     echo $input_value;
 }
 
@@ -48,12 +60,32 @@ else{ //IF EDIT IN PLACE IS NOT BEING CALLED:
         //if we are adding a new category to DB:
         $new_category = $_GET['new_category'];
         $new_category_points = $_GET['new_category_points'];
+        $multiple_choice = $_GET['multiple_choice'];
         $pool = new Pool();
-        $pool->AddCategory($pool_id, $new_category, $new_category_points);
+        $new_category_id = $pool->AddCategory($pool_id, $new_category, $new_category_points, $multiple_choice); //AddCategory FUNCTION RETURNS CATEGORY ID OF NEWLY ADDED CATEGORY
         $pool_categories = $pool->GetPoolCategoryData($pool_id);
         $number_of_saved_categories = count($pool_categories);
         if($number_of_saved_categories>0){ 
-            $return_value = Update_Category_List($pool_categories);
+            $return_value = Update_Category_List($pool_categories, $multiple_choice); 
+            $return_array = array(
+                0 => $return_value, 
+                1 => $new_category_id
+            );
+            echo json_encode($return_array); //return JSON encoded array (this goes to the save_new_category javascript ajax function in the edit_pool.php file)
+        }
+    }
+
+    //ADD A NEW SAVED CATEGORY CHOICE (FOR MULTIPLE CHOICE POOLS)
+    if(isset($_GET['new_category_choice'])){ 
+        //if we are adding a new category to DB:
+        $category_id = $_GET['category_id'];
+        $new_category_choice = $_GET['new_category_choice'];
+        $pool = new Pool();
+        $pool->AddCategoryChoice($pool_id, $category_id, $new_category_choice);
+        $category_choices = $pool->GetCategoryChoices($category_id);
+        $number_categories_choices = count($category_choices);
+        if($number_categories_choices>0){ 
+            $return_value = Update_Category_Choice_List($category_choices, $category_id);
             echo $return_value;
         }
     }
@@ -62,12 +94,27 @@ else{ //IF EDIT IN PLACE IS NOT BEING CALLED:
     if(isset($_GET['remove_category'])){ 
         //if we are removing a given category from DB:
         $removal_category = $_GET['remove_category'];
+        $multiple_choice = $_GET['multiple_choice'];
         $pool = new Pool();
         $pool->RemoveCategory($removal_category);
         $pool_categories = $pool->GetPoolCategoryData($pool_id);
         $number_of_saved_categories = count($pool_categories);
         if($number_of_saved_categories>0){ 
-            $return_value = Update_Category_List($pool_categories);
+            $return_value = Update_Category_List($pool_categories, $multiple_choice);
+            echo $return_value;
+        }
+    }
+
+    if(isset($_GET['remove_category_choice'])){
+        //if we are removing a given category choice from DB:
+        $category_id = $_GET['category_id'];
+        $removal_choice = $_GET['remove_category_choice'];
+        $pool = new Pool();
+        $pool->RemoveCategoryChoice($removal_choice);
+        $category_choices = $pool->GetCategoryChoices($category_id);
+        $number_categories_choices = count($category_choices);
+        if($number_categories_choices>0){ 
+            $return_value = Update_Category_Choice_List($category_choices, $category_id);
             echo $return_value;
         }
     }
@@ -123,59 +170,6 @@ else{ //IF EDIT IN PLACE IS NOT BEING CALLED:
         echo $user_picks_json;
     }
 }
-
-
-//UPDATE CATEGORY LIST FUNCTION
-//ACCEPTS POOL_CATEGORIES ARRAY AS PARAMETER (ARRAY CONTAINS ALL DATA FOR A SUBSET OF POOL CATEGORIES)
-//RETURNS HTML MARKUP FOR THE ORDERED LIST OF SAVED CATEGORIES FOR THE GIVEN POOL
-function Update_Category_List($pool_categories){
-    $category_counter = 1;
-    $return_array = array();
-    foreach($pool_categories as $category_id => $category_info){
-        //store desired html in return_array for each category
-        $return_array[$category_counter] = <<<HTML
-            <div id="category_{$category_counter}">
-                <div style="margin-left:50px" class="well well-sm"> 
-                    <div class="row">
-                        <div class="col-md-2">
-                            <h4> Category name: &nbsp; </h4>
-                        </div>
-                        <div class="col-md-5">
-                            <h4>
-                                <span class="label label-info"><span class="edit_pool_field" id="category_n_span{$category_info['Category ID']}" style="margin-left:0px; white-space:pre-line;">{$category_info['Category Name']}</span></span>
-                            </h4>
-                        </div>
-                        <div class="col-md-3">
-                            <h4>
-                                Point Value: <span class="label label-info">&nbsp;<span class="edit_pool_field" id="category_p_span{$category_info['Category ID']}">&nbsp;{$category_info['Category Point Value']}&nbsp; </span>&nbsp;</span>
-                            </h4>  
-                        </div>
-                        <div class="col-md-2"> 
-                            <h5> 
-                                <input type="button" onclick="remove_category({$category_counter}, {$category_info['Category ID']})" value="Remove category"> 
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-HTML;
-        $category_counter++;
-        }
-        foreach($return_array as $category_number => $category_html_content){
-            //concatenate each category's html section together into one long string of html text
-            $return_value = $return_value.$category_html_content;
-        }
-        return $return_value;
-}
-
-
-
-//EDIT POOL SETTINGS SECTION
-//THIS SECTION IS FOR THE "EDIT POOL SETTINGS" TAB THAT IS FOUND ON THE EDIT_POOL.PHP PAGE 
-//E.G., START/END DATES AND TIMES, ETC.
-
-//BELOW IS CALLED WHEN THE "change_date_time" AJAX FUNCTION IS RUN:
-
 
 
 ?> 
