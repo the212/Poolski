@@ -14,8 +14,9 @@
         $tie_question = $_POST['tie_question']; //get tie breaker question from input
         $pool_question = $_POST['pool_question']; //get overall question from input
         $pool_public_status = $_POST['public_private']; //get pool public/private status
+        $pool_category_type = $_POST['category_type']; //get pool public/private status
         //create new pool in database with inputs:
-        $new_pool_result = $pool->CreateNewPool($_SESSION['Username'] , $pool_title , $pool_question, $pool_description, $tie_question, $pool_public_status);
+        $new_pool_result = $pool->CreateNewPool($_SESSION['Username'] , $pool_title , $pool_question, $pool_description, $tie_question, $pool_public_status, NULL, $pool_category_type);
         //send user to newly created pool page automatically:
         header("Location: edit_pool.php?pool_id=$new_pool_result[2]");
     else:
@@ -65,8 +66,15 @@
             <input type="text" name="tie_question" id="tie_question" size="100"/>
             <br>
             <br>
+            <label for="public_private">Public or Private?</label>
+            <br>
             <input type="radio" name="public_private" value="public" checked="checked"> Make Pool Public (Default - anyone can invite others)<br>
             <input type="radio" name="public_private" value="private"> Make Pool Private (only you can invite others)<br>
+            <br>
+            <label for="category_type">Questions in pool should be:</label>
+            <br>
+            <input type="radio" name="category_type" value="MC" checked="checked">Multiple Choice (participants choose from a list of choices)<br>
+            <input type="radio" name="category_type" value="non_MC">Open Ended (participants answer however they want)<br>
             <br>
 
             <input type="submit" name="new_pool_button" id="new_pool_button" value="Create New Pool" class="button" />

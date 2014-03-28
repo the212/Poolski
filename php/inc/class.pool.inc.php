@@ -25,19 +25,22 @@ class Pool {
     //Required arguments: pool leader's ID, pool title, overall question 
     //Optional arguments: pool description, tie breaker question
     //Returns array consisting of a result code, result message, and the new Pool ID number if pool creation was successful
-    public function CreateNewPool($Leader_ID, $Pool_Title, $Overall_Question, $Description = NULL, $Tie_question = NULL, $pool_public_status = NULL, $template_id = NULL) {
+    public function CreateNewPool($Leader_ID, $Pool_Title, $Overall_Question, $Description = NULL, $Tie_question = NULL, $pool_public_status = NULL, $template_id = NULL, $pool_category_type = NULL) {
+        //give pool settings variables default values of 0:
+        $multiple_choice = 0;
+        $public_private_variable = 0;
         if($pool_public_status == "private"){ //if pool is private:
             $public_private_variable = 1;
         }
-        else{ //if pool is anything else (default is public):
-            $public_private_variable = 0;
+        if($pool_category_type == "MC"){ //if pool is to have multiple choice answers:
+            $multiple_choice = 1;
         }
         //ESCAPE BAD CHARACTERS FROM STRING INPUTS:
             $escaped_title = $this->escapeBadCharacters($Pool_Title); 
             $escaped_overall_question = $this->escapeBadCharacters($Overall_Question); 
             $escaped_description = $this->escapeBadCharacters($Description); 
             $escaped_tie_question = $this->escapeBadCharacters($Tie_question); 
-        $pool_query = "INSERT INTO `Pool` (`Title`, `Leader ID`, `Description`, `Overall Question`, `Tie-Breaker Question`, `Private?`) VALUES ('$escaped_title', '$Leader_ID', '$escaped_description', '$escaped_overall_question', '$escaped_tie_question', '$public_private_variable');";
+        $pool_query = "INSERT INTO `Pool` (`Title`, `Leader ID`, `Description`, `Overall Question`, `Tie-Breaker Question`, `Multiple Choice?`, `Private?`) VALUES ('$escaped_title', '$Leader_ID', '$escaped_description', '$escaped_overall_question', '$escaped_tie_question', '$multiple_choice', '$public_private_variable');";
         if($result = mysqli_query($this->cxn, $pool_query)){
             //get ID from Pool table of Pool that was just created:
             $new_pool_id = mysqli_insert_id($this->cxn);
@@ -222,14 +225,9 @@ class Pool {
                 //get all category ID's associated with given template ID:
                 $query = "SELECT `Category ID` FROM  `Pool Categories` WHERE `Template ID` = '$template_id'";
             }
-            else{
-                /*this codepath will only be hit if "Multiple Choice?" is 1 but Template ID is zero or less
-                **that would indicate that the pool is multiple choice but the user has defined the choices for each category in which case it is not a template
-                **as of 12/3/13, I am not planning on supporting this in the 1st release of the app, so there isn't anything here for the time-being
-                **SUPPORT FOR USER-DEFINED MULTIPLE CHOICE POOL HERE**
-                **it's actually possible that this would just be the same query as if "Multiple Choice?" were zero
-                */
-                return "We shouldn't be here...";
+            else{ //if pool is NOT a template (user-defined categories with multiple choice responses):
+                //3/24/14 - NOTE, THE BELOW QUERY CAN BE CONSOLIDATED WITH THE MULTIPLE CHOICE == 0 PATH ABOVE
+                $query = "SELECT `Category ID` FROM  `Pool Categories` WHERE `Pool ID` = '$pool_id'";
             }
         }
         //below code executes the query and returns us an array of arrays of pool category info
@@ -252,6 +250,25 @@ class Pool {
     }
         
     
+    //ADD CATEGORY CHOICE METHOD
+    public function AddCategoryChoice($pool_id, $category_id, $category_choice_name){
+        $escaped_name_input = $this->escapeBadCharacters($category_choice_name); //strip out bad characters from input
+        $query = "INSERT INTO `Category Choices` (`Category ID`, `Choice`, `Pool ID`) VALUES ('$category_id', '$escaped_name_input', '$pool_id');";
+        $result = mysqli_query($this->cxn, $query);
+    }
+
+
+    public function UpdateCategoryChoice($choice_id, $new_category_choice_name){
+        $escaped_name_input = $this->escapeBadCharacters($new_category_choice_name); //strip out bad characters from input
+        $query = "UPDATE `Category Choices` SET `Choice` = '$escaped_name_input' WHERE `Choice ID` = '$choice_id';";
+        $result = mysqli_query($this->cxn, $query);
+    }
+
+    //REMOVE CATEGORY CHOICE METHOD
+    public function RemoveCategoryChoice($choice_id){
+        $query = "DELETE FROM `Category Choices` WHERE `Choice ID` = '$choice_id'";
+        $result = mysqli_query($this->cxn, $query);
+    }
 
 
     //GET CATEGORY CHOICES METHOD
@@ -304,18 +321,22 @@ class Pool {
 
 
     //ADD CATEGORY METHOD
-    public function AddCategory($pool_id, $category_name, $category_pt_value){
+    //RETURNS CATEGORY ID OF THE NEW CATEGORY
+    public function AddCategory($pool_id, $category_name, $category_pt_value, $multiple_choice){
         $escaped_name_input = $this->escapeBadCharacters($category_name); //strip out bad characters from input
         $escaped_point_input = $this->escapeBadCharacters($category_pt_value); //strip out bad characters from input
-        $query = "INSERT INTO `Pool Categories` (`Pool ID`, `Category Name`, `Category Point Value`) VALUES ('$pool_id', '$escaped_name_input', '$escaped_point_input');";
+        $query = "INSERT INTO `Pool Categories` (`Pool ID`, `Category Name`, `Category Point Value`, `Category Multiple Choice?`) VALUES ('$pool_id', '$escaped_name_input', '$escaped_point_input', '$multiple_choice');";
         $result = mysqli_query($this->cxn, $query);
+        return mysqli_insert_id($this->cxn);
     }
 
 
     //REMOVE CATEGORY METHOD
     public function RemoveCategory($category_id){
-        $query = "DELETE FROM `Pool Categories` WHERE `Category ID` = '$category_id'";
-        $result = mysqli_query($this->cxn, $query);
+        $delete_category_query = "DELETE FROM `Pool Categories` WHERE `Category ID` = '$category_id'";
+        $result = mysqli_query($this->cxn, $delete_category_query);
+        $delete_category_choices_query = "DELETE FROM `Category Choices` WHERE `Category ID` = '$category_id';";
+        $result2 = mysqli_query($this->cxn, $delete_category_choices_query);
     }
 
 

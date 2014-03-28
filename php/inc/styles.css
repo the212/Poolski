@@ -173,6 +173,39 @@ EDIT_POOL.PHP STYLING
 	font-style:italic;
 }
 
+#category_space{
+	margin-left:3%;
+}
+
+#category_choices_container{
+	width:92%;
+}
+
+.new_category_choice_goes_here_div{
+	margin-left:40%;
+}
+
+.category_name_label{
+	font-size: 110%;
+}
+
+.edit_category_choices_label{
+	font-size:120%;
+}
+
+.add_category_button{
+	font-size: 120%;
+}
+
+.add_category_choice_button{
+	font-size: 120%;
+	position:relative;
+}
+
+.remove_category_button{
+	font-size: 140%;
+}
+
 
 /*BEGIN NEW.PHP CSS*/
 

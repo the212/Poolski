@@ -47,20 +47,29 @@
     else:
 ?>
     <script>
-        function save_new_category(){
+        function save_new_category(multiple_choice){
             //note we can't remove this JS function from the page and put in separate .js file due to the document.getElementByID functions
+            multiple_choice = multiple_choice || 0; //set multiple_choice variable if it is passed (default is 0 which means category is NOT multiple choice)
             new_category_name = document.getElementById('new_category').value
             new_category_points = document.getElementById('new_category_points').value
             //ajax request for adding new category
             $.ajax({
                 type: "GET",
                 url: "send_pool_data.php",
-                data: {pool_id: "<?php echo $pool_fetch_result['Pool ID']; ?>", new_category: new_category_name, new_category_points: new_category_points}
+                data: {pool_id: "<?php echo $pool_fetch_result['Pool ID']; ?>", new_category: new_category_name, new_category_points: new_category_points, multiple_choice: multiple_choice}
             })
                 .done(function(html){ //when ajax request completes
+                    var return_array = JSON.parse(html); //return html is sent as an array - 1st value is the html to generate new category space, 2nd value is the new category ID
                     $("#saved_category_space").fadeOut(300, function(){
-                        $("#saved_category_space").html(html);
-                        $("#saved_category_space").fadeIn(300);
+                        $("#saved_category_space").html(return_array[0]); //insert html for new category space
+                        $("#add_choice_button_for_category_"+return_array[1]).css("left", "-120%"); //temporarily move the "add choice" button to the left of the screen (we animate it on screen below)
+                        $("#saved_category_space").fadeIn(300, function(){
+                            $("#add_choice_button_for_category_"+return_array[1]).animate({"left":"0.5%"}, 400, function(){
+                                $("#add_choice_button_for_category_"+return_array[1]).animate({"font-size":"160%"}, 200, function(){
+                                    $("#add_choice_button_for_category_"+return_array[1]).animate({"font-size":"119%"}, 200);
+                                });
+                            });
+                        });
                         //re-add the edit in place functionality since it will not initially work after fadeout above:
                         var pool_id = $("#pool_id_span").html();
                         $(".edit_pool_field").editInPlace({
@@ -76,7 +85,33 @@
                 $("#new_category_points").val("1");
         }
 
-        function remove_category(category_div_id, category_id){ 
+        function save_new_category_choice(category_id){
+            new_category_choice_name = document.getElementById('new_category'+category_id+'_choice').value
+            //ajax request for adding new category
+            $.ajax({
+                type: "GET",
+                url: "send_pool_data.php",
+                data: {pool_id: "<?php echo $pool_fetch_result['Pool ID']; ?>", category_id: category_id, new_category_choice: new_category_choice_name}
+            })
+                .done(function(html){ //when ajax request completes
+                    $("#category"+category_id+"_choice_space").fadeOut(300, function(){
+                        $("#category"+category_id+"_choice_space").html(html);
+                        $("#category"+category_id+"_choice_space").fadeIn(300);
+                        //re-add the edit in place functionality since it will not initially work after fadeout above:
+                        var pool_id = $("#pool_id_span").html();
+                        $(".edit_pool_field").editInPlace({
+                            url: 'send_pool_data.php',
+                            params: 'pool_id='+pool_id,
+                            show_buttons: true,
+                            value_required: true
+                        });
+                    });
+                });
+                //reset inputs for new category name and point value:
+                $("#new_category"+category_id+"_choice").val("");
+        }
+
+        function remove_category(category_div_id, category_id, multiple_choice){ 
             if (category_div_id === undefined){ //if category_div_id is undefined, it means that we are removing a new category that hasn't yet been written to DB
                 var div_id = $("#remove_category_button").parents().eq(3).attr("id"); //get the id of the "new category" div
                 $("#"+div_id).replaceWith('<div id="new_category_goes_here"><input type="button" onclick="add_category()" value="Add new category"></div>'); //remove new category div and replace it with the original add_category button and its enclosing new_Category_goes_here div:
@@ -88,10 +123,31 @@
                     $.ajax({
                         type: "GET",
                         url: "send_pool_data.php",
-                        data: {pool_id: "<?php echo $pool_fetch_result['Pool ID']; ?>", remove_category: category_id}
+                        data: {pool_id: "<?php echo $pool_fetch_result['Pool ID']; ?>", remove_category: category_id, multiple_choice: multiple_choice}
                     })
                     .done(function(html) { //when ajax request completes
                         $("#saved_category_space").html(html);
+                    }); 
+                });
+            }
+        }
+
+        function remove_category_choice(category_id, choice_div_id, choice_id){ 
+            if (choice_div_id === undefined){ //if choice_div_id is undefined, it means that we are removing a new category that hasn't yet been written to DB (e.g., user is clicking the "cancel" button after clicking "add choice")
+                var div_id = $("#remove_category_choice_button_"+category_id).parents().eq(3).attr("id"); //get the id of the "new category" div
+                $("#"+div_id).replaceWith('<div id="new_category'+category_id+'_choice_goes_here" style="margin-left:40%;"><h4><span class="add_category_choice_button"><input type="button" onclick="add_category_choice('+category_id+')" value="Add new choice"></span></h4></div>'); //remove new category div and replace it with the original add_category button and its enclosing new_Category_goes_here div:
+            }
+            else{ //if choice_div_id was set, it means we are removing an existing choice from the DB
+                //fade out and remove the category div from the html of the page:
+                $("#category"+category_id+"_choice_"+choice_div_id).fadeOut(500, function(){
+                   //AJAX call to send_pool_data.php with the "remove_category_choice" variable set in URL - send_pool_data.php will run the remove category choice method
+                    $.ajax({
+                        type: "GET",
+                        url: "send_pool_data.php",
+                        data: {category_id: category_id, remove_category_choice: choice_id}
+                    })
+                    .done(function(html) { //when ajax request completes
+                        $("#category"+category_id+"_choice_space").html(html);
                     }); 
                 });
             }
@@ -212,10 +268,16 @@
 ?>
             <!--EDIT POOL CATEGORIES DIV -->
             <div class="tab-pane fade in active" id="pool_categories">
-                <div id="category_space" style="width:80%">
+                <div id="category_space" style="width:95%">
                     <h3 class="edit_pool_heading" style="text-decoration:underline">Categories</h3>            
-                    <?php include_once "inc/edit_pool_categories_nonMC.php"; ?> <!--NON MULTIPLE CHOICE EDIT CATEGORIES FILE -->
-                        <!--WE CAN EVENTUALLY ADD AN IF STATEMENT HERE TO CHECK WHETHER POOL IS MULTIPLE CHOICE OR NOT -->
+<?php 
+                    if($pool_fetch_result['Multiple Choice?'] == 0){
+                        include_once "inc/edit_pool_categories_nonMC.php"; //NON MULTIPLE CHOICE EDIT CATEGORIES FILE
+                    }
+                    else{
+                        include_once "inc/edit_pool_categories_MC.php"; //MULTIPLE CHOICE EDIT CATEGORIES FILE
+                    }
+?>   
                 </div> <!--end of category_space div-->
             </div>
             <!--END OF EDIT POOL CATEGORIES DIV -->

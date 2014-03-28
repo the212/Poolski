@@ -1,42 +1,14 @@
 <?php
             if($number_of_saved_categories>0){
                 //if saved categories exist in given pool:
+                include_once 'inc/update_categories_list.php';
 ?>
                 <p style="font-style:italic">Click on a category name or its point value to edit it</p>
                 <br>
                 <div id="saved_category_space"> 
 <?php
-                $category_counter = 1;
-                //create list of saved pool categories for given pool by walking through pool_categories array:
-                foreach($pool_categories as $category_id => $category_info){
-?>          
-                    <div id="category_<?php echo $category_counter; ?>">
-                        <div style="margin-left:50px; width:100%;" class="well well-sm"> 
-                            <div class="row">
-                                <div class="col-md-2">
-                                    <h4> Category name: &nbsp; </h4>
-                                </div>
-                                <div class="col-md-5">
-                                    <h4>
-                                        <span class="label label-info"><span class="edit_pool_field" id="category_n_span<?php echo $category_info['Category ID']; ?>" style="margin-left:0px; white-space:pre-line;"><?php echo $category_info['Category Name']; ?></span></span>
-                                    </h4>
-                                </div>
-                                <div class="col-md-3">
-                                    <h4>
-                                        Point Value: <span class="label label-info">&nbsp;<span class="edit_pool_field" id="category_p_span<?php echo $category_info['Category ID']; ?>">&nbsp;<?php echo $category_info['Category Point Value']; ?>&nbsp; </span>&nbsp;</span>
-                                    </h4>  
-                                </div>
-                                <div class="col-md-2"> 
-                                    <h5> 
-                                        <input type="button" onclick="remove_category(<?php echo $category_counter; ?>, <?php echo $category_info['Category ID']; ?>)" value="Remove category"> 
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-<?php 
-                $category_counter++;
-                }
+                $category_list = Update_Category_List($pool_categories, 0);
+                echo $category_list;
 ?>
                 </div>
 <?php
@@ -57,5 +29,7 @@
             }
 ?>                
             <div id="new_category_goes_here">
-                <h4><input type="button" onclick="add_category()" value="Add new category"></h4>
+                <h4>
+                    <span class="add_category_button"><input type="button" onclick="add_category()" value="Add new category"></span>
+                </h4>
             </div>
