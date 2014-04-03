@@ -6,40 +6,35 @@ $pageTitle = "Score Template (INTERNAL)";
 include_once "inc/header.php";
 include_once 'inc/class.users.inc.php';
 $user = new SiteUser();
-
 $current_user_id = $user->GetUserIDFromEmail($_SESSION['Username']); //get user ID of user who is trying to access this page
-if($_GET['finalize_template'] == 998) {
-    if($current_user_id == 1){ 
-        include_once 'inc/class.pool.inc.php';
-        $pool = new Pool(); //new instance of the Pool class
-        if($_GET['no_email'] == 1){
-            $finalize_template_result = $pool->FinalizeTemplateScores($_GET['template_id'], 1);
+
+include_once 'inc/class.pool.inc.php';
+$pool = new Pool(); //new instance of the Pool class
+$template_id = $_GET['template_id']; //get pool ID from URL
+$template_fetch_result = $pool->GetBasicTemplateInfo($template_id);
+if(isset($_GET['template_id']) && isset($template_fetch_result) && $current_user_id == 1){ //if template is specified, exists, and current user is admin
+    if($_GET['finalize_template'] == 998) {
+        if($current_user_id == 1){ 
+            include_once 'inc/class.pool.inc.php';
+            $pool = new Pool(); //new instance of the Pool class
+            if($_GET['no_email'] == 1){
+                $finalize_template_result = $pool->FinalizeTemplateScores($_GET['template_id'], 1);
+            }
+            else {
+                $finalize_template_result = $pool->FinalizeTemplateScores($_GET['template_id']);
+            }
+            echo "<h2>Pool Results Stored.</h2><br>";
         }
-        else {
-            $finalize_template_result = $pool->FinalizeTemplateScores($_GET['template_id']);
+        else{ //IF USER IS ANYONE BESIDES USER ID #1
+            header("Location: home.php");
         }
-        echo "<h2>Pool Results Stored.</h2><br>";
-        /*echo "<br>";
-        print_r($finalize_template_result);*/
-    }
-    else{ //IF USER IS ANYONE BESIDES USER ID #1
-        header("Location: home.php");
     }
 }
-
-
-if(isset($_GET['template_id'])) { //if a pool ID is specified in URL:
-    include_once 'inc/class.pool.inc.php';
-    $pool = new Pool(); //new instance of the Pool class
-    $template_id = $_GET['template_id']; //get pool ID from URL
-    $template_fetch_result = $pool->GetBasicTemplateInfo($template_id);
-    $template_category_fetch = $pool->GetTemplateCategories($template_id); //get template category data
-}
-else {
-    //if no pool ID is specified in URL, return the user to the homepage:
+else{
     header("Location: home.php");
 }
-    
+   
+$template_category_fetch = $pool->GetTemplateCategories($template_id); //get template category data 
 
 //************************************BEGIN MULTIPLE CHOICE SECTION***********************************
         

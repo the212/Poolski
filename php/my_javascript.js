@@ -172,6 +172,34 @@
 /************************************************************************************************/
 
 
+//BEGINNING OF EDIT_TEMPLATE.PHP JAVASCRIPT
+
+    function change_template_live_variable(template_id, new_live_variable){
+            var publish_variable;
+            if(new_live_variable == 1){
+                publish_variable = "publish";
+            }
+            else{
+                publish_variable = "retire";
+            }
+            if(confirm("Are you sure you want to "+publish_variable+" the template?")){
+                //AJAX call to submit pool:
+                $.ajax({
+                    type: "GET",
+                    url: "send_pool_data.php",
+                    data: {template_id: template_id, change_template_variable_action: new_live_variable}
+                })
+                .done(function(html){ //refresh the page once ajax completes
+                    location.reload(); 
+                });
+            }
+        } 
+
+//END OF EDIT_TEMPLATE.PHP JAVASCRIPT
+
+
+/************************************************************************************************/
+
 //BEGINNING OF POOL.PHP JAVASCRIPT
 
     //Jquery for tabs on pool.php page:
@@ -212,7 +240,7 @@
                     alert(html);
                 });*/
             }
-            else{ //IF WE ARE NOT SCORING A TEMPLATE'S CATEGORIES (ADMIN) AND INSTEAD A DROPDOWN PICK IS BEING EDITED:
+            else{ //IF WE ARE NOT SCORING ANYTHING AT ALL AND INSTEAD A DROPDOWN PICK IS BEING EDITED
                 $.ajax({
                     type: "POST",
                     url: "send_pool_picks.php",

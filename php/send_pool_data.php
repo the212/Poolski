@@ -22,6 +22,8 @@ if(isset($_POST['element_id'])){
     //BEGIN INPUT CHECKS
     $category_check = substr_compare(substr($input_id,0,8),"category",0,8); //get first 8 characters of pool item id and check to see if they are "category" - if so, we are updating a category or a category's point value and need to write to the 'Pool Category' table
     $choice_check = substr_compare(substr($input_id,0,6),"choice",0,6);
+    $template_info_check = substr_compare(substr($input_id,0,8),"template",0,8); //see if we are editing a template's info (edit_template.php)
+    $template_category_update_check = substr_compare(substr($pool_id,0,8),"template",0,8);
     //BELOW SEQUENCE OF IF'S IS TO VALIDATE CATEGORY POINT INPUTS (THEY MUST BE NUMERIC IN DB)
     if($category_check == 0){ //if we have been sent a category related update:
         $category_item = $input_id[9]; //CHECK TO SEE WHAT CATEGORY ITEM IS BEING EDITED 
@@ -39,11 +41,20 @@ if(isset($_POST['element_id'])){
         $new_nickname_result = $pool->UpdateNickname($_POST['user_id'], $pool_id, $input_value);
         echo $new_nickname_result;
     }
-    elseif($choice_check == 0){ //UPDATE CATEGORY CHOICE NAME:
+    elseif($choice_check == 0){ //if we are updating a category's choice name:
         $choice_id = substr($input_id,11);
         $new_category_choice_result = $pool->UpdateCategoryChoice($choice_id, $input_value);
     }
-    else{ //UPDATE CATEGORY NAME:
+    elseif($template_info_check == 0) { //if we are updating a template's info (name, description, overall question, tie breaker question):
+        $template_item_to_be_updated = substr($input_id,9); //get name of field in Templates DB table that is to be updated
+        $template_id = $_POST['template_id'];
+        $new_template_result = $pool->UpdateTemplateData($template_id, $template_item_to_be_updated, $input_value);
+    }
+    elseif($template_category_update_check == 0){ //if we are updating a template category:
+        $template_id = substr($pool_id,9); //the last characters in the $pool_id input variable will be the template id in which the given category is to be updated
+        $new_pool_result = $pool->UpdateTemplateData($template_id, $input_id, $input_value);
+    }
+    else{ //if we are updating a non-template category for a pool:
         $new_pool_result = $pool->UpdatePoolData($pool_id, $input_id, $input_value);
     }
     //END INPUT COMMANDS
@@ -62,8 +73,15 @@ else{ //IF EDIT IN PLACE IS NOT BEING CALLED:
         $new_category_points = $_GET['new_category_points'];
         $multiple_choice = $_GET['multiple_choice'];
         $pool = new Pool();
-        $new_category_id = $pool->AddCategory($pool_id, $new_category, $new_category_points, $multiple_choice); //AddCategory FUNCTION RETURNS CATEGORY ID OF NEWLY ADDED CATEGORY
-        $pool_categories = $pool->GetPoolCategoryData($pool_id);
+        if(isset($_GET['template_id'])){ //if we are adding a category to a template:
+            $template_id = $_GET['template_id'];
+            $new_category_id = $pool->AddTemplateCategory($template_id, $new_category, $new_category_points, $multiple_choice); //AddTemplateCategory FUNCTION RETURNS CATEGORY ID OF NEWLY ADDED CATEGORY
+            $pool_categories = $pool->GetTemplateCategories($template_id);
+        }
+        else{ //if we are not adding a category to a template:
+            $new_category_id = $pool->AddCategory($pool_id, $new_category, $new_category_points, $multiple_choice); //AddCategory FUNCTION RETURNS CATEGORY ID OF NEWLY ADDED CATEGORY
+            $pool_categories = $pool->GetPoolCategoryData($pool_id);
+        }
         $number_of_saved_categories = count($pool_categories);
         if($number_of_saved_categories>0){ 
             $return_value = Update_Category_List($pool_categories, $multiple_choice); 
@@ -81,7 +99,13 @@ else{ //IF EDIT IN PLACE IS NOT BEING CALLED:
         $category_id = $_GET['category_id'];
         $new_category_choice = $_GET['new_category_choice'];
         $pool = new Pool();
-        $pool->AddCategoryChoice($pool_id, $category_id, $new_category_choice);
+        if(isset($_GET['template_id'])){ //if we are adding a choice for a template category:
+            $null_variable = NULL;
+            $pool->AddCategoryChoice($null_variable, $category_id, $new_category_choice);
+        }
+        else{ //if we are adding a choice for a non-template category:
+            $pool->AddCategoryChoice($pool_id, $category_id, $new_category_choice);
+        }
         $category_choices = $pool->GetCategoryChoices($category_id);
         $number_categories_choices = count($category_choices);
         if($number_categories_choices>0){ 
@@ -97,7 +121,13 @@ else{ //IF EDIT IN PLACE IS NOT BEING CALLED:
         $multiple_choice = $_GET['multiple_choice'];
         $pool = new Pool();
         $pool->RemoveCategory($removal_category);
-        $pool_categories = $pool->GetPoolCategoryData($pool_id);
+        if(isset($_GET['template_id'])){ //if we are removing a template category:
+            $template_id = $_GET['template_id'];
+            $pool_categories = $pool->GetTemplateCategories($template_id);
+        }
+        else{ //if we are removing a non template category:
+            $pool_categories = $pool->GetPoolCategoryData($pool_id);
+        }
         $number_of_saved_categories = count($pool_categories);
         if($number_of_saved_categories>0){ 
             $return_value = Update_Category_List($pool_categories, $multiple_choice);
@@ -131,6 +161,13 @@ else{ //IF EDIT IN PLACE IS NOT BEING CALLED:
             //IF WE GET A 1 BACK FROM MakePoolReadyForInvitees FUNCTION, IT MEANS POOL WAS NOT PREVIOUSLY READY FOR INVITES
             echo "Pool has been submitted!"; //note, as of 11/13, this text will not be shown anywhere
         }
+    }
+
+    //PUBLISH TEMPLATE - MAKE IT VISIBLE TO ALL SITE USERS 
+    if(isset($_GET['change_template_variable_action'])){
+        $pool = new Pool();
+        $template_id = $_GET['template_id'];
+        $result_array_test = $pool->ChangeTemplateLiveVariable($template_id, $_GET['change_template_variable_action']);
     }
 
     //DELETE POOL - IF POOL IS TO BE DELETED

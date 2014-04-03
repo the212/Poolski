@@ -223,7 +223,7 @@
                     include_once 'inc/class.users.inc.php';
                     $user = new SiteUser();
                     $current_user_id = $user->GetUserIDFromEmail($_SESSION['Username']);
-                    if($current_user_id == 1) { //as of 3/10/14, we only allow admin to edit a scored pool's scores
+                    if($current_user_id == 1 && !isset($pool_fetch_result['Template ID'])) { //as of 3/10/14, we only allow admin to edit a scored pool's scores (only let pool scores be manually edited if it did NOT come from a template)
                         echo "<h4><a href='score_pool_manual.php?pool_id=".$pool_id."'>Click here to edit the pool's score</a></h4>";
                     }
                     //include_once "inc/final_pool_rankings.php"; //show pool ranking list

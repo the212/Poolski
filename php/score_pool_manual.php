@@ -203,20 +203,18 @@ else {
     else{ //if pool is multiple choice:
 
 //************************************BEGIN MULTIPLE CHOICE SECTION***********************************
-        //AS OF 12/30/13, I AM NOT PLANNING ON SUPPORTING USER-SCORING FOR A MULTIPLE CHOICE POOL IN THE FIRST PROTOTYPE
-        echo "<h3>The scoring page for a multiple choice pool is under construction.  <a href='home.php'>Click here to return to the home page</a></h3>";
-        //BELOW IS THE CODE WHICH CAN BE USED WHEN WE DO SUPPORT USER-SCORING FOR MULTIPLE CHOICE POOLS:
-/*
+
 ?>
+        <span id="pool_id_span" style="display:none"><?php echo $pool_id; ?></span>
         <h2 style="text-decoration:underline">Tally Pool Score</h2> 
-        <p>Choose the correct picks below.  Users will only receive points for correct picks.</p>
+        <h3>Choose the correct picks below.  Users will only receive points for correct picks.</h3>
         <br>
         <div class="row">
             <div class="col-md-5">
                 <h4 style="text-decoration:underline"><?php echo $pool_fetch_result['Overall Question']; ?></h4> 
             </div>
             <div class="col-md-7">
-                <h4><input type="button" id="score_pool_button" class="btn btn-warning btn-lg" value="Submit" onclick="JAVASCRIPT:;" /> Click here once all correct answers have been chosen</h4>
+                <h4><input type="button" id="score_pool_button" class="btn btn-warning btn-lg" value="Finish and Calculate Pool Score" onclick="JAVASCRIPT:CalculatePoolScoreValidate(<?php echo $pool_id; ?>, 1);" /></h4>
             </div>
         </div>
         <br>
@@ -225,24 +223,47 @@ else {
             $category_choices = $pool->GetCategoryChoices($category_id); //store all of the multiple choices for given category in $category_choices array
             $correct_response = $pool->GetCorrectChoiceForTemplateCategory($category_id);
             if($correct_response == '0'){ //if the category has not yet been marked as correct, display the first value of the category_choices array:
-                $display_choice = reset($category_choices);
+                //$display_choice = reset($category_choices);
+                $display_choice = '000NA000'; //if we pass this value to the ScoreTemplateChoice method, it will reset the category to be unscored
             }
             else{ //if category has been marked correct, display the saved correct value:
                 $display_choice = key($correct_response);
             }
-            echo $category_info['Category Name'];
+            echo "<h4>".$category_info['Category Name']."</h4>";
 ?>
             <div class="bfh-selectbox" id="TEMPLATE99_<?php echo $category_info['Category ID']; ?>" data-name="selectbox1" data-value="<?php echo $display_choice; ?>" data-filter="true">
+                <div data-value='000NA000'>**No answer chosen**</div> <!--default drop down choice when no answer has been previously selected-->
 <?php
-            foreach($category_choices as $choice_number => $choice){ //put all of the given category's multiple choices in the bfh-selectbox dropdown menu
+            foreach($category_choices as $choice_id => $choice){ //put all of the given category's multiple choices in the bfh-selectbox dropdown menu
 ?>
-                <div data-value='<?php echo $choice_number; ?>'><?php echo $choice; ?></div> <!--display category choices in a drop down-->
+                <div data-value='<?php echo $choice_id; ?>'><?php echo $choice; ?></div> <!--display category choices in a drop down-->
 <?php
             }
-            echo "</div>";
-            echo "<br><br>";
+?>
+            </div>
+            <br><br>
+<?php
         }
-*/
+?>
+            <div class="well well-sm">
+            <h2 style="margin-left:50px; text-decoration:underline">Tie breaker question:</h2>
+            <h4 style="margin-left:50px"><?php echo $pool_fetch_result['Tie-Breaker Question']; ?></h4> 
+            <div id="tie-breaker" style="margin-left:50px;">
+    <?php
+                $tie_breaker_answer = $pool->GetCustomPoolTieBreakerAnswer($pool_id);
+                if(isset($tie_breaker_answer)){
+                    $tie_breaker_answer_display = $tie_breaker_answer;
+                }
+                else{
+                    $tie_breaker_answer_display = "**Enter tie-breaker value here**";
+                }
+    ?>
+                <h3 style="margin-left:50px;"><span class="label label-info"><span id="tie_breaker_input" class="edit_custom_pool_tie_breaker" style="font-weight:bold;"><?php echo $tie_breaker_answer_display; ?></span></span></h3>
+            </div>
+        </div>
+        <br><hr><br>
+
+<?php
 //************************************END MULTIPLE CHOICE SECTION***********************************
     }
 ?>

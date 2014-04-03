@@ -29,6 +29,14 @@ $(document).ready(function(){
 		value_required: true
 	});
 
+	//Edit pool fields (for leader - edit_pool.php):
+	$(".edit_template_field").editInPlace({
+		url: 'send_pool_data.php',
+		params: 'template_id='+template_id,
+		show_buttons: true,
+		value_required: true
+	});
+
 	//Edit picks for a pool (for pool participant) - pool.php:
 	$(".edit_pick").editInPlace({
 		url: 'send_pool_picks.php',
