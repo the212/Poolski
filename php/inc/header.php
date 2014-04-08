@@ -21,10 +21,8 @@
 <script src="inc/bootstrap_addons//bootstrap/js/bootstrap.min.js"></script> 
 <script src="inc/bootstrap_addons/bootstrap-formhelpers.min.js"></script>
 
-
 <!--Bootstrap Form Helpers -->
-    <link href="inc/bootstrap_addons/bootstrap-formhelpers.min.css" rel="stylesheet" media="screen">
-
+<link href="inc/bootstrap_addons/bootstrap-formhelpers.min.css" rel="stylesheet" media="screen">
 
 <!--Bootstrap Plugins-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,9 +57,8 @@
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 <?php
 
-	if(isset($_SESSION['LoggedIn']) && isset($_SESSION['Username']) && $_SESSION['LoggedIn']==999):
+	if(isset($_SESSION['LoggedIn']) && isset($_SESSION['Username']) && $_SESSION['LoggedIn']==999): //if user is logged in:
 ?>
-<!-- IF LOGGED IN -->
                   <!-- Collect the nav links, forms, and other content for toggling -->
                   
                         <ul class="nav navbar-nav">
@@ -86,14 +83,12 @@
                             <!--<li><a href="mailto:contact@poolski.com?Subject=Hello">Contact us</a></li>-->
                             <li><a href="logout.php">Log out</a></li>
                         </ul>
-<?php else: ?>
-<!-- IF LOGGED OUT -->
+<?php else: //if logged out: ?>
                         <ul class="nav navbar-nav">
                             <li><a href="login.php">Log in</a></li>
                             <li><a href="signup.php">Sign up</a></li>
                         </ul>
 <?php endif; ?>
-<!-- END OF IF STATEMENT -->
                     </div><!-- /.navbar-collapse -->
                 </nav>
             </div>

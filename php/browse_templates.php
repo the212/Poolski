@@ -3,6 +3,9 @@
     include_once "inc/constants.inc.php";
     $pageTitle = "Browse Pool Templates";
     include_once "inc/header.php";
+    include_once 'inc/class.pool.inc.php';
+    $pool = new Pool(); 
+    $published_templates_array = $pool->GetPublishedTemplates();
 
 ?>
     <!--
@@ -55,11 +58,18 @@
             <br><br>
         </div>
         <br>
+<?php
+    foreach($published_templates_array as $template_id => $template_info){ //for each published template:
+?>
         <div class="thumbnail" style="margin-left:15%; margin-right:15%;">
-            <h2><a href="create_new_template.php?template_id=3">Academy Awards Pick 'em 2014</a></h2>
-            <h4>Make your picks for who is taking home the golden statue.</h4>
+            <h2><a href="create_new_template.php?template_id=<?php echo $template_id; ?>"><?php echo $template_info['Template Name']; ?></a></h2>
+            <h4><?php echo $template_info['Template Description']; ?></h4>
         </div>    
-        <br><br><br><br>
+        <br><br>
+<?php
+    }
+?>
+        <br><br>
         <h4>More templates coming soon...</h4>
     </div>
 

@@ -87,6 +87,9 @@ class Pool {
         //DELETE ENTRIES FROM THE USER PICKS TABLE (ENTRIES WILL ONLY EXIST IF AT LEAST ONE PICK BY A POOL MEMBER HAS BEEN MADE)
             $delete_user_picks_query = "DELETE FROM `User Picks` WHERE `Pool ID` = '$pool_id'";
             $result4 = mysqli_query($this->cxn, $delete_user_picks_query);
+        //DELETE ENTRIES FROM CATEGORY CHOICES TABLE (ENTRIES WILL ONLY BE DELETED IF A POOL IS NOT A TEMPLATE)
+            $delete_category_choices_query = "DELETE FROM `Category Choices` WHERE `Pool ID` = '$pool_id';";
+            $result5 = mysqli_query($this->cxn, $delete_category_choices_query);
     } //END OF DELETE POOL METHOD
     
 
@@ -105,10 +108,10 @@ class Pool {
                 $pool_end_time = strtotime($pool_data['End Time']); //convert pool end timestamp to unix timestamp
             }
             $current_time = time(); //get current time (unix timestamp) - this should be based on the timezone specified for the date_default_timezone_set() function at the top of this file
-            if(isset($pool_start_time) AND ($current_time-$pool_start_time) > 0) { //if it is past the pool start time:
-                if($pool_data['Live?'] <> 1) { //if pool is not already live
+            if($pool_data['Ready for invites?'] == 1){ //if we are past edit_pool.php:
+                if(isset($pool_start_time) AND ($current_time-$pool_start_time) > 0 AND $pool_data['Live?'] <> 1) { //if it is past the pool start time and pool is ready for invites:
                     $pool_start_query = "UPDATE  `Pool` SET `Live?` =  '1' WHERE  `Pool ID` ='$pool_id';"; //make pool live
-                    $pool_start_result = mysqli_query($this->cxn, $pool_start_query);
+                    $pool_start_result = mysqli_query($this->cxn, $pool_start_query);    
                 }
                 if(isset($pool_end_time) AND ($current_time-$pool_end_time) > 0 AND $pool_data['Pool Ended?'] <> 1) { //if pool is not already over and it is past the pool end time:
                     $pool_end_query = "UPDATE  `Pool` SET `Pool Ended?` =  '1' WHERE  `Pool ID` ='$pool_id';"; //end pool
@@ -134,7 +137,20 @@ class Pool {
     **  THIS DELIMITED STRING IS CONVERTED TO A JAVASCRIPT ARRAY IN THE BROWSER AFTER AN AJAX CALL  - SEE EDIT_POOL.PHP AND MY_JAVASCRIPT.JS 
     */
     public function UpdatePoolSettings($pool_id, $setting_to_be_updated, $new_setting_value){
-        $pool_fetch_result = $this->GetPoolData($pool_id);
+        $template_check = substr($pool_id, 0, 8);
+        if($template_check == "template"){ //if we are updating a template's settings
+            $template_id = substr($pool_id, 9);
+            $pool_fetch_result = $this->GetBasicTemplateInfo($template_id);
+            $db_table_to_be_updated = "Templates";
+            $db_id_field = "Template ID";
+            $update_id = $template_id;
+        }
+        else{ //if we are updating a regular pool's settings:
+            $pool_fetch_result = $this->GetPoolData($pool_id);
+            $db_table_to_be_updated = "Pool";
+            $db_id_field = "Pool ID";
+            $update_id = $pool_id;
+        }
         $error_message = 0; //set error_message to 0.  error_message will only be changed if there is a problem
         switch ($setting_to_be_updated) {
             case 'SD': //if we are editing start date:
@@ -145,7 +161,7 @@ class Pool {
                     return $error_message.",edit_start_date,".$original_value;
                 }
                 else {
-                    $query = "UPDATE  `Pool` SET  `Start Time` =  '$new_start_timestamp' WHERE  `Pool ID` ='$pool_id';";
+                    $query = "UPDATE  `$db_table_to_be_updated` SET  `Start Time` =  '$new_start_timestamp' WHERE  `$db_id_field` ='$update_id';";
                 }
                 break;
             case 'ST': //if we are editing start time:
@@ -156,7 +172,7 @@ class Pool {
                     return $error_message.",edit_start_time,".$original_value; 
                 }
                 else {
-                    $query = "UPDATE  `Pool` SET  `Start Time` =  '$new_start_timestamp' WHERE  `Pool ID` ='$pool_id';";
+                    $query = "UPDATE  `$db_table_to_be_updated` SET  `Start Time` =  '$new_start_timestamp' WHERE  `$db_id_field` ='$update_id';";
                 }
                 break;
             case 'ED': //if we are editing end date:
@@ -172,7 +188,7 @@ class Pool {
                     return $error_message.",edit_end_date,".$original_value;
                 }
                 else{
-                    $query = "UPDATE  `Pool` SET  `End Time` =  '$new_end_timestamp' WHERE  `Pool ID` ='$pool_id';";
+                    $query = "UPDATE  `$db_table_to_be_updated` SET  `End Time` =  '$new_end_timestamp' WHERE  `$db_id_field` ='$update_id';";
                 }
                 break;
             case 'ET': //if we are editing end time:
@@ -183,7 +199,7 @@ class Pool {
                     return $error_message.",edit_end_time,".$original_value; 
                 }
                 else {
-                    $query = "UPDATE  `Pool` SET  `End Time` =  '$new_end_timestamp' WHERE  `Pool ID` ='$pool_id';";
+                    $query = "UPDATE  `$db_table_to_be_updated` SET  `End Time` =  '$new_end_timestamp' WHERE  `$db_id_field` ='$update_id';";
                 }
                 break;
             case 'public_private': //if we are changing whether the pool is public or private:
@@ -253,7 +269,12 @@ class Pool {
     //ADD CATEGORY CHOICE METHOD
     public function AddCategoryChoice($pool_id, $category_id, $category_choice_name){
         $escaped_name_input = $this->escapeBadCharacters($category_choice_name); //strip out bad characters from input
-        $query = "INSERT INTO `Category Choices` (`Category ID`, `Choice`, `Pool ID`) VALUES ('$category_id', '$escaped_name_input', '$pool_id');";
+        if(is_null($pool_id)){ //if we are adding a category for a template (pool_id is null)
+            $query = "INSERT INTO `Category Choices` (`Category ID`, `Choice`) VALUES ('$category_id', '$escaped_name_input');";
+        }
+        else{ //if we are adding a category for a non-template pool:
+            $query = "INSERT INTO `Category Choices` (`Category ID`, `Choice`, `Pool ID`) VALUES ('$category_id', '$escaped_name_input', '$pool_id');";
+        }
         $result = mysqli_query($this->cxn, $query);
     }
 
@@ -531,7 +552,10 @@ class Pool {
         while($row = mysqli_fetch_assoc($result)){
             $user_id = $row['User ID'];
             if(!isset($row['Pool Nickname'])){
-                $nickname = "no_nickname";
+                $email_query = "SELECT `Email Address` FROM `User` WHERE `User ID` = '$user_id'";
+                $email_result = mysqli_query($this->cxn, $email_query);
+                $email_array = mysqli_fetch_assoc($email_result);
+                $nickname = $email_array['Email Address'];
             }
             else{
                 $nickname = $row['Pool Nickname'];
@@ -1062,12 +1086,78 @@ class Pool {
     /* POOL TEMPLATE METHODS
     */
 
+    public function CreateNewTemplate($template_title, $overall_question, $description=NULL, $tie_question=NULL){
+        //ESCAPE BAD CHARACTERS FROM STRING INPUTS:
+            $escaped_title = $this->escapeBadCharacters($template_title); 
+            $escaped_overall_question = $this->escapeBadCharacters($overall_question); 
+            $escaped_description = $this->escapeBadCharacters($description); 
+            $escaped_tie_question = $this->escapeBadCharacters($tie_question); 
+        $create_template_query = "INSERT INTO `Templates` (`Template Name`, `Template Description`, `Overall Question`, `Tie Breaker Question`) VALUES ('$escaped_title', '$escaped_description', '$escaped_overall_question', '$escaped_tie_question');";
+        if($result = mysqli_query($this->cxn, $create_template_query)){
+            $new_template_id = mysqli_insert_id($this->cxn);
+            $return_variable = array(2, "<p>Template created successfully!</p>", $new_template_id);
+        }
+        else{
+            $return_variable = array(3, "<p style='color:red'>There was an error connecting to the database<p>", NULL);
+        }
+        return $return_variable;
+    }
+
+
     public function GetBasicTemplateInfo($template_id){
         $query = "SELECT * FROM `Templates` WHERE `Template ID` = '$template_id';";
         $result = mysqli_query($this->cxn, $query);
         $template_info = mysqli_fetch_assoc($result);
         return $template_info;
     }
+
+
+    //GET ALL TEMPLATES METHOD
+    //NO INPUT
+    //RETURNS AN ARRAY CONTAINING THE ID'S OF TEMPLATES AS ARRAY KEYS AND ARRAYS CONSISTING OF THE TEMPLATE'S INFO AS VALUES
+    //AS OF 4/1/14, THIS IS ONLY CALLED FROM HOME.PHP WHEN THE USER IS AN ADMIN
+    public function GetAllTemplates(){
+        //get all templates:
+        $templates_query = "SELECT * FROM  `Templates`;";
+        $result = mysqli_query($this->cxn, $templates_query);
+        //create blank array to store the pool ID(s)
+        $list_of_templates = array();
+        //store all of the found pool's info in list_of_templates array:
+        while($row = mysqli_fetch_assoc($result)){
+            $template_id = $row['Template ID'];
+            //get info of pool for given pool id
+            $template_title_query = "SELECT * FROM  `Templates` WHERE `Template ID` = '$template_id'";
+            $result3 = mysqli_query($this->cxn, $template_title_query);
+            $result3_array = mysqli_fetch_assoc($result3);
+            //store pool info into the list_of_templates array
+            $list_of_templates[$template_id] = $result3_array;
+        }
+        return $list_of_templates;
+    }
+
+    //GET PUBLISHED TEMPLATES METHOD
+    //NO INPUT
+    //RETURNS AN ARRAY CONTAINING THE ID'S OF PUBLISHED TEMPLATES AS ARRAY KEYS AND ARRAYS CONSISTING OF THE TEMPLATE'S INFO AS VALUES
+    //AS OF 4/1/14, THIS IS ONLY CALLED FROM BROWSE_TEMPLATES.PHP 
+    public function GetPublishedTemplates(){
+        //get all templates:
+        $templates_query = "SELECT * FROM  `Templates` WHERE `Live?` = '1';";
+        $result = mysqli_query($this->cxn, $templates_query);
+        //create blank array to store the pool ID(s)
+        $list_of_templates = array();
+        //store all of the found pool's info in list_of_templates array:
+        while($row = mysqli_fetch_assoc($result)){
+            $template_id = $row['Template ID'];
+            //get info of pool for given pool id
+            $template_title_query = "SELECT * FROM  `Templates` WHERE `Template ID` = '$template_id'";
+            $result3 = mysqli_query($this->cxn, $template_title_query);
+            $result3_array = mysqli_fetch_assoc($result3);
+            //store pool info into the list_of_templates array
+            $list_of_templates[$template_id] = $result3_array;
+        }
+        return $list_of_templates;
+    }
+
 
 
     /*GetTemplateCategories method
@@ -1093,6 +1183,82 @@ class Pool {
             return 0;
         }
     }
+
+    //ADD TEMPLATE CATEGORY METHOD
+    //RETURNS CATEGORY ID OF THE NEW CATEGORY
+    public function AddTemplateCategory($template_id, $category_name, $category_pt_value, $multiple_choice){
+        $escaped_name_input = $this->escapeBadCharacters($category_name); //strip out bad characters from input
+        $escaped_point_input = $this->escapeBadCharacters($category_pt_value); //strip out bad characters from input
+        $query = "INSERT INTO `Pool Categories` (`Template ID`, `Category Name`, `Category Point Value`, `Category Multiple Choice?`) VALUES ('$template_id', '$escaped_name_input', '$escaped_point_input', '$multiple_choice');";
+        $result = mysqli_query($this->cxn, $query);
+        return mysqli_insert_id($this->cxn);
+    }
+
+
+    public function UpdateTemplateData($template_id, $template_item, $input){
+        /*
+        TEMPLATE_ITEM VARIABLE: The pool_item variable will be the ID of the HTML element containing the editable field for the given pool item (e.g., category name, category point value, etc)
+            This ID will be in the form of "category_X_span###" where the "X" tells us what type of category item is to be edited:
+                If X = "n" we want to update the category name
+                If X = "p" we want to update the category point value
+            The number ("###") at the end of the ID tells us which category ID we are editing
+        */
+        $escaped_input = $this->escapeBadCharacters($input); //strip out bad characters from input
+        $category_check = substr_compare(substr($template_item,0,8),"category",0,8); //get first 8 characters of pool item id and check to see if they are "category" - if so, we are updating a category or a category's point value and need to write to the 'Pool Category' table
+        if($category_check == 0){ 
+            //if we are writing to the 'Pool Category' table:
+            $category_id = substr($template_item,15); //get the number at the end of the category_span ID which is the category ID in the table
+            $category_item = $template_item[9]; //9th position in the $template_item string tells us which column in the pool categories table we are updating 
+            switch ($category_item) {
+                case "n"; //if we're updating the category name:
+                    $query = "UPDATE  `Pool Categories` SET  `Category Name` =  '$escaped_input' WHERE  `Category ID` ='$category_id' AND `Template ID` ='$template_id';";
+                    break;
+                case "p"; //if we're updating the category point value:
+                    $query = "UPDATE  `Pool Categories` SET  `Category Point Value` =  '$escaped_input' WHERE  `Category ID` ='$category_id' AND `Template ID` ='$template_id';";
+                    break;   
+            }
+            $result = mysqli_query($this->cxn, $query);
+        }
+        else{
+            //if the pool item is anything but a category or a category's point value, we write to the 'Pool' table
+            $query = "UPDATE  `Templates` SET  `$template_item` =  '$escaped_input' WHERE  `Template ID` ='$template_id';";
+            $result = mysqli_query($this->cxn, $query);
+            return $escaped_input;
+        }
+    }
+
+    /*
+    **ChangeTemplateLiveVariable function
+    **Accepts template id and an action variable (as of 4/1/14, only send_pool_data.php is sending us this info/calling this function)
+    **Action variable is a 1 if we are publishing a template and 0 if we are retiring a template
+    **Does not return anything
+    */
+    public function ChangeTemplateLiveVariable($template_id, $action){
+        $query = "UPDATE  `Templates` SET  `Live?` =  '$action' WHERE  `Template ID` ='$template_id';";
+        $result = mysqli_query($this->cxn, $query);
+    }
+
+
+    //DELETE TEMPLATE METHOD (ONLY ACCESSIBLE BY ADMINS - SEE HOME.PHP AND DELETE_TEMPLATE.PHP FILES FOR LOGIC)
+    public function DeleteTemplate($template_id){
+        //DELETE ENTRY FROM POOL TABLE:
+            $delete_template_id = "DELETE FROM `Templates` WHERE `Template ID` = '$template_id'";
+            $result1 = mysqli_query($this->cxn, $delete_template_id);
+        //DELETE ENTRIES FROM CATEGORY CHOICES TABLE 
+            $get_template_category_ids_query = "SELECT `Category ID` FROM `Pool Categories` WHERE `Template ID` = '$template_id';";
+            $result2 = mysqli_query($this->cxn, $get_template_category_ids_query);
+            while($row = mysqli_fetch_assoc($result2)){
+                $category_id = $row['Category ID'];
+                $delete_category_choices_query = "DELETE FROM `Category Choices` WHERE `Category ID` = '$category_id';";
+                $result3 = mysqli_query($this->cxn, $delete_category_choices_query);
+            }
+        //DELETE ENTRIES FROM THE POOL CATEGORIES TABLE 
+            $delete_template_categories_query = "DELETE FROM `Pool Categories` WHERE `Template ID` = '$template_id'";
+            $result4 = mysqli_query($this->cxn, $delete_template_categories_query);
+    } //END OF DELETE TEMPLATE METHOD
+
+
+
 
 
     public function SendPoolEndingEmails($pool_id) {

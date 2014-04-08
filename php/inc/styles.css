@@ -125,6 +125,10 @@ HOME.PHP STYLING
 CREATE_POOL.PHP STYLING
 */
 
+#create_new_pool_form{
+	margin-left:15px;
+}
+
 .edit_settings_instruction{
 	margin-left:5px;
 	font-style:italic;

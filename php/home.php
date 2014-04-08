@@ -108,13 +108,6 @@
             foreach($active_pools as $pool_id => $pool_info){
                 $active_pool_data = $pool->GetPoolData($pool_id); //this is only here so that the pool will begin if it is past the start date (GetPoolData method has a check to see if current time is past pool start time)
                 $pool_url = "pool.php?pool_id=$pool_id"; //set pool URL - this is the default and will be overridden if necessary depending on what state the pool is in
-                if($pool_info['Ready for invites?']==0){ //if pool is still in edit mode and hasn't been finalized:
-                    if($current_user == $pool_info['Leader ID']){ //check to make sure user is leader of the pool:
-                        $pool_url = "edit_pool.php?pool_id=$pool_id";
-                        $live_variable = "INACTIVE - Edit Pool";
-                        $status_styling = "color:#d9534f";
-                    }
-                }
                 if($pool_info['Ready for invites?']==1 && $pool_info['Live?']==0){
                     //if pool has been submitted, but is not live yet:
                     $live_variable = "Pool has not started yet - Click to make your picks!"; 
@@ -124,11 +117,6 @@
                     //if pool is ready for invites and is live also:
                     $live_variable = "Pool is live - Click to view pool!"; 
                     $status_styling = "color:#5cb85c;";
-                }
-                if($pool_info['Live?']==1 && $pool_info['Pool ended?'] ==1){
-                    //if pool has ended:
-                    $live_variable = "Pool has ended - Click to view pool results"; 
-                    $status_styling = "color:black";
                 }
                 
                 if($current_user == $pool_info['Leader ID']){
@@ -144,18 +132,9 @@
                             <td class="pool_row"><?php echo $leader_variable; ?></td>
 <?php
                 if($current_user_id == 1){ //if user is user #1 (admin):
-                    $score_template_url = "score_template_choices.php?template_id=".$pool_info['Template ID'];
                     $delete_pool_url = "delete_pool.php?pool_id=$pool_id";
 ?>
                             <td>
-<?php
-                    if(isset($pool_info['Template ID'])){ //display score_template_choices link only if given pool is a template:
-?>                            
-                                <a href=<?php echo $score_template_url; ?>>Score Template ID <?php echo $pool_info['Template ID']; ?></a>
-                                &nbsp;
-<?php
-                    } 
-?>
                                 <a href=<?php echo $delete_pool_url; ?>>Delete</a>
                             </td>
 <?php
@@ -202,18 +181,9 @@
                             <td class="pool_row"><?php echo $leader_variable; ?></td>
 <?php
                 if($current_user_id == 1){ //if user is user #1 (admin):
-                    $score_template_url = "score_template_choices.php?template_id=".$pool_info['Template ID'];
                     $delete_pool_url = "delete_pool.php?pool_id=$pool_id";
 ?>
                             <td>
-<?php
-                    if(isset($pool_info['Template ID'])){ //display score_template_choices link only if given pool is a template:
-?>                            
-                                <a href=<?php echo $score_template_url; ?>>Score Template ID <?php echo $pool_info['Template ID']; ?></a>
-                                &nbsp;
-<?php
-                    } 
-?>
                                 <a href=<?php echo $delete_pool_url; ?>>Delete</a>
                             </td>
 <?php
@@ -263,18 +233,9 @@
                             <td class="pool_row"><?php echo $leader_variable; ?></td>
 <?php
                 if($current_user_id == 1){ //if user is user #1 (admin):
-                    $score_template_url = "score_template_choices.php?template_id=".$pool_info['Template ID'];
                     $delete_pool_url = "delete_pool.php?pool_id=$pool_id";
 ?>
                             <td>
-<?php
-                    if(isset($pool_info['Template ID'])){ //display score_template_choices link only if given pool is a template:
-?>                            
-                                <a href=<?php echo $score_template_url; ?>>Score Template ID <?php echo $pool_info['Template ID']; ?></a>
-                                &nbsp;
-<?php
-                    } 
-?>
                                 <a href=<?php echo $delete_pool_url; ?>>Delete</a>
                             </td>
 <?php
@@ -302,7 +263,68 @@
                 </div> <!--END OF ROW DIV-->
             </div> <!--END OF ACTIVE POOLS DIV-->
         </div><!--END OF TOP ROW DIV-->
-    </div>
+
+<?php
+    if($current_user_id == 1){ //if user is an admin:
+        $list_of_templates = $pool->GetAllTemplates();
+?>
+    <!--************BEGIN TEMPLATES SECTION***********************************************-->
+            <h3 style="text-decoration:underline">Templates (Internal)</h3>
+                <table border="1" style="width:95%">
+                    <tr>
+                        <th class="pool_top_row pool_column">Template</th>
+                        <th class="pool_top_row pool_status_column">Status</th>
+                        <th class="pool_top_row pool_leader_column">Score Template</th>
+                        <th class="pool_top_row pool_leader_column">Delete Template</th>
+                    </tr>
+<?php
+        foreach($list_of_templates as $template_id => $template_info){
+            $edit_template_url = "edit_template.php?template_id=$template_id"; 
+
+            if($template_info['Live?']==1){
+                //if template has been published and is live:
+                $live_variable = "Template is Live"; 
+                $status_styling = "color:#5cb85c";
+            }
+            else{
+                //if template has been not yet been published and is NOT live:
+                $live_variable = "Template is not yet Live"; 
+                $status_styling = "color:black";
+            }
+?>
+                    <tr>
+                        <td class="pool_row"><a href=<?php echo $edit_template_url; ?>><?php echo $template_info['Template Name']; ?></a></td>
+                        <td class="pool_status"><a href=<?php echo $edit_template_url; ?> style="<?php echo $status_styling; ?>"><?php echo $live_variable; ?></a></td>
+<?php
+            $score_template_url = "score_template_choices.php?template_id=".$template_info['Template ID'];
+            $delete_template_url = "delete_template.php?template_id=$template_id";
+?>
+                        <td>
+<?php
+            if(isset($template_info['Template ID'])){ //display score_template_choices link 
+?>                            
+                            <a href=<?php echo $score_template_url; ?>>Score Template ID <?php echo $template_info['Template ID']; ?></a>
+                            &nbsp;
+<?php
+            } 
+?>
+                        </td>
+                        <td>
+                            <a href=<?php echo $delete_template_url; ?>>Delete</a>
+                        </td>
+                    </tr>
+<?php
+            } //END OF TEMPLATES FOREACH STATEMENT
+?>
+                </table> 
+                <br>
+
+    <!--************END TEMPLATES SECTION***********************************************-->
+<?php
+    } //END OF "IF USER IS ADMIN" IF STATEMENT
+?>
+
+    </div><!--END OF CONTAINER DIV-->
 
 <?php
     include_once 'inc/close.php';

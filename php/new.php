@@ -4,6 +4,11 @@
     $pageTitle = "New Pool";
     include_once "inc/header.php";
 
+    include_once 'inc/class.users.inc.php';
+    $user = new SiteUser(); 
+    $current_user = $_SESSION['Username'];
+    $current_user_id = $user->GetUserIDFromEmail($current_user);
+
 ?>
 <br>
 <div style="text-align: center">
@@ -34,4 +39,20 @@
             </div>
         </div>
     </div>
+<?php
+if($current_user_id == 1){
+?>
+    <div class="row" style="padding:5%;">
+        <div class="thumbnail">
+            <div class="caption">
+                <h3>Create a new template</h3>
+                <p>Internal Only.  Create a new template that other users can use to create their own pools</p>
+                <br>
+                <p><a href="create_new.php?template=1" class="btn btn-lg btn-primary center-block" role="button">Create Template</a> </p>
+            </div>
+        </div>
+    </div>
+<?php
+}
+?>
 </div>
