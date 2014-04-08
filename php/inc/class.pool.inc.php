@@ -108,10 +108,10 @@ class Pool {
                 $pool_end_time = strtotime($pool_data['End Time']); //convert pool end timestamp to unix timestamp
             }
             $current_time = time(); //get current time (unix timestamp) - this should be based on the timezone specified for the date_default_timezone_set() function at the top of this file
-            if(isset($pool_start_time) AND ($current_time-$pool_start_time) > 0) { //if it is past the pool start time:
-                if($pool_data['Live?'] <> 1) { //if pool is not already live
+            if($pool_data['Ready for invites?'] == 1){ //if we are past edit_pool.php:
+                if(isset($pool_start_time) AND ($current_time-$pool_start_time) > 0 AND $pool_data['Live?'] <> 1) { //if it is past the pool start time and pool is ready for invites:
                     $pool_start_query = "UPDATE  `Pool` SET `Live?` =  '1' WHERE  `Pool ID` ='$pool_id';"; //make pool live
-                    $pool_start_result = mysqli_query($this->cxn, $pool_start_query);
+                    $pool_start_result = mysqli_query($this->cxn, $pool_start_query);    
                 }
                 if(isset($pool_end_time) AND ($current_time-$pool_end_time) > 0 AND $pool_data['Pool Ended?'] <> 1) { //if pool is not already over and it is past the pool end time:
                     $pool_end_query = "UPDATE  `Pool` SET `Pool Ended?` =  '1' WHERE  `Pool ID` ='$pool_id';"; //end pool
