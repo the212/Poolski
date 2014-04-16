@@ -21,6 +21,7 @@ Color schemes:
 	http://stackoverflow.com/questions/18534390/bootstrap-3-navbar-branding-colour 
 	*/
 }
+
 /*END NAVBAR STYLING*/
 
 
@@ -59,6 +60,32 @@ body {
 /*END OF FOOTER CSS
 */
 
+/*SITE COLORS
+*/
+.bckgrd_light_blue {
+	background-color:#5bc0de;
+}
+.bckgrd_dark_blue {
+	background-color:#428bca;
+}
+.bckgrd_green {
+	background-color:#5cb85c;
+}
+.bckgrd_red {
+	background-color:#d9534f;
+}
+.bckgrd_orange {
+	background-color:#f0ad4e;
+}
+
+/*Site Rectangles*/
+.rectangle {
+	width:10px;
+	height:50px;
+	float:left;
+}
+/*END SITE COLORS
+*/
 
 /*BEGIN LANDING PAGE CSS
 */
@@ -69,6 +96,10 @@ body {
 	top:50px;
 }
 
+#welcome_heading {
+	font-size: 350%;
+}
+
 #landing_page_list {
 	width:220px;
 	margin-left:auto;
@@ -76,7 +107,34 @@ body {
 	font-size:120%;
 }
 
+.landing_page_rectangle, .login_page_rectangle {
+	width:4%;
+	margin-right:15.2%;
+	min-width:10px;
+}
+
+#landing_page_rectangles_container {
+	margin: 0 auto;
+	width:50%;
+	min-width:350px;
+}
+
 /*END LANDING PAGE CSS
+*/
+
+
+/*BEGIN LOGIN PAGE CSS
+*/
+
+#login_page_rectangles_container {
+	width:40%;
+	max-width:480px; 
+	min-width:350px;
+	padding-top:10px;
+}
+
+
+/*END LOGIN PAGE CSS
 */
 
 
@@ -90,6 +148,94 @@ HOME.PHP STYLING
 */
 
 /*BEGIN POOL TABLE STYLING*/
+
+	.main_container{
+		padding:40px;
+	}
+
+	.panel-title { 
+		font-size:140%;
+	}
+
+	#homepage_pools {
+	}
+
+	#news_panel_body {
+		color:#428bca;
+
+	}
+
+	#homepage_news_headline {
+		margin-right:10px;
+	}
+
+	.homepage_news_line {
+		margin-left:10px;
+	}
+
+	.homepage_news_float_right {
+		float:right;
+	}
+
+	#recent_winners_panel_body {
+		color:white;
+		background-color: #5cb85c;
+	}
+
+	.recent_winners_line {
+		text-decoration:underline;
+	}
+
+	#recent_pool_winners_list {
+		margin-left:5%;
+	}
+
+	#create_new_pool_button {
+		width:70%;
+		margin: 0 auto;
+	}
+
+	#home_create_new_pool_body{
+		color:white;
+		background-color: #5bc0de;
+	}
+
+	#home_create_new_pool_content {
+		text-align: center;
+	}
+
+	.home_create_new_pool_text {
+		color:white; 
+	}
+
+	.active_pool_list_item, .past_pool_list_item {
+		padding:10px;
+	}
+
+	.active_pool_list_item_title, .past_pool_list_item_title {
+		padding-left:15px;
+		font-size:150%;
+	}
+
+	.active_pool_list_item_content, .past_pool_list_item_content {
+		margin-left:10%;
+		font-weight:bold;
+	}
+
+	.past_pool_list_item_title, .past_pool_list_item_content {
+		font-size:100%;
+	}
+
+	.past_pool_list_item_content {
+		font-size: 85%;
+	}
+
+	.homepage_pool_list_rectangle {
+		width:10px;
+		height:50px;
+		float:left;
+	}
+
 	.pool_top_row, .pool_row {
 		padding:6px;
 	}
@@ -248,7 +394,6 @@ POOL.PHP CSS
 #show_invites_link {
 	font-weight:bold;
 	font-size:130%;
-	color: white;
 }
 
 .pool_member_table_rank, .pool_member_table_nickname, .pool_member_table_username, .pool_member_table_email, .pool_member_table_tie, .pool_member_table_picks, .pool_member_table_score, .pool_member_table_tie_breaker {

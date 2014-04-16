@@ -335,6 +335,25 @@ class SiteUser {
     }
 
 
+
+    /*CHECKADMIN METHOD
+    **Accepts user ID 
+    **Checks to see if user ID is in the admin array
+    **Returns 1 if user is an admin
+    **Returns 0 otherwise
+    */
+    public function CheckAdmin($user_id) {
+        $admin_id_list = array("1","");
+        if(in_array($user_id, $admin_id_list, true)){
+            $check_result = 1;
+        }
+        else {
+            $check_result = 0;
+        }
+        return $check_result;
+    }
+
+
     /**********************************************************************
     MAIL METHODS
     **********************************************************************/

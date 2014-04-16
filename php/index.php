@@ -77,11 +77,19 @@
             </div>
         </div>
 <div id="landing_page_welcome">
-	<h1>Welcome to Poolski</h1>
-	<br>
+	<h1 id="welcome_heading">Welcome to Poolski</h1>
+
+    <div class="row" id="landing_page_rectangles_container">
+        <div class="rectangle landing_page_rectangle bckgrd_light_blue"></div>
+        <div class="rectangle landing_page_rectangle bckgrd_green"></div>
+        <div class="rectangle landing_page_rectangle bckgrd_dark_blue"></div>
+        <div class="rectangle landing_page_rectangle bckgrd_orange"></div>
+        <div class="rectangle landing_page_rectangle bckgrd_red"></div>
+        <div class="rectangle landing_page_rectangle bckgrd_light_blue" style="margin-right:0%;"></div>
+    </div>
+	
 	<div id="landing_page_sub_text">
 		<h3>Poolski allows you to create and manage "pick 'em" style betting pools with your friends.</h3>
-		<h3>You can either use one of our pre-made templates or create your own pool from scratch</h3>
 		<br>
 		<h3>Simply create a pool, invite your friends, and Poolski will take care of the rest.</h3>
 		<br>
@@ -93,7 +101,7 @@
 			</ul>
 		</div>
 		<br>
-		<h3><a href="home.php">Click here to try the beta version</a></h3>
+		<h1><a href="home.php"><span class='label label-warning' style="color:white;">Click here to try the beta version</span></a></h1>
 	</div>
 </div>
 
