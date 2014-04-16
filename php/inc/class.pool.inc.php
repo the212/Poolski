@@ -1258,7 +1258,38 @@ class Pool {
     } //END OF DELETE TEMPLATE METHOD
 
 
+/* END POOL TEMPLATE METHODS
+    */
 
+//*************************************************************************************
+
+
+/*
+**GETPOOLWINNERS FUNCTION
+**Takes no input
+**Returns an array where keys are pool ID and only value is the pool nickname of the winner
+**If no nickname was chosen, a NULL value is returned
+*/
+
+    public function GetPoolWinners() {
+        $number_to_return = 5; //SET THE NUMBER OF WINNERS TO BE RETURNED BY THIS FUNCTION HERE
+        //GET RECENT WINNERS FROM POOL TABLE
+            $recent_winners_query = "SELECT * FROM  `Pool` ORDER BY `Pool ID` DESC LIMIT 0,$number_to_return;";
+            $result1 = mysqli_query($this->cxn, $recent_winners_query);
+            //$recent_pools_array = mysqli_fetch_assoc($result1);
+            $pool_winnder_array = array();
+            while($row = mysqli_fetch_assoc($result1)){
+                $pool_id = $row['Pool ID'];
+                $winner_user_id = $row['Pool Winner'];
+                $nickname_query = "SELECT `Pool Nickname` FROM  `Pool Membership` WHERE `User ID` = '$winner_user_id' AND `Pool ID` = '$pool_id';";
+                $result2 = mysqli_query($this->cxn, $nickname_query);
+                $nickname_array = mysqli_fetch_assoc($result2);
+                $pool_winnder_array[$pool_id] = $nickname_array['Pool Nickname'];
+            }
+            return $pool_winnder_array;
+    }
+
+    
 
 
     public function SendPoolEndingEmails($pool_id) {

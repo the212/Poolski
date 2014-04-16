@@ -4,10 +4,6 @@
     include_once "inc/constants.inc.php";
     $pageTitle = "Edit Template";
     include_once "inc/header.php";
-    include_once 'inc/class.users.inc.php';
-    $user = new SiteUser(); 
-    $current_user = $_SESSION['Username'];
-    $current_user_id = $user->GetUserIDFromEmail($current_user);
 
     if(!isset($_GET['template_id']) || $current_user_id <> 1) {
         //if no pool ID is specified in URL or user is not an admin, return the user to the homepage:
@@ -15,8 +11,6 @@
     }
     else {
         //if we successfully got the pool id or template id from the URL:
-        include_once 'inc/class.pool.inc.php';
-        $pool = new Pool(); 
 
         $template_id = $_GET['template_id'];
         $pool_fetch_result = $pool->GetBasicTemplateInfo($template_id);

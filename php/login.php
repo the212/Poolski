@@ -38,7 +38,7 @@
         else:
             //if the login form was not submitted, then display the below HTML prompting user to login:
 ?>
-    <div style="margin-left:20px;">
+    <div style="margin-left:20px;" id="login_page_container">
         <br>
         <h2>Please log in...</h2>
         <form method="post" action="javascript:login_function()" name="loginform" id="loginform">
@@ -56,6 +56,15 @@
         <h4><a href="password.php">Did you forget your password?</a></h4>
         <br>
         <h4><a href="signup.php">Don't have an account?  Click here to sign up!</a></h4>
+        <br>
+        <div id="login_page_rectangles_container">
+            <div class="rectangle login_page_rectangle bckgrd_light_blue"></div>
+            <div class="rectangle login_page_rectangle bckgrd_green"></div>
+            <div class="rectangle login_page_rectangle bckgrd_dark_blue"></div>
+            <div class="rectangle login_page_rectangle bckgrd_orange"></div>
+            <div class="rectangle login_page_rectangle bckgrd_red"></div>
+            <div class="rectangle login_page_rectangle bckgrd_light_blue" style="margin-right:0%;"></div>    
+        </div>
     </div>
 <?php
         endif;
@@ -65,7 +74,5 @@
         <div style="clear: both;"></div> 
 
 <?php
-        
-    
     include_once 'inc/close.php';
 ?>
