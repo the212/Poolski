@@ -326,7 +326,6 @@
 <?php
             } //END OF COMPLETED POOLS FOREACH STATEMENT
 ?>
-                    </table> 
                     <br>
 <?php
         } //END OF COMPLETED POOLS IF STATEMENT

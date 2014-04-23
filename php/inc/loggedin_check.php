@@ -1,6 +1,5 @@
 <?php
     include_once "constants.inc.php";
-    $pageTitle = "Logged in check";
     session_start();
 
     //check to see if the LoggedIn and Username $_SESSION variables are NOT set

@@ -25,27 +25,55 @@ else{ //if this file is being accessed by user navigation and not thru ajax:
     include_once "inc/constants.inc.php";
     $pageTitle = "Invite";
     include_once "inc/header.php";
+    include_once 'inc/class.users.inc.php';
+    $user = new SiteUser();
 
     $pool_id = $_GET['pool_id'];
     $inviter = $_SESSION['Username']; //get the inviter's email address/username (this is so that the invitee knows who is inviting them)
+    $user_id = $user->GetUserIDFromEmail($inviter);
+    $users_friends_array = $user->GetFriends($user_id);
+
 ?>
+    <br>
+    <div class="row" >
+        <div class="col-md-7" id="invite_email_input_container">
+            <h3>Enter email addresses to invite people to the pool:</h3>
+            <br>
+            <div id="invitee_email_form">   
+                    <input type="text" name="new_invitee_email" id="new_invitee_email" size="75" required>
+                    <input id="submit_invitee_email" type="submit" value="Add to invite list">
+                    <span id="invite_error_message" style='color:red'></span>
+            </div>
+            <br>
+            <div id="invitee_email_list">
 
-    <h3>Enter email addresses to invite people to the pool:</h3>
-    <br>
-    <div id="invitee_email_form">   
-            <input type="text" name="new_invitee_email" id="new_invitee_email" size="75" required>
-            <input id="submit_invitee_email" type="submit" value="Add to invite list">
-            <span id="invite_error_message" style='color:red'></span>
+            </div>
+            <br>
+            <form action="javascript:invite_people(<?php echo $pool_id; ?>, '<?php echo $inviter; ?>')" method="post">
+                <br>
+                <h4>When you're finished adding emails, click below to send invites:</h4>
+                <h3><input id="invite_button" type="submit" value="Send Invites"><h3>
+                <input type="hidden" name="form_sent" value="form_sent">
+            </form>
+            <br>
+        </div>
+        <div class="col-md-5">
+            <h3>Previous Pool <?php echo FRIEND; ?>s</h3>
+            <p style="font-style:italic;">You've played with them before.  Know anyone?</p>
+            <h4>Click an email to add to invite list</h4>
+            <br>
+<?php
+            sort($users_friends_array, SORT_STRING);
+            foreach($users_friends_array as $user_id => $user_email){
+?>
+            <div class="friend_invite_div" id="friend_invite_id_<?php echo $user_id; ?>">
+                <a href='JAVASCRIPT:add_friend_invitee_email("<?php echo $user_email; ?>", <?php echo $user_id; ?>);'><span class='friend_invite_span label label-primary'><?php echo $user_email; ?></span></a>
+            </div>
+<?php
+            }
+?>
+        </div>
     </div>
-    <br>
-    <div id="invitee_email_list">
-
-    </div>
-    <br>
-    <form action="javascript:invite_people(<?php echo $pool_id; ?>, '<?php echo $inviter; ?>')" method="post">
-        <h3><input id="invite_button" type="submit" value="Send Invites"><h3>
-        <input type="hidden" name="form_sent" value="form_sent">
-    </form>
     <br>
     <!--<h3>Or, choose people from the list of past pool participants</h3>-->
 <?php

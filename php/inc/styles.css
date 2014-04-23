@@ -391,6 +391,13 @@ EDIT_POOL.PHP STYLING
 POOL.PHP CSS
 */
 
+#edit_pool_success { /*THIS IS FOR MESSAGE THAT APPEARS AFTER USER HAS MADE AN AJAX EDIT ON POOL.PHP*/
+	display:none; 
+	padding:8px; 
+	width:250px; 
+	float:right
+}
+
 #show_invites_link {
 	font-weight:bold;
 	font-size:130%;
@@ -424,6 +431,22 @@ POOL.PHP CSS
 	margin-top: 35px;
 	z-index: 10;
 	background-color: white;
+}
+
+/*
+INVITE_PEOPLE.PHP CSS
+*/
+
+#invite_email_input_container {
+	padding-left:30px;
+}
+
+.friend_invite_div {
+	font-size:170%;
+}
+
+.friend_invite_span{
+	color:white;
 }
 
 
