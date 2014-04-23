@@ -147,8 +147,6 @@ body {
 HOME.PHP STYLING 
 */
 
-/*BEGIN POOL TABLE STYLING*/
-
 	.main_container{
 		padding:40px;
 	}
@@ -260,11 +258,15 @@ HOME.PHP STYLING
 	.pool_leader_column {
 		width:30%;
 	}
-/*END POOL TABLE STYLING*/
 
-#pool_invite_list {
-	margin-left:30px;
-}
+
+	#pool_invite_list {
+		margin-left:30px;
+	}
+
+	.invite_list_rectangle {
+		height:50px;
+	}
 
 
 /*

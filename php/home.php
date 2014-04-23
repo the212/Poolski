@@ -43,12 +43,19 @@
 <?php
     //BEGIN CHECK FOR POOL INVITES IF STATEMENT
     if($pool_invites_result <> "0"){ //if user has pool invites pending:
+        $number_of_invites = count($pool_invites_result) - 1;
+        if($number_of_invites == 1){
+            $invite_plural = "invite";
+        }
+        else {
+            $invite_plural = "invites";
+        }
 ?>
-                    <h3 style='word-wrap:break-word;'><span class='label label-primary'>** You have been invited to a new pool! **</span></h3>
-                    <h5 style="margin-left: 20px;"><a id="show_invites_link" style="cursor:pointer;">Click here to see your list of invites.</a></h5>
+                    <h3 style='word-wrap:break-word;'><span class='label label-primary'><a id="show_invites_link" style="cursor:pointer; color:white;">You have <?php echo $number_of_invites; ?> new Pool <?php echo $invite_plural; ?>!</a></span></h3>
+                    <!--<h5 style="margin-left: 20px;"><a id="show_invites_link" style="cursor:pointer;">Click here to see your list of invites.</a></h5>-->
                     <br>
                     <div id='pool_invite_list' style='display:none'>
-                        <h4 style='text-decoration:underline'>Pool invites:</h4>
+                        <h4 style='text-decoration:underline'>You Pool invites:</h4>
 <?php
         foreach($pool_invites_result as $index => $pool_id){
             $given_pool_data = $pool->GetPoolData($pool_id);
@@ -57,11 +64,13 @@
             }
             else{ //if we are able to find a pool for the given pool id:
 ?>
+                        <div class="rectangle invite_list_rectangle bckgrd_dark_blue"></div>
                         <span id="pool_span_<?php echo $pool_id; ?>"style="margin-left:30px; font-weight:bold;"><?php echo $given_pool_data['Title']; ?></span>
+                            <br>
                             <input class="accept_invite_button" type='button' onclick="accept_invite(<?php echo $current_user_id.", ".$given_pool_data['Pool ID']; ?>)" value='Join Pool'>
                             <input type='button' onclick="decline_invite(<?php echo $current_user_id.", ".$given_pool_data['Pool ID']; ?>)" value='Decline Invite'>
                         </span>
-                        <br>
+                        <br><br>
 <?php
             }
         } //END OF POOL INVITE LIST FOREACH STATEMENT
