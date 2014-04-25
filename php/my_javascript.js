@@ -346,6 +346,17 @@
         } 
     });
 
+    //CODE FOR KEEPING "Pool Updated" MESSAGE STATIC WHEN SCROLLING THRU A USER'S OWN PICKS (POOL.PHP)
+    $(window).scroll(function(e){ 
+        $item = $('#edit_pool_success'); 
+        if ($(this).scrollTop() > 200 && $item.css('position') != 'fixed'){ 
+            $('#edit_pool_success').css({'position': 'fixed', 'top': '0px'}); 
+        }
+        if ($(this).scrollTop() < 200 && $item.css('position') != 'absolute'){ 
+            $('#edit_pool_success').css({'position': 'absolute', 'top': '155px'}); 
+        } 
+    });
+
 
 //END OF POOL.PHP JAVASCRIPT
 
@@ -376,14 +387,26 @@
             if(e.keyCode==13)
             $('#submit_invitee_email').click();
         });
+
+        $('#submit_friend_invitee_email').click(function() {
+            add_invitee_email($('#submit_friend_invitee_email').val());
+            $('#new_invitee_email').val("");
+            $('#invite_error_message').html("");
+        });
     });
 
     var invitees = new Array(); //invitees array - we store the input emails addresses here and then submit this array once the user clicks the invite button
 
     function add_invitee_email(email){
         //CREATE CUSTOMIZED DIV BASED ON EMAIL INPUT SO THAT REMOVE_INVITEE_EMAIL FUNCTION WILL WORK
-        $("#invitee_email_list").append("<div id="+email+">"+email+" <input id='input_"+email+"' type='button' onclick='remove_invitee_email(this);' value='Remove'><br></div>");
+        $("#invitee_email_list").append("<div id="+email+"><span style='font-size:130%;font-weight:bold;'>"+email+"</span> <input id='input_"+email+"' type='button' onclick='remove_invitee_email(this);' value='Remove'><br></div>");
         invitees.push(email); //add email to invitees array
+    }
+
+    function add_friend_invitee_email(email, user_id){ //THIS IS ONLY CALLED WHEN USER CHOOSES AN INVITEE FROM THEIR FRIEND LIST
+        add_invitee_email(email); //ADD FRIEND TO INVITE LIST USING ABOVE ADD_INVITEE_EMAIL FUNCTION
+        $('#invite_error_message').html("");
+        $("#friend_invite_id_"+user_id).remove(); //REMOVE FRIEND DIV FROM FRIEND LIST ONCE THEY'VE BEEN ADDED AS AN INVITE
     }
 
     function remove_invitee_email(email_div_id){

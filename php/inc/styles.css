@@ -147,8 +147,6 @@ body {
 HOME.PHP STYLING 
 */
 
-/*BEGIN POOL TABLE STYLING*/
-
 	.main_container{
 		padding:40px;
 	}
@@ -260,11 +258,15 @@ HOME.PHP STYLING
 	.pool_leader_column {
 		width:30%;
 	}
-/*END POOL TABLE STYLING*/
 
-#pool_invite_list {
-	margin-left:30px;
-}
+
+	#pool_invite_list {
+		margin-left:30px;
+	}
+
+	.invite_list_rectangle {
+		height:50px;
+	}
 
 
 /*
@@ -391,6 +393,16 @@ EDIT_POOL.PHP STYLING
 POOL.PHP CSS
 */
 
+#edit_pool_success { /*THIS IS FOR MESSAGE THAT APPEARS AFTER USER HAS MADE AN AJAX EDIT ON POOL.PHP*/
+	display:none;
+	padding:8px; 
+	width:250px; 
+	margin-left:70%;
+	z-index:2;
+	position: absolute;
+	top:155px;
+}
+
 #show_invites_link {
 	font-weight:bold;
 	font-size:130%;
@@ -424,6 +436,22 @@ POOL.PHP CSS
 	margin-top: 35px;
 	z-index: 10;
 	background-color: white;
+}
+
+/*
+INVITE_PEOPLE.PHP CSS
+*/
+
+#invite_email_input_container {
+	padding-left:30px;
+}
+
+.friend_invite_div {
+	font-size:170%;
+}
+
+.friend_invite_span{
+	color:white;
 }
 
 

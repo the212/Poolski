@@ -3,14 +3,6 @@
     include_once "inc/constants.inc.php";
     
 
-    /*
-    TO DO AS OF 8:20 pm 11/20/13:
-        -Add a check so that a user can only view the page if they are a member of the pool
-            -NOTE - THIS SHOULD PROBABLY BE A SEPARATE PHP FILE SO WE CAN INCLUDE IT IN OTHER FILES (SUCH AS INVITE_FRIENDS.PHP)
-    */
-
-    //IT IS EXPECTED THAT THIS PAGE WILL BE LOADED WITH THE POOL_ID VARIABLE SET IN THE URL
-
     if(!isset($_GET['pool_id'])){
         //if no pool ID is specified in URL, return the user to the homepage:
         header("Location: home.php");
@@ -22,19 +14,13 @@
         $pool = new Pool(); //new instance of the Pool class
         //Below functions fetch the necessary pool data for the user:
         $pool_fetch_result = $pool->GetPoolData($pool_id); 
-        //Get pool start/end times and dates from pool_fetch_result array:
-        $pool_start_date = substr($pool_fetch_result['Start Time'], 0, 10);
-        $pool_start_time = substr($pool_fetch_result['Start Time'], 11); //pool start time will be in 24 hour time
-        $pool_start_time = $pool->timestampTo12HourConversion($pool_start_time); //convert pool start time into appropriate time
-        $pool_end_date = substr($pool_fetch_result['End Time'], 0, 10);
-        $pool_end_time = substr($pool_fetch_result['End Time'], 11);
-        $pool_end_time = $pool->timestampTo12HourConversion($pool_end_time); //convert pool start time into appropriate time
-        $user_is_leader = 0; //set user is leader variable to 0 initially
-        include_once 'inc/class.users.inc.php';
-        $user = new SiteUser();
-        $current_user_id = $user->GetUserIDFromEmail($_SESSION['Username']); //get current user id
+        $pageTitle = $pool_fetch_result['Title'];
+        include_once "inc/header.php";
+
+        /*BEGIN CHECK TO SEE IF GIVEN USER IS A MEMBER OF THE POOL:
+        **NOTE - THIS SHOULD PROBABLY BE A SEPARATE PHP FILE SO WE CAN INCLUDE IT IN OTHER FILES (SUCH AS INVITE_FRIENDS.PHP)
+        */
         $pool_members_id_array = $pool->GetPoolMembers($pool_id); //generate array of pool members
-        //BEGIN CHECK TO SEE IF GIVEN USER IS A MEMBER OF THE POOL:
         $user_is_pool_member_check = 0; //we use this variable to check whether the given user is a member of the pool 
         foreach($pool_members_id_array as $user_id => $user_info){ //run thru pool member array - if the given user's ID is present in the array, we make the is_user_pool_member variable equal to 1, if not it remains as 0
             if($user_id == $current_user_id){ //if current user is a member of the pool:
@@ -45,30 +31,53 @@
             header("Location: home.php");
         }
         //END CHECK TO SEE IF GIVEN USER IS A MEMBER OF POOL
+
     }
 
-    $pageTitle = $pool_fetch_result['Title'];
-    include_once "inc/header.php";
-
+    //BEGIN CHECK TO SEE IF POOL EXISTS OR IF POOL IS READY FOR INVITES:
     if($pool_fetch_result==0 or $pool_fetch_result['Ready for invites?']==0):
     //if the pool id passed thru url does not exist in database OR the pool has not yet been finalized by Leader::
 ?>
+
         <h3>Error: pool does not exist</h3>
         <h4><a href="home.php">Click here to return to home page</a></h3>
+
 <?php
-    else:
-        $pool_category_fetch = $pool->GetPoolCategoryData($pool_id); //get pool category data
+    else: //if pool exists and is ready for invites, load the rest of pool.php file:
+        //Get pool category data
+        $pool_category_fetch = $pool->GetPoolCategoryData($pool_id); 
+        
+        //Get pool start/end times and dates from pool_fetch_result array:
+        $pool_start_date = substr($pool_fetch_result['Start Time'], 0, 10);
+        $pool_start_time = substr($pool_fetch_result['Start Time'], 11); //pool start time will be in 24 hour time
+        $pool_start_time = $pool->timestampTo12HourConversion($pool_start_time); //convert pool start time into appropriate time
+        $pool_end_date = substr($pool_fetch_result['End Time'], 0, 10);
+        $pool_end_time = substr($pool_fetch_result['End Time'], 11);
+        $pool_end_time = $pool->timestampTo12HourConversion($pool_end_time); //convert pool start time into appropriate time
+        
+        //BEGIN CHECK TO SEE IF USER IS THE LEADER OF POOL:
+        $user_is_leader = 0; //set user is leader variable to 0 initially
         if($pool_fetch_result['Leader ID'] == $_SESSION['Username']){
             $user_is_leader = 1; //if user is the leader of the pool we set user is leader variable to 1
         }
+        //END CHECK TO SEE IF USER IS LEADER OF POOL
+
+        //BEGIN GENERAL HTML:
 ?>
+
+    <!--BEGIN HIDDEN SPANS (FOR AJAX)-->
     <span id="pool_id_span" style="display:none"><?php echo $pool_fetch_result["Pool ID"]; ?></span>
     <span id="user_id_span" style="display:none"><?php echo $_SESSION['Username']; ?></span>
+    <!--END HIDDEN SPANS-->
+    
+
+    <!--BEGIN TOP ROW DIV-->
     <div class="row">
         <div class="col-md-5" id="pool_title">
             <h1><?php echo $pool_fetch_result['Title']; ?></h1>
         </div>
         <div class="col-md-7" id="pool_status_message">
+
             <!--BEGIN POOL LIVE STATUS MESSAGE-->
             <h1 style="position:relative;">
 <?php
@@ -93,31 +102,44 @@
          </div> 
              
     </div>
+    <!--END TOP ROW DIV-->
 
-    <!--POOL UPDATED SUCCESS MESSAGE: -->
-    <span class="alert alert-success alert-dismissable" id="edit_pool_success" style="display:none; padding:8px; width:250px; float:right">
+
+<!--*****************************************************************************************-->
+<!--*****************************************************************************************-->    
+
+
+    <!--BEGIN POOL UPDATED SUCCESS MESSAGE (FOR AJAX): -->
+    <span class="alert alert-success alert-dismissable" id="edit_pool_success">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            Pool successfully updated!.
+            Pool successfully updated!
     </span>
+    <!--END POOL UPDATED SUCCESS MESSAGE: -->
+
+<!--*****************************************************************************************-->
+<!--*****************************************************************************************-->
+
+    
+    <!--BEGIN MAIN CONTENT SECTION -->
     <br>
+    <div id="content">
+        <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+            <li class="active"><a href="#summary" data-toggle="tab">Pool Summary</a></li>
+            <li><a href="#my_picks" data-toggle="tab">My Picks</a></li>
+            <!--<li><a href="#message_board" data-toggle="tab">Message Board</a></li>-->
+        </ul>
+        <div id="pool_tab_content" class="tab-content">
+            <!--TABS ARE BELOW:-->
 
-<div id="content">
-    <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-        <li class="active"><a href="#summary" data-toggle="tab">Pool Summary</a></li>
-        <li><a href="#my_picks" data-toggle="tab">My Picks</a></li>
-        <!--<li><a href="#pool_members" data-toggle="tab">Pool Members</a></li>
-        <li><a href="#message_board" data-toggle="tab">Message Board</a></li>-->
-    </ul>
-    <div id="pool_tab_content" class="tab-content">
+<!--*****************************************************************************************-->
+<!--*****************************************************************************************-->
 
 
-<!--********POOL SUMMARY TAB********-->
-
-
-        <div class="tab-pane fade in active" id="summary">
-            <div class="row" style="padding-left:15px;">   
-                <h3>&#8220;<?php echo $pool_fetch_result['Description']; ?>&#8221;</h3>
-            </div>
+    <!--BEGIN POOL SUMMARY TAB-->
+            <div class="tab-pane fade in active" id="summary">
+                <div class="row" style="padding-left:15px;">   
+                    <h3>&#8220;<?php echo $pool_fetch_result['Description']; ?>&#8221;</h3>
+                </div>
                     
 <?php
             $invite_people_button = "<h4><form method='post' action='invite_people.php?pool_id=".$pool_id."'><input type='submit' value='Click here to invite people to the pool'></form></h4>";
@@ -136,7 +158,7 @@
             /*END INVITE BUTTON LOGIC*/
 
 ?>
-            <div id="pool_summary_container">
+                <div id="pool_summary_container">
 <?php
             if($pool_fetch_result['Pool ended?']== 0) { //only display the start/end times and end pool button if pool has not ended:
                 
@@ -232,13 +254,16 @@
             }
         /*END "IF POOL HAS ENDED" LOGIC*/
 ?>
-            </div> 
-        </div>
-        <!--END POOL SUMMARY TAB-->
+                </div> <!--END POOL SUMMARY CONTAINER DIV-->
+            </div>
+    <!--END POOL SUMMARY TAB-->
 
-        <!--***********************************************************************-->
+<!--*****************************************************************************************-->
+<!--*****************************************************************************************-->
 
-        <div class="tab-pane fade" id="my_picks">
+
+    <!--BEGIN MY PICKS TAB-->
+            <div class="tab-pane fade" id="my_picks">
 <?php 
             if($pool_fetch_result['Multiple Choice?'] == 0){
                 include_once "inc/my_picks_nonMC.php"; //include multiple choice picks file
@@ -247,19 +272,29 @@
                 include_once "inc/my_picks_MC.php"; //include non multiple choice picks file
             }
 ?>
-        </div>
-        <!--
-        <div class="tab-pane fade" id="pool_members">
-            <?php //include "inc/pool_members.php"; ?>
-        </div>
-        
-        <div class="tab-pane fade" id="message_board">
-            <h1>Message Board</h1>
-            <p>Message Board here</p>
-        </div>
+            </div>
+    <!--END MY PICKS TAB-->
+
+
+<!--*****************************************************************************************-->
+<!--*****************************************************************************************-->
+
+
+        <!--        
+            <div class="tab-pane fade" id="message_board">
+                <h1>Message Board</h1>
+                <p>Message Board here</p>
+            </div>
         -->
-    </div> <!--END OF pool_tab_content DIV-->
-</div>  <!--END OF content DIV-->
+
+
+<!--*****************************************************************************************-->
+<!--*****************************************************************************************-->
+
+
+        </div> <!--END OF pool_tab_content DIV-->
+    </div>  
+    <!--END MAIN CONTENT SECTION -->
 
 <?php 
     /*DISPLAY CURRENT TIME IN TIMESTAMP FORM (ONLY FOR TESTING)
