@@ -112,7 +112,7 @@
     <!--BEGIN POOL UPDATED SUCCESS MESSAGE (FOR AJAX): -->
     <span class="alert alert-success alert-dismissable" id="edit_pool_success">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            Pool successfully updated!.
+            Pool successfully updated!
     </span>
     <!--END POOL UPDATED SUCCESS MESSAGE: -->
 

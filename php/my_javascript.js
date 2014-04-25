@@ -346,6 +346,17 @@
         } 
     });
 
+    //CODE FOR KEEPING "Pool Updated" MESSAGE STATIC WHEN SCROLLING THRU A USER'S OWN PICKS (POOL.PHP)
+    $(window).scroll(function(e){ 
+        $item = $('#edit_pool_success'); 
+        if ($(this).scrollTop() > 200 && $item.css('position') != 'fixed'){ 
+            $('#edit_pool_success').css({'position': 'fixed', 'top': '0px'}); 
+        }
+        if ($(this).scrollTop() < 200 && $item.css('position') != 'absolute'){ 
+            $('#edit_pool_success').css({'position': 'absolute', 'top': '155px'}); 
+        } 
+    });
+
 
 //END OF POOL.PHP JAVASCRIPT
 

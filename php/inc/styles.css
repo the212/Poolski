@@ -394,10 +394,13 @@ POOL.PHP CSS
 */
 
 #edit_pool_success { /*THIS IS FOR MESSAGE THAT APPEARS AFTER USER HAS MADE AN AJAX EDIT ON POOL.PHP*/
-	display:none; 
+	display:none;
 	padding:8px; 
 	width:250px; 
-	float:right
+	margin-left:70%;
+	z-index:2;
+	position: absolute;
+	top:155px;
 }
 
 #show_invites_link {
