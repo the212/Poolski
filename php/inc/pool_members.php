@@ -24,7 +24,7 @@ else{ //if pool has not ended:
 
 <div class="pool_members_container">
     <br>
-    <h1>Pool Standings</h1>
+    <h2>Pool Standings</h2>
 <?php
             //BEGIN POOL NICKNAME LOGIC
             $user_nickname = $pool->GetNickname($current_user_id, $pool_id);

@@ -416,8 +416,13 @@ POOL.PHP CSS
 	font-weight:bold;
 }
 
-#pool_title {
+#pool_title_pool_page {
 	text-decoration:underline;
+}
+
+#pool_description_pool_page {
+	text-decoration:none;
+	font-style:italic;
 }
 
 
@@ -438,6 +443,10 @@ POOL.PHP CSS
 	background-color: white;
 }
 
+#start_end_time_container {
+	padding-right:30px;
+}
+
 /*
 INVITE_PEOPLE.PHP CSS
 */
@@ -452,6 +461,13 @@ INVITE_PEOPLE.PHP CSS
 
 .friend_invite_span{
 	color:white;
+}
+
+#no_invite_message{
+	margin: 0 auto;
+	padding-top:100px;
+	width:70%;
+	text-align:center;
 }
 
 

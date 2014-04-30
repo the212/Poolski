@@ -73,13 +73,14 @@
 
     <!--BEGIN TOP ROW DIV-->
     <div class="row">
-        <div class="col-md-5" id="pool_title">
-            <h1><?php echo $pool_fetch_result['Title']; ?></h1>
+        <div class="col-md-5">
+            <h1 id="pool_title_pool_page"><?php echo $pool_fetch_result['Title']; ?></h1>  
+            <h4 id="pool_description_pool_page"><?php echo $pool_fetch_result['Description']; ?></h4>
         </div>
         <div class="col-md-7" id="pool_status_message">
 
             <!--BEGIN POOL LIVE STATUS MESSAGE-->
-            <h1 style="position:relative;">
+            <h1 style="position:relative; width:10%;">
 <?php
             if($pool_fetch_result['Live?']==0){ //if pool is not yet live:
                 echo "<span class='label label-warning'>Pool is unlocked - make your picks!</span>";
@@ -126,6 +127,7 @@
         <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
             <li class="active"><a href="#summary" data-toggle="tab">Pool Summary</a></li>
             <li><a href="#my_picks" data-toggle="tab">My Picks</a></li>
+            <li><a href="#invite_people_tab" data-toggle="tab">Invite Friends</a></li>
             <!--<li><a href="#message_board" data-toggle="tab">Message Board</a></li>-->
         </ul>
         <div id="pool_tab_content" class="tab-content">
@@ -137,43 +139,16 @@
 
     <!--BEGIN POOL SUMMARY TAB-->
             <div class="tab-pane fade in active" id="summary">
-                <div class="row" style="padding-left:15px;">   
-                    <h3>&#8220;<?php echo $pool_fetch_result['Description']; ?>&#8221;</h3>
-                </div>
-                    
-<?php
-            $invite_people_button = "<h4><form method='post' action='invite_people.php?pool_id=".$pool_id."'><input type='submit' value='Click here to invite people to the pool'></form></h4>";
-            
-            /* BEGIN INVITE BUTTON LOGIC*/
-            if($user_is_leader == 1) { //if user is the leader of the pool:
-                if($pool_fetch_result['Live?']==0){ //if pool is not let live, let leader invite new people:
-                    echo $invite_people_button;
-                }
-            } 
-            else{ //if user is NOT the leader of the pool:
-                if($pool_fetch_result['Private?'] == 0 && $pool_fetch_result['Live?']==0){ //if pool is public and is not yet Live, allow a non-leader user to invite others:
-                    echo $invite_people_button; 
-                }
-            }
-            /*END INVITE BUTTON LOGIC*/
 
-?>
                 <div id="pool_summary_container">
+
+                    <div id="start_end_time_container">
 <?php
-            if($pool_fetch_result['Pool ended?']== 0) { //only display the start/end times and end pool button if pool has not ended:
-                
                 /*BEGIN START TIME DISPLAY AND START POOL BUTTON LOGIC*/
                 if($pool_fetch_result['Start Time']!== NULL && $pool_fetch_result['Live?']==0) {  //if start time is set and pool is not yet live:
 ?>
-                    
-                    <div class="row" style="width:55%">
-                        <div class="col-md-6">
-                            <h4>Picks will be locked in at: </h4>
-                        </div>
-                        <div class="col-md-6">
-                            <h4><?php echo $pool_start_time; ?> EST on <?php echo $pool_start_date; ?> </h4>
-                        </div>
-                    </div>
+                <h4>Picks will be locked in at: </h4>
+                <h4><?php echo $pool_start_time; ?> EST on <?php echo $pool_start_date; ?> </h4>
 <?php 
                 }
                 else { //if pool does not have any start date defined, we allow the leader to start the pool manually:
@@ -181,21 +156,18 @@
                         echo "<h4><span style='margin-left:30px'><form method='post' action='JAVASCRIPT:makePoolLive($pool_id);'><input type='submit' value='Click here to make pool live!'></form></span></h4>";
                     }
                 }
-        /*END START TIME DISPLAY AND START POOL BUTTON LOGIC*/
+                /*END START TIME DISPLAY AND START POOL BUTTON LOGIC*/
 
-        /*BEGIN END TIME DISPLAY AND END POOL BUTTON LOGIC*/
+                /*BEGIN END TIME DISPLAY AND END POOL BUTTON LOGIC*/
         
                 if($pool_fetch_result['End Time']!== NULL && $pool_fetch_result['Live?']==1) {  //if end time is set and the pool is live:
 ?>
-                    <br>
-                    <div class="row" style="width:55%">
-                        <div class="col-md-6">
-                            <h4>The pool will end at: </h4>
-                        </div>
-                        <div class="col-md-6">
-                            <h4><?php echo $pool_end_time; ?> EST on <?php echo $pool_end_date; ?></h4>
-                        </div>
-                    </div>
+                <br>
+                <h4>This pool ends: </h4>
+                <h4><?php echo $pool_end_time; ?> EST on 
+                <br>
+                <?php echo $pool_end_date; ?></h4>
+
 <?php
                 }
                 else { //if pool does not have any end date defined, we allow the leader to end the pool manually:
@@ -203,7 +175,15 @@
                         echo "<br><div style='padding-left:25px'><h4><form method='post' action='JAVASCRIPT:endPool($pool_id);'><input type='submit' value='No end date set - click here when pool is finished'></form></h4></div>";
                     }
                 }
-        /*END END TIME DISPLAY AND END POOL BUTTON LOGIC*/
+                /*END END TIME DISPLAY AND END POOL BUTTON LOGIC*/
+
+?>
+                    </div>
+<?php
+            if($pool_fetch_result['Pool ended?']== 0) { //only display the start/end times and end pool button if pool has not ended:
+                
+
+        
                 //BELOW IS BUTTON FOR MARKING POOL PICKS AS CORRECT/INCORRECT WHILE POOL IS STILL LIVE
                 if($user_is_leader == 1 && !isset($pool_fetch_result['Template ID']) && $pool_fetch_result['Live?']== 1) { //if user is the leader of the pool, the pool was customized from scratch (i.e. not a template), and the pool is live, we let them tally the pool's score before pool has ended:
                     echo "<br><h4><form method='post' action='score_pool_manual.php?pool_id=".$pool_id."'><input type='submit' value='You are the pool leader.  Click here to mark pool member picks as correct/incorrect'></form></h4>";
@@ -278,6 +258,35 @@
 
 <!--*****************************************************************************************-->
 <!--*****************************************************************************************-->
+
+            
+            <div class="tab-pane fade" id="invite_people_tab">
+<?php           
+            /* BEGIN INVITE BUTTON LOGIC*/
+            if($pool_fetch_result['Live?']==0){ //if pool is not yet live:
+                if($user_is_leader == 1 || $pool_fetch_result['Private?'] == 0){ //if pool is public OR if the user is the leader:
+                    include_once "invite_people.php"; 
+                }
+                else { //if user is not authorized to invite others (i.e., pool is private and user is not the leader)
+?>
+                <div id='no_invite_message'>
+                    <h2>You cannot invite people because the pool is private</h2>
+                    <h4>Only the pool leader can invite others</h4>
+                </div>
+<?php
+                }
+            }
+            else{ //if pool is already live:
+?>
+                <div id='no_invite_message'>
+                    <h2>You cannot invite people once the pool is live</h2>
+                    <h4>Those who aren't here are missing out.</h4>
+                </div>
+<?php
+            }
+            /*END INVITE BUTTON LOGIC*/
+?>
+            </div>
 
 
         <!--        
