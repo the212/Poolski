@@ -58,6 +58,8 @@
 <?php
 
 	if(isset($_SESSION['LoggedIn']) && isset($_SESSION['Username']) && $_SESSION['LoggedIn']==999): //if user is logged in:
+        include_once "inc/loggedin_check.php";
+        include_once "inc/constants.inc.php";
         include_once 'inc/class.users.inc.php';
         $user = new SiteUser(); 
         include_once 'inc/class.pool.inc.php';

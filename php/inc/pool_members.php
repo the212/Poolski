@@ -21,20 +21,11 @@ else{ //if pool has not ended:
     $pool_member_table_score_style = "text-decoration:underline; width:15%;"; //give score column in table full 15% width since it doesn't share with rank column
 }
 ?>
-
+<hr>
 <div class="pool_members_container">
     <br>
-    <h1>Pool Standings</h1>
-<?php
-            //BEGIN POOL NICKNAME LOGIC
-            $user_nickname = $pool->GetNickname($current_user_id, $pool_id);
-            if ($pool_fetch_result['Live?']==0) {
-?>
-                <h4>Choose your nickname for this pool: <span class="label label-info"><span class='edit_nickname' id='update_nickname'><?php echo $user_nickname; ?></span></span><span style="margin-left:15px; font-style:italic; font-size:70%;">(Click to edit)</span></h4>
-<?php
-            }
-            //END POOL NICKNAME LOGIC
-?>
+    <h2>Pool Standings</h2>
+
     <br>
     <table border="1" style="margin-left:20px">
         <tr>
