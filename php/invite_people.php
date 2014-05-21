@@ -22,7 +22,7 @@ if($_POST['invite'] == 1){ //if this file is being run thru the invite ajax func
 else{ //if this file is being accessed by user navigation and not thru ajax:
     if(!isset($current_user)){ 
             /*We send the user back to home page if $current_user is not set 
-            **This would indicate that the user is trying to access invite_people.php by itself and not via the pool.php page
+            This would indicate that the user is trying to access invite_people.php by itself and not via the pool.php page
             */
         header("Location: home.php");
     }

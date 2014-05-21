@@ -408,6 +408,11 @@ POOL.PHP CSS
 	font-size:130%;
 }
 
+#pool_page_top_row, #pool_tab_content, .pool_members_container, .well {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
 .pool_member_table_rank, .pool_member_table_nickname, .pool_member_table_username, .pool_member_table_email, .pool_member_table_tie, .pool_member_table_picks, .pool_member_table_score, .pool_member_table_tie_breaker {
 	padding:10px;
 }
@@ -426,13 +431,15 @@ POOL.PHP CSS
 }
 
 
-.pool_members_container{
-	position: absolute; 
+#pool_nickname_glyph, #pool_time_glyph, #pool_score_calculate_glyph, #pool_make_live_glyph, #pool_end_glyph, #pool_score_manual_glyph, #pool_winner_glyph, #pool_mypicks_link_glyph {
+	/*GLYPH STYLING:*/
+	font-size: 150%;
 }
 
-.pool_members_container, .well {
-	padding-left: 10px;
-	padding-right: 10px;
+
+.pool_members_container{
+	margin-top:-40px;
+	position: absolute; 
 }
 
 #see_user_picks_back_button{
@@ -443,9 +450,10 @@ POOL.PHP CSS
 	background-color: white;
 }
 
-#start_end_time_container {
-	padding-right:30px;
+.pool_page_sub_tabs_column {
+	text-align:center;
 }
+
 
 /*
 INVITE_PEOPLE.PHP CSS
