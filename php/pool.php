@@ -118,11 +118,20 @@
 
     
     <!--BEGIN MAIN CONTENT SECTION -->
+<?php
+    //pool summary tab should be active tab UNLESS pool is not yet live in which case the my_picks tab should be active:
+    $pool_summary_tab_class = "active";
+    $my_picks_tab_class = "";
+    if($pool_fetch_result['Live?'] == 0){ //if pool is not yet live:
+        $pool_summary_tab_class="";
+        $my_picks_tab_class = "active";
+    }   
+?>
     <br>
     <div id="content">
         <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-            <li class="active"><a href="#summary" data-toggle="tab">Pool Summary</a></li>
-            <li><a href="#my_picks" data-toggle="tab">My Picks</a></li>
+            <li class="<?php echo $pool_summary_tab_class; ?>"><a href="#summary" data-toggle="tab">Pool Summary</a></li>
+            <li class="<?php echo $my_picks_tab_class; ?>"><a href="#my_picks" data-toggle="tab">My Picks</a></li>
             <li><a href="#invite_people_tab" data-toggle="tab">Invite Friends</a></li>
             <!--<li><a href="#message_board" data-toggle="tab">Message Board</a></li>-->
         </ul>
@@ -134,7 +143,7 @@
 
 
     <!--BEGIN POOL SUMMARY TAB-->
-            <div class="tab-pane fade in active" id="summary">
+            <div class="tab-pane fade in <?php echo $pool_summary_tab_class; ?>" id="summary">
 
                 <div id="pool_summary_container">
                     <br>
@@ -367,7 +376,7 @@
 
 
     <!--BEGIN MY PICKS TAB-->
-            <div class="tab-pane fade" id="my_picks">
+            <div class="tab-pane fade in <?php echo $my_picks_tab_class; ?>" id="my_picks">
 <?php 
             if($pool_fetch_result['Multiple Choice?'] == 0){
                 include_once "inc/my_picks_nonMC.php"; //include multiple choice picks file
