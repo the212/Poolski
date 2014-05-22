@@ -13,16 +13,21 @@
             $user = new SiteUser();
             $addNewUser_result = $user->addNewUser($entryValue); 
 
-            //Send Email to new user:
-            include_once 'inc/send_mail.php'; //include email file
-            SendEmail($entryValue, "Welcome to ".BRAND_NAME, 
-                "Thank you for signing up.  
-                Please click the following link to verify your account: ".$addNewUser_result[2]."\n
-                If clicking the link does not work, please copy and paste it into your browser."
-                );
+            if($addNewUser_result[0] == 2 OR $addNewUser_result[0] == 4){
+                //Send Email to new user:
+                include_once 'inc/send_mail.php'; //include email file
+                $verification_instruction = "<h4>A verification link has been sent to your email address.  Please click the link to verify your account</h4>";
+                SendEmail($entryValue, "Welcome to ".BRAND_NAME, 
+                    "Thank you for signing up.  
+                    Please click the following link to verify your account: ".$addNewUser_result[2]."\n
+                    If clicking the link does not work, please copy and paste it into your browser."
+                    );
+            }
             
+            echo "<div id='signup_page_message_div' style='padding-left:20px;'>";
             echo $addNewUser_result[1];
-            echo "<h4>An verification link has been sent to your email address.  Please click the link to verify your account</h4>";
+            echo $verification_instruction;
+            echo "</div>";
             if($addNewUser_result[0]==2){
                 //if email was stored successfully, don't show the signup HTML
                 exit(); 
