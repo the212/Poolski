@@ -20,6 +20,31 @@
 
 /************************************************************************************************/
 
+/*ANIMATE BACK AND FORTH FUNCTION
+**ACCEPTS THE ELEMENT TO BE ANIMATED (CLASS OR ID), THE SPEED AT WHICH TO ANIMATE (in milliseconds), AND THE DISTANCE TO ANIMATE HORIZONTALLY (IN PIXELS)
+*/
+
+    function animate_back_and_forth(targetElement, speed, distance) {
+        $(targetElement).animate({ marginLeft: "+="+distance+"px"},
+        {
+            duration: speed,
+            complete: function ()
+            {
+                targetElement.animate({ marginLeft: "-="+distance+"px" },
+                {
+                    duration: speed,
+                    complete: function ()
+                    {
+                        animate_back_and_forth(targetElement, speed, distance);
+                    }
+                });
+            }
+        });
+    };
+
+
+/************************************************************************************************/
+
 
 //BEGINNING OF HOME PAGE JAVASCRIPT (HOME.PHP)
     function accept_invite(user_id, pool_id){
@@ -420,12 +445,15 @@
     function invite_people(pool_id, inviter){
         //when inviter clicks "invite" button:
         if(invitees.length > 0){
+            $("#invite_button").replaceWith("<h2><span class='glyphicon glyphicon-send' id='emails_sending_glyph'></span></h2><h5 style='margin-left:10%;'>Please wait...Emails being sent</h5>");
+            animate_back_and_forth($('#emails_sending_glyph'), 1000, 250); //start email sending glyph animation
             $.ajax({ //if invites were specified at submission:
                     type: "POST",
                     url: "invite_people.php",
                     data: {invitees_array : invitees, invite : "1", pool_id : pool_id, inviter : inviter} //send the invitee array, an invite value of 1, and the inviter's email/username to invite_people.php
                 })
                     .done(function(html){ //when ajax request completes
+                        $("#emails_sending_glyph").stop(); //stop email sending glyph animation
                         alert(html);
                         window.location.href = 'pool.php?pool_id='+pool_id; //return user to pool page
                     });

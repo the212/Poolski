@@ -54,6 +54,7 @@ class SiteUser {
     **  1=Error - account for given email address already exists
     **  2=email was stored successfully
     **  3=database query error
+    **  4=account activated but password has not been set
     */
     public function addNewUser($email){
     	//check to see whether given email address already exists in database
@@ -61,9 +62,18 @@ class SiteUser {
     	$result = mysqli_query($this->cxn,$check_query)
     		or die("Error: Could not check database for duplicate");
     	$email_check_result = mysqli_fetch_assoc($result);
-    	if (isset($email_check_result)) {
-    		//if email already exists:
-    		$return_variable = array (1, "<p style='color:red'>An account with this email address already exists!</p>");
+    	if (isset($email_check_result)) { //if email already exists:
+            if($email_check_result['Account activated'] == 1 && is_null($email_check_result['Password'])){ //if account is verified but a password is NOT set for the account:
+                $ver_code = $this->GenerateVerification($email); //generate new verification code for user
+                $user_id = $this->GetUserIDFromEmail($email);
+                $verify_url = DOMAIN."accountverify.php?v=".$ver_code."&e=".$user_id;
+                $unverify_query = "UPDATE  `User` SET  `Account activated` =  '0' WHERE  `Email Address` ='$email';";
+                $unverify_result = mysqli_query($this->cxn, $unverify_query); //unverify account
+                $return_variable = array (4, "<h4 style='color:red'>An account with this email address already exists!<br>We have sent a new verification link to your email address - please click the link to set up your password</h4><br>", $verify_url, $user_id);
+            }
+            else { //if account is verified and a password is set for the account:
+                $return_variable = array (1, "<h4 style='color:red'>An account with this email address already exists!</h4>");
+            }
     	}
         else {
     	    //if email does not already exist, add input value as email address for new row in database
