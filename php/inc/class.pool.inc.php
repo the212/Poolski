@@ -989,6 +989,16 @@ class Pool {
                 $this->SendPoolEndingEmails($pool_id); //send pool ending emails
             }
         }
+        //The following code makes sure that the actual pool winner's ID is first in the user_points_array in the event of a tie
+        //This ensures that the actual pool winner's name appears first in a pool member table after a pool has ended
+        $this_pool_data = $this->GetPoolData($pool_id); //get pool data
+        if(isset($this_pool_data['Pool Winner'])){ //if a pool winner is set:
+            $pool_winner_id = $this_pool_data['Pool Winner'];
+            //move pool winner ID to beginning of array
+            //found this technique here: http://stackoverflow.com/questions/11276313/php-move-associative-array-element-to-beginning-of-array
+            $users_points_array = array($pool_winner_id => $users_points_array[$pool_winner_id]) + $users_points_array;
+        }
+        //End of code for making sure actual pool winner's ID is at beginning of user_points_array 
         return $users_points_array; 
     }
 
