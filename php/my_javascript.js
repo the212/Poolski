@@ -343,6 +343,7 @@
                 $(".user_picks_container").css("display", "block");
                 $(".user_picks_container").animate({"right":"0%"}, 400, function() {
                     $(".pool_members_container").css("display", "none"); //hide pool_members_container div once it is animated out of screen
+                    window.location.href = "#users_picks_view"; //this is just a dummy hash and is here so that the hash in the url changes so that the back button will work.  See javascript at top of pool_members.php file for this functionality
                 });
             });
     }

@@ -26,6 +26,20 @@ else{ //if pool has not ended:
     <br>
     <h2>Pool Standings</h2>
 
+    <script>
+        //below javascript ensures that the browser's back button works when a user is viewing another user's picks onscreen
+        window.onhashchange = locationHashChanged; //fire locationHashChanged function when url hash (#) changes
+        function locationHashChanged(){ //when hash changes in URL for this page:
+            var hash = location.hash; //get the new hash
+            if(hash == "" || hash == "#summary"){ //if we are arriving at the pool summary page (both "" and #summary hashes represent this page)
+                var pick_display_check = $(".pool_members_container").css("display"); //get the display attribute for the pool_members_container div
+                if(pick_display_check == "none"){ //if the pool_members_container is offscreen and hidden (meaning a given user's picks are shown instead)
+                    hideUserPicks(); //run hideUserPicks function
+                }
+            }
+        }
+    </script>
+
     <br>
     <table border="1" style="margin-left:20px">
         <tr>
