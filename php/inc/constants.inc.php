@@ -15,11 +15,9 @@
 
     define('FRIEND', 'Friendski');
     
-
-    
+    /*
     //Below credentials are for localhost
     
-    /*
     define('DB_HOST', 'localhost');
     define('DB_USER', 'root');
     define('DB_PASS', 'william88');
@@ -31,6 +29,4 @@
     
     define('FRIEND', 'Friendski');
 	*/
-
 ?>
-

@@ -4,7 +4,6 @@
     $pageTitle = "New Pool";
     include_once "inc/header.php";
 
-    include_once 'inc/class.users.inc.php';
     $user = new SiteUser(); 
     $current_user = $_SESSION['Username'];
     $current_user_id = $user->GetUserIDFromEmail($current_user);

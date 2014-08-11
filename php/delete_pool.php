@@ -2,7 +2,6 @@
     include_once "inc/loggedin_check.php";
     include_once "inc/constants.inc.php";
     $pageTitle = "Delete Pool (INTERNAL)";
-    include_once "inc/header.php";
     $current_user = $_SESSION['Username'];
 
     if(!isset($_GET['pool_id'])){
@@ -32,7 +31,7 @@
             }
         }
     }
-
+    include_once "inc/header.php";
 ?>
 <br>
 <div style="text-align: center">

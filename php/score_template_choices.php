@@ -3,20 +3,23 @@
 include_once "inc/loggedin_check.php";
 include_once "inc/constants.inc.php";
 $pageTitle = "Score Template (INTERNAL)";
-include_once "inc/header.php";
-include_once 'inc/class.users.inc.php';
 $user = new SiteUser();
 $current_user_id = $user->GetUserIDFromEmail($_SESSION['Username']); //get user ID of user who is trying to access this page
-
-include_once 'inc/class.pool.inc.php';
 $pool = new Pool(); //new instance of the Pool class
 $template_id = $_GET['template_id']; //get pool ID from URL
 $template_fetch_result = $pool->GetBasicTemplateInfo($template_id);
-if(isset($_GET['template_id']) && isset($template_fetch_result) && $current_user_id == 1){ //if template is specified, exists, and current user is admin
-    if($_GET['finalize_template'] == 998) {
-        if($current_user_id == 1){ 
-            include_once 'inc/class.pool.inc.php';
-            $pool = new Pool(); //new instance of the Pool class
+//if template is specified, exists, and current user is admin:
+if($admin !== 1){ //if user is not admin:
+    header("Location: home.php");
+}
+else{ //if user is admin:
+    if(isset($_GET['template_id']) && isset($template_fetch_result)) { //if template ID variable is properly defined and we can properly fetch template info from DB:
+        /*8/10/14 - made some edits to the logic here so that the header redirects would
+        //work correctly and also to clean up code.  Tested page load and it seemed to 
+        work fine, but did not test the finalize template functionality.  Hopefully this
+        still works?
+        */
+        if($_GET['finalize_template'] == 998) {
             if($_GET['no_email'] == 1){
                 $finalize_template_result = $pool->FinalizeTemplateScores($_GET['template_id'], 1);
             }
@@ -25,23 +28,13 @@ if(isset($_GET['template_id']) && isset($template_fetch_result) && $current_user
             }
             echo "<h2>Pool Results Stored.</h2><br>";
         }
-        else{ //IF USER IS ANYONE BESIDES USER ID #1
-            header("Location: home.php");
-        }
-    }
-}
-else{
-    header("Location: home.php");
-}
-   
-$template_category_fetch = $pool->GetTemplateCategories($template_id); //get template category data 
+
+        include_once "inc/header.php";
+        $template_category_fetch = $pool->GetTemplateCategories($template_id); //get template category data 
 
 //************************************BEGIN MULTIPLE CHOICE SECTION***********************************
         
-
-    if($current_user_id == 1){ 
-        /*12/29/13 - FOR NOW, WE ONLY LET USER ID 1 TALLY THE SCORE OF A MULTIPLE CHOICE POOL
-        **THIS IS JUST AN INTERNAL INTERFACE FOR MARKING TEMPLATES AS CORRECT
+        /*THIS IS JUST AN INTERNAL INTERFACE FOR MARKING TEMPLATES AS CORRECT
         */
 ?>
         <span id="template_id_span" style="display:none"><?php echo $template_id; ?></span>
@@ -110,9 +103,10 @@ $template_category_fetch = $pool->GetTemplateCategories($template_id); //get tem
 
 <?php
     }
-    else{ //IF USER IS ANYONE BESIDES USER ID #1
+    else{ //if template variable is not properly defined or we have trouble fetching template info from DB:
         header("Location: home.php");
     }
+}
 //************************************END MULTIPLE CHOICE SECTION***********************************
     
 ?>

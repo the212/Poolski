@@ -3,7 +3,6 @@
     include_once "inc/constants.inc.php";
     $pageTitle = "Browse Pool Templates";
     include_once "inc/header.php";
-    include_once 'inc/class.pool.inc.php';
     $pool = new Pool(); 
     $published_templates_array = $pool->GetPublishedTemplates();
 
@@ -59,7 +58,7 @@
         </div>
         <br>
 <?php
-    rsort($published_templates_array); //sort published templates array with the most recently created template first
+    arsort($published_templates_array); //sort published templates array with the most recently created template (i.e., highest template ID) first
     foreach($published_templates_array as $template_id => $template_info){ //for each published template:
 ?>
         <div class="thumbnail" style="margin-left:15%; margin-right:15%;">

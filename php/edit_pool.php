@@ -7,7 +7,6 @@
     include_once "inc/loggedin_check.php";
     include_once "inc/constants.inc.php";
     $pageTitle = "Edit Pool";
-    include_once "inc/header.php";
 
     if(!isset($_GET['pool_id'])){
         //if no pool ID is specified in URL, return the user to the homepage:
@@ -36,6 +35,8 @@
         $pool_categories = $pool->GetPoolCategoryData($pool_id);
         //get the number of saved cateogires
         $number_of_saved_categories = count($pool_categories);
+
+        include_once "inc/header.php";
     }
 
     if($pool_fetch_result==0):

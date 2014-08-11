@@ -2,7 +2,6 @@
     include_once "inc/loggedin_check.php";
     include_once "inc/constants.inc.php";
     $pageTitle = "New Pool";
-    include_once "inc/header.php";
 
     if(!empty($_POST['pool_title']) && !empty($_POST['pool_question']) && !empty($_POST['tie_question'])):
         //IF WE ARE ABLE TO CREATE THE POOL FROM THE USER'S INPUTS:
@@ -38,6 +37,7 @@
         else{ //if we are NOT creating a template
             $pool_template_variable = "pool";
         }
+    include_once "inc/header.php";
     //display below HTML if page loads without any input:
 ?>
 

@@ -12,11 +12,13 @@
     $number_of_total_pools = count($all_pools);
 
     //BEGIN CHECK TO SEE IF ANY OF THE USER'S INVITE POOLS ARE LIVE ALREADY:
-    foreach($pool_invites_result_pre as $index => $pool_id){ //for each pool ID in the user's invite list:
-        if($pool_id !== ""){ //if we have NOT yet reached the end of the pool invite list for the given user:
-            $given_pool_data = $pool->GetPoolData($pool_id); //get given pool data
-            if($given_pool_data == 0 OR $given_pool_data['Live?'] == 1){ //if pool id doesn't exist in DB or the pool is already live:
-                $user->RemoveInvite($current_user_id, $pool_id); //remove pool invite entry if pool doesn't exist
+    if($pool_invites_result_pre !== 0){
+        foreach($pool_invites_result_pre as $index => $pool_id){ //for each pool ID in the user's invite list:
+            if($pool_id !== ""){ //if we have NOT yet reached the end of the pool invite list for the given user:
+                $given_pool_data = $pool->GetPoolData($pool_id); //get given pool data
+                if($given_pool_data == 0 OR $given_pool_data['Live?'] == 1){ //if pool id doesn't exist in DB or the pool is already live:
+                    $user->RemoveInvite($current_user_id, $pool_id); //remove pool invite entry if pool doesn't exist
+                }
             }
         }
     }

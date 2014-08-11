@@ -3,7 +3,6 @@
     include_once "inc/loggedin_check.php";
     include_once "inc/constants.inc.php";
     $pageTitle = "Edit Template";
-    include_once "inc/header.php";
 
     if(!isset($_GET['template_id']) || $current_user_id <> 1) {
         //if no pool ID is specified in URL or user is not an admin, return the user to the homepage:
@@ -34,7 +33,7 @@
         //get the number of saved cateogires
         $number_of_saved_categories = count($pool_categories);
     }
-
+    include_once "inc/header.php";
     if($pool_fetch_result==0):
     //if the pool id passed thru url does not exist in database:
 ?>

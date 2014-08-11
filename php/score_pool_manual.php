@@ -3,12 +3,8 @@
 include_once "inc/loggedin_check.php";
 include_once "inc/constants.inc.php";
 $pageTitle = "Score Pool";
-include_once "inc/header.php";
-
 
 if(isset($_GET['pool_id'])) { //if a pool ID is specified in URL:
-    include_once 'inc/class.pool.inc.php';
-    include_once 'inc/class.users.inc.php';
     $pool = new Pool(); //new instance of the Pool class
     $user = new SiteUser();
     $pool_id = $_GET['pool_id']; //get pool ID from URL
@@ -26,7 +22,8 @@ else {
     //if no pool ID is specified in URL, return the user to the homepage:
     header("Location: home.php");
 }
-    if($pool_fetch_result['Multiple Choice?'] == 0){
+include_once "inc/header.php";
+if($pool_fetch_result['Multiple Choice?'] == 0){
 
 //*************************************BEGIN NON-MULTIPLE CHOICE SECTION*********************************
 ?>
@@ -199,8 +196,8 @@ else {
         } //END OF FOREACH STATEMENT FOR ALL POOL USERS
 
 //************************************END NON-MULTIPLE CHOICE SECTION*********************************
-    }
-    else{ //if pool is multiple choice:
+}
+else{ //if pool is multiple choice:
 
 //************************************BEGIN MULTIPLE CHOICE SECTION***********************************
 
@@ -265,7 +262,7 @@ else {
 
 <?php
 //************************************END MULTIPLE CHOICE SECTION***********************************
-    }
+}
 ?>
 
 <br>

@@ -1,7 +1,8 @@
 <?php
     include_once "inc/constants.inc.php";
+    $on_login_page = 1;
+    include_once "inc/loggedin_check.php";
     $pageTitle = "Home";
-    include_once "inc/header.php";
 
     //check to see if the LoggedIn and Username $_SESSION variables are set (if so, then the user is already logged in and they dont need to see this page)
     if(!empty($_SESSION['LoggedIn']) && !empty($_SESSION['Username'])):
@@ -18,6 +19,7 @@
         $user->accountLogin($email_entry , $password_entry, $timezone); //run accountLogin method in user class.  This will log the user in and set the session variables if the user is authenticated successfully
         exit;
     else:
+        include_once "inc/header.php";
         if(isset($_GET['login'])):
             //if the user was not logged in and the "login" variable was set (indicating that we came from the AJAX login function):
 ?>
