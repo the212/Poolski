@@ -15,7 +15,6 @@
         //Below functions fetch the necessary pool data for the user:
         $pool_fetch_result = $pool->GetPoolData($pool_id); 
         $pageTitle = $pool_fetch_result['Title'];
-        include_once "inc/header.php";
 
         /*BEGIN CHECK TO SEE IF GIVEN USER IS A MEMBER OF THE POOL:
         **NOTE - THIS SHOULD PROBABLY BE A SEPARATE PHP FILE SO WE CAN INCLUDE IT IN OTHER FILES (SUCH AS INVITE_FRIENDS.PHP)
@@ -32,6 +31,7 @@
         }
         //END CHECK TO SEE IF GIVEN USER IS A MEMBER OF POOL
 
+        include_once "inc/header.php";
     }
 
     //BEGIN CHECK TO SEE IF POOL EXISTS OR IF POOL IS READY FOR INVITES:

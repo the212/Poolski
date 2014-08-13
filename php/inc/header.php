@@ -1,3 +1,7 @@
+<?php
+    //need this here so that the login functionality from login.php works
+    session_start();
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -40,9 +44,6 @@
         <div id="page-wrap">
             <div id="header">
                 <div id="control">
-<?php
-	session_start();
-?>
                 <nav class="navbar navbar-default" role="navigation">
                     <!-- Brand and toggle get grouped for better mobile display -->
                     <div class="navbar-header">
@@ -57,17 +58,7 @@
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 <?php
 
-	if(isset($_SESSION['LoggedIn']) && isset($_SESSION['Username']) && $_SESSION['LoggedIn']==999): //if user is logged in:
-        include_once "inc/loggedin_check.php";
-        include_once "inc/constants.inc.php";
-        include_once 'inc/class.users.inc.php';
-        $user = new SiteUser(); 
-        include_once 'inc/class.pool.inc.php';
-        $pool = new Pool(); 
-        $current_user = $_SESSION['Username'];
-        $current_user_id = $user->GetUserIDFromEmail($current_user);
-        $pool_invites_result_pre = $user->CheckPoolInvites($current_user); //get initial pool invites for a user if they exist - these may include pools which are live that we don't want the user to join, so we do a check for live pool invites below and remove the invite if the pool is live
-        $admin = $user->CheckAdmin($current_user_id); //$ADMIN variable is a 1 if user is an admin and 0 if not
+	if($_SESSION['LoggedIn']==999): //if user is logged in:
 ?>
                   <!-- Collect the nav links, forms, and other content for toggling -->
                   
@@ -93,7 +84,7 @@
                             <!--<li><a href="mailto:contact@poolski.com?Subject=Hello">Contact us</a></li>-->
                             <li><a href="logout.php">Log out</a></li>
                         </ul>
-<?php else: //if logged out: ?>
+<?php else: //if the user is logged out: ?>
                         <ul class="nav navbar-nav">
                             <li><a href="login.php">Log in</a></li>
                             <li><a href="signup.php">Sign up</a></li>

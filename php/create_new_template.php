@@ -2,7 +2,6 @@
     include_once "inc/loggedin_check.php";
     include_once "inc/constants.inc.php";
     $pageTitle = "New Pool";
-    include_once "inc/header.php";
 
     /*
     11/30/13 - IF WE WANT TO INCLUDE THE ABILITY TO SET THE START/END DATES/TIMES FOR THE POOL ON THIS PAGE, THEN WE SHOULD JUST ADD THEM AS INPUTS ON THE PAGE AND THEN ADD PHP CODE TO TAKE THE POST VALUES AND RUN A METHOD IN THE POOL CLASS FOR THEM - SEE EDIT POOL.PHP PAGE 
@@ -20,6 +19,7 @@
         }
         //if form was not submitted:
         $template_category_info = $pool->GetTemplateCategories($_GET['template_id']);
+        include_once "inc/header.php";
 ?>
     <div style="text-align:center;">
         <h2><?php echo $pool_template_info['Template Name']; ?> Template </h2>
@@ -110,4 +110,5 @@
         echo "<p style='color:red'>Please fill in all required fields.</p>";
     }
     include_once 'inc/close.php';
+    */
 ?>

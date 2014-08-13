@@ -1,7 +1,6 @@
 <?php
     include_once "inc/constants.inc.php";
     $pageTitle = "Reset Password";
-    include_once "inc/header.php";
     
     if(isset($_GET['v']) && isset($_GET['user_id'])) { 
         //if the user arrives here with the v and user_id variables properly set, we want to set their 'Account Activated' field in the user table to 1, so we run the verifyAccount method:
@@ -14,6 +13,7 @@
         header("Location: home.php");
         exit;
     }
+    include_once "inc/header.php";
 ?>
         <br>
         <div style="margin-left:20px;">

@@ -2,8 +2,6 @@
     include_once "inc/loggedin_check.php";
     include_once "inc/constants.inc.php";
     $pageTitle = "Delete Template (INTERNAL)";
-    include_once "inc/header.php";
-    include_once 'inc/class.users.inc.php';
     $current_user = $_SESSION['Username'];
     $user = new SiteUser(); 
     $current_user_id = $user->GetUserIDFromEmail($current_user);
@@ -27,7 +25,7 @@
             $confirm_delete_url = "delete_template.php?template_id=$template_id&delete=5668";
         }
     }
-
+    include_once "inc/header.php";
 ?>
 <br>
 <div style="text-align: center">
