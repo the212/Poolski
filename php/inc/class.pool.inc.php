@@ -10,6 +10,7 @@ include_once "constants.inc.php";
 date_default_timezone_set('America/New_York'); //set timezone for getting the current time to be EST
 include_once 'inc/class.db_queries.inc.php';
 
+
 class Pool {
 
 	private $cxn;
@@ -19,7 +20,6 @@ class Pool {
 	    $this->cxn = mysqli_connect(DB_HOST,DB_USER,DB_PASS,DB_NAME)
 			or die("Could not connect to the server"); 
 	}  //END OF CONSTRUCTOR METHOD FOR NEW INSTANCE OF USER CLASS
-
    
     //CREATE NEW POOL METHOD
     //Required arguments: pool leader's ID, pool title, overall question 
@@ -594,12 +594,25 @@ class Pool {
             $user_id = $user_id_input;
         }
         $query = new DB_Queries(); 
-        $nickname_result_array = $query->SelectFromDB('Pool Nickname', 'Pool Membership', 'User ID', $user_id, 'Pool ID', $pool_id);
+        $select_array = $this->CreateArrayFromDB_QueryInputs(
+            'Pool Nickname',
+            'TABLE:',
+            'Pool Membership',
+            'User ID', $user_id,
+            'Pool ID', $pool_id
+        );
+        $nickname_result_array = $query->SelectFromDB($select_array);
         if(isset($nickname_result_array['Pool Nickname'])) {
             return $nickname_result_array['Pool Nickname'];
         }
         else{
-            $no_nickname_result_array = $query->SelectFromDB('Email Address', 'User', 'User ID', $user_id);
+            $select_array2 = $this->CreateArrayFromDB_QueryInputs(
+                'Email Address',
+                'TABLE:',
+                'User',
+                'User ID', $user_id
+            );
+            $no_nickname_result_array = $query->SelectFromDB($select_array2);
             return $no_nickname_result_array['Email Address'];
         }
     }
@@ -1249,7 +1262,7 @@ class Pool {
     }
 
 
-    //DELETE TEMPLATE METHOD (ONLY ACCESSIBLE BY ADMINS - SEE HOME.PHP AND DELETE_TEMPLATE.PHP FILES FOR LOGIC)
+    //DELETE TEMPLATE METHOD (ONLY ACCESSIBLE BY ADMINS - SEE HOME.PHP AND DELETE_TEMPLATE_OR_SERIES.PHP FILES FOR LOGIC)
     public function DeleteTemplate($template_id){
         //DELETE ENTRY FROM POOL TABLE:
             $delete_template_id = "DELETE FROM `Templates` WHERE `Template ID` = '$template_id'";
@@ -1269,7 +1282,7 @@ class Pool {
 
 
 /* END POOL TEMPLATE METHODS
-    */
+*/
 
 //*************************************************************************************
 
@@ -1322,6 +1335,150 @@ class Pool {
         }
     }
 
+
+//*************************************************************************************
+
+/* POOL SERIES METHODS
+*/
+
+
+    public function CreateNewPoolSeries($Leader , $pool_series_title , $overall_topic, $pool_series_description, $public_status){
+        $query = new DB_Queries(); //new instance of the DB_Queries object
+        $public_private_variable = 0;
+        if($public_status == "private"){ //if pool is private:
+            $public_private_variable = 1;
+        }
+        $Leader = 1; //JUST FOR TESTING PURPOSES
+        //prepare insert array:
+        $insert_array = $this->CreateArrayFromDB_QueryInputs(
+            'Pool Series',
+            'Title', $pool_series_title, 
+            'Description', $pool_series_description, 
+            'Leader ID', $Leader, 
+            'Overall Topic', $overall_topic, 
+            'Private?', $public_private_variable
+        );
+        //insert new pool series info into DB:
+        $return_variable = $query->InsertIntoDB($insert_array);
+        return $return_variable;
+    }
+
+    //GET POOL SERIES DATA METHOD
+    //accepts the pool series ID as the input
+    //if pool series id is valid, the method returns an array with all of the fields from the given pool series row in Pool Series table in database
+    //if pool series id is not valid, method returns 0
+    public function GetPoolSeriesData($pool_series_id){
+        $query = new DB_Queries(); //new instance of the DB_Queries object
+        $select_array = $this->CreateArrayFromDB_QueryInputs(
+            '*',
+            'TABLE:',
+            'Pool Series',
+            'Series ID', $pool_series_id
+        );
+        $return_variable = $query->SelectFromDB($select_array);
+        if($return_variable[0] == 2){ //if we did not find a pool series for the given series id:
+            $return_variable = array(2, "No Pool Series Found with that ID.");
+            return $return_variable;
+        }
+        else{ //if we did find a pool series:
+            return $return_variable;
+        }
+    }
+
+
+    /*UpdateSeriesData METHOD
+    //
+    */
+    public function UpdateSeriesData($series_id, $series_item, $input) {
+        $query = new DB_Queries();
+        $update_array = $this->CreateArrayFromDB_QueryInputs(
+        //sample update query:   
+        //UPDATE  `Pool Series` SET  `Title` = 'Pool Series Test 1a' WHERE `Series ID` =15;
+            'Pool Series',
+            $series_item, $input,
+            'WHERE:',
+            'Series ID', $series_id
+        );
+        $return_variable = $query->UpdateDB($update_array);
+        return $return_variable;
+    }
+    
+
+    //GET ALL SERIES METHOD
+    //NO INPUT
+    //RETURNS AN ARRAY CONTAINING THE ID'S OF SERIES AS ARRAY KEYS AND ARRAYS CONSISTING OF THE SERIES'S INFO AS VALUES
+    //AS OF 9/1/14, THIS IS ONLY CALLED FROM HOME.PHP WHEN THE USER IS AN ADMIN
+    public function GetAllSeries(){
+        $query = new DB_Queries(); //new instance of the DB_Queries object
+        $select_array = $this->CreateArrayFromDB_QueryInputs(
+            '*',
+            'TABLE:',
+            'Pool Series'
+        );
+        $result = $query->SelectFromDB($select_array);
+        //create blank array to store the series IDs and info:
+        $list_of_series = array();
+        //***BEGIN CHECK TO SEE HOW MANY DB RECORDS ARE IN THE RESULT ARRAY***
+        //If there is more than one DB record in the result array, we need to run the while loop (in "else" part of IF statement below)
+        $result_type = gettype($result);
+        if($result_type == "array"){ //if only one pool series is found (meaning $result is just an associative array for the single pool series and not a mysqli object)
+            $list_of_series[$result['Series ID']] = $result; //store pool series data in list_of_series variable with the series ID as the array key
+        }
+        else{ //if more than one pool series is found (meaning $result is a mysqli object, not an associative array)
+            //store all of the found series info in list_of_series array:
+            while($row = mysqli_fetch_assoc($result)) {
+                $series_id = $row['Series ID'];
+                //get info of pool for given series id:
+                $select_series_info_array = $this->CreateArrayFromDB_QueryInputs(
+                    '*',
+                    'TABLE:',
+                    'Pool Series',
+                    'Series ID', $series_id
+                );
+                $result2 = $query->SelectFromDB($select_series_info_array);
+                $list_of_series[$series_id] = $result2; //store series info into the list_of_series array
+            }
+        }
+        //END OF RESULT ARRAY CHECK
+        return $list_of_series;
+    }
+
+
+    /*
+    **ChangeSeriesLiveVariable function
+    **Accepts series id and an action variable (as of 9/7/14, only send_pool_data.php is sending us this info/calling this function)
+    **Action variable is a 1 if we are publishing a series and 0 if we are retiring a series
+    **Does not return anything
+    */
+    public function ChangeSeriesLiveVariable($series_id, $action){
+        $query = new DB_Queries();
+        $update_array = $this->CreateArrayFromDB_QueryInputs(
+            'Pool Series',
+            'Live?', $action,
+            'WHERE:',
+            'Series ID', $series_id
+        );
+        $return_variable = $query->UpdateDB($update_array);
+    }
+
+    //DELETE SERIES METHOD (ONLY ACCESSIBLE BY ADMINS - SEE HOME.PHP AND DELETE_TEMPLATE_OR_SERIES.PHP FILES FOR LOGIC)
+    public function DeleteSeries($series_id){
+        //DELETE ENTRY FROM POOL SERIES TABLE:
+        $query = new DB_Queries();
+        $delete_array = $this->CreateArrayFromDB_QueryInputs(
+            'Pool Series',
+            'Series ID', $series_id
+        );
+        $return_variable = $query->DeleteFromDB($delete_array);
+        return $return_variable;
+        //NOTE, MAY WANT TO WRITE ADDITIONAL CODE IN THIS METHOD TO DELETE POOLS ASSOCIATED WITH SERIES?  MAY NOT WANT TO AS WELL...  LEAVING THIS FOR NOW (9/7/14)
+
+    } //END OF DELETE SERIES METHOD
+
+
+/* END POOL SERIES METHODS
+*/
+
 //*************************************************************************************
 
 
@@ -1366,6 +1523,22 @@ class Pool {
         $new_string2 = str_replace(array("%", "\\", "#", " - ", "&", "$", "^", "(", ")"),"", $new_string1); //filter #2
         $new_string3 = addcslashes($new_string2, "'");
         return $new_string3;
+    }
+
+
+    /*CreateArrayFromDB_QueryInputs method
+    **Accepts any number of inputs to be sent to an MYSQL method in DB_Query class file
+    **Returns an array with each input as an element
+    **E.g., for an insert query: array(TABLE, field1, value1, field2, value2, field3, value3, ... )
+    */
+    public function CreateArrayFromDB_QueryInputs(){
+        $return_array = array();
+        $arg_list = func_get_args();
+        $numargs = func_num_args();
+        for ($i = 0; $i < $numargs; $i++) {
+            $return_array[$i] = $arg_list[$i];
+        }
+        return $return_array;
     }
 
 }

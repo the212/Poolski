@@ -360,7 +360,6 @@ class SiteUser {
         include_once 'inc/class.pool.inc.php';
         $query = new DB_Queries(); 
         $pool = new Pool();
-        //$users_pools_array = $query->SelectFromDB('Pool ID', 'Pool Membership', 'User ID', $user_id);
         $users_pools_query = "SELECT `Pool ID` FROM  `Pool Membership` WHERE `User ID` = '$user_id';";
         $result = mysqli_query($this->cxn, $users_pools_query);
         $return_array = array();
@@ -370,7 +369,13 @@ class SiteUser {
             $result2 = mysqli_query($this->cxn, $pool_member_query);
             while($row_user_id = mysqli_fetch_assoc($result2)){ //for each user that is in the given pool
                 $user_id = $row_user_id['User ID'];
-                $email_array = $query->SelectFromDB('Email Address', 'User', 'User ID', $user_id);
+                $select_array3 = $pool->CreateArrayFromDB_QueryInputs(
+                    'Email Address',
+                    'TABLE:',
+                    'User',
+                    'User ID', $user_id
+                );
+                $email_array = $query->SelectFromDB($select_array3);
                 $return_array[$user_id] = $email_array['Email Address'];
             }
         }

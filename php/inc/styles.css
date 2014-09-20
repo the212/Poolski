@@ -288,7 +288,7 @@ CREATE_POOL.PHP STYLING
 }
 
 /*
-EDIT_POOL.PHP STYLING
+BEGIN EDIT_POOL.PHP STYLING
 */
 
 #pool_space {
@@ -357,6 +357,14 @@ EDIT_POOL.PHP STYLING
 .remove_category_button{
 	font-size: 140%;
 }
+
+#edit_pool_series_for_pool_div{
+
+}
+
+/*
+END EDIT_POOL.PHP STYLING
+*/
 
 
 /*BEGIN NEW.PHP CSS*/
@@ -478,5 +486,23 @@ INVITE_PEOPLE.PHP CSS
 	text-align:center;
 }
 
+
+/*
+EDIT_SERIES.PHP CSS
+*/
+
+#series_info_container{
+	padding-left: 2%;
+	padding-right: 2%;
+}
+
+
+/*
+General Error Message CSS
+*/
+
+.error_message_div{
+	padding-left: 10px;
+}
 
 

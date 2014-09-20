@@ -225,6 +225,35 @@
 
 /************************************************************************************************/
 
+
+//BEGINNING OF EDIT_SERIES.PHP JAVASCRIPT
+
+    function change_series_live_variable(series_id, new_live_variable){
+            var publish_variable;
+            if(new_live_variable == 1){
+                publish_variable = "publish";
+            }
+            else{
+                publish_variable = "retire";
+            }
+            if(confirm("Are you sure you want to "+publish_variable+" the series?")){
+                //AJAX call to submit pool:
+                $.ajax({
+                    type: "GET",
+                    url: "send_pool_data.php",
+                    data: {series_id: series_id, change_series_variable_action: new_live_variable}
+                })
+                .done(function(html){ //refresh the page once ajax completes
+                    location.reload(); 
+                });
+            }
+        } 
+
+//END OF EDIT_SERIES.PHP JAVASCRIPT
+
+
+/************************************************************************************************/
+
 //BEGINNING OF POOL.PHP JAVASCRIPT
 
     //Jquery for tabs on pool.php page:
