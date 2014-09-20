@@ -39,15 +39,27 @@
         </div>
     </div>
 <?php
-if($current_user_id == 1){
+if($admin == 1){ //below are for internal users only:
 ?>
     <div class="row" style="padding:5%;">
-        <div class="thumbnail">
-            <div class="caption">
-                <h3>Create a new template</h3>
-                <p>Internal Only.  Create a new template that other users can use to create their own pools</p>
-                <br>
-                <p><a href="create_new.php?template=1" class="btn btn-lg btn-primary center-block" role="button">Create Template</a> </p>
+        <div class="col-sm-6 col-md-6">
+            <div class="thumbnail">
+                <div class="caption">
+                    <h3>Create pool series (beta)</h3>
+                    <p>Create a series of pools (internal only)</p>
+                    <br>
+                    <p><a href="create_new.php?series=1" class="btn btn-lg btn-primary center-block" role="button">Create pool series</a> </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-6">
+            <div class="thumbnail">
+                <div class="caption">
+                    <h3>Create a new template</h3>
+                    <p>Internal Only.  Create a new template that other users can use to create their own pools</p>
+                    <br>
+                    <p><a href="create_new.php?template=1" class="btn btn-lg btn-primary center-block" role="button">Create Template</a> </p>
+                </div>
             </div>
         </div>
     </div>

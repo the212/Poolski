@@ -265,25 +265,49 @@
 
 
 
-<!--BEGIN CREATE NEW POOL BUTTON ****************************************************************-->
+<!--BEGIN 2ND COLUMN ***************************************************************************-->
 
 
         <div class="col-md-6" id="homepage_pools"> 
-        <!--
-            <div class="panel panel-info" id="create_new_pool_button">
-                <div class="panel-body" id="home_create_new_pool_body">
-                    <div id="home_create_new_pool_content">
-                        <div>
-                            <h3><a href="new.php"><span class="home_create_new_pool_text">Create new pool</span></a></h3>
+
+
+<!--BEGIN CURRENT POOL SERIES SECTION *******************************************************-->
+
+<?php
+    if($admin == 1): //TEMPORARILY MAKE POOL SERIES VIEW ADMIN ONLY (AS OF 9/20 SINCE IT IS NOT READY YET):
+        //get all pool series that a user is involved in by looking at their pool membership ($all_pools defined earlier in home.php):
+        $list_of_pool_series_that_user_is_in = array();
+        foreach($all_pools as $pool_id => $pool_info){ //examine the series ID value for all pools that a user is involved in
+            if($pool_info['Ready for invites?'] == 1){ //only get series ID's for pools that are active and past the draft/edit stage:
+                $list_of_pool_series_that_user_is_in[] = $pool_info['Series ID'];
+            }
+        }
+        $list_of_pool_series_that_user_is_in = array_unique(array_filter($list_of_pool_series_that_user_is_in)); //get rid of duplicates and blank SERIES ID entries
+        
+        foreach($list_of_pool_series_that_user_is_in as $key => $series_id){
+            $series_info = $pool->GetPoolSeriesData($series_id);
+?>
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><?php echo $series_info['Title']; ?></h3>
+                </div>
+                <div class="panel-body">
+                     <div class="row past_pool_list_item" id="">
+                        <div class="past_pool_list_item_title">
+                            <?php print_r($series_info); ?>
                         </div>
                     </div>
                 </div>
-            </div>
-            <br>
-        -->
-        
+            </div>  
+<?php
+        } //end of $list_of_pool_series_that_user_is_in foreach
+    endif; //end of temporary if statement to check if user is admin before displaying pool series stuff
+?>
 
-<!--END CREATE NEW POOL BUTTON *******************************************************-->
+
+
+<!--END CURRENT POOL SERIES SECTION *******************************************************-->
+
 
 
 
@@ -390,7 +414,7 @@
                         <td class="pool_status"><a href=<?php echo $edit_template_url; ?> style="<?php echo $status_styling; ?>"><?php echo $live_variable; ?></a></td>
 <?php
             $score_template_url = "score_template_choices.php?template_id=".$template_info['Template ID'];
-            $delete_template_url = "delete_template.php?template_id=$template_id";
+            $delete_template_url = "delete_template_or_series.php?template_id=$template_id";
 ?>
                         <td>
 <?php
@@ -410,18 +434,68 @@
             } //END OF TEMPLATES FOREACH STATEMENT
 ?>
                 </table> 
+                </div>
             </div>
-        </div>
                 <br>
 
     <!--************END TEMPLATES SECTION***********************************************-->
+
+    <!--************BEGIN SERIES SECTION************************************************-->
+    
+    <!--sample pool series URL: http://localhost/openshift_clone/php/php/edit_series.php?series_id=15 -->
+
+<?php
+    $list_of_series = $pool->GetAllSeries(); //get series info for every series in DB
+?>
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Pool Series (Internal - Admin only)</h3>
+                </div>
+                <div class="panel-body">
+                    <h3 style="text-decoration:underline">Series</h3>
+                    <table border="1" style="width:95%">
+                        <tr>
+                            <th class="pool_top_row pool_column">Series</th>
+                            <th class="pool_top_row pool_status_column">Status</th>
+                            <th class="pool_top_row pool_leader_column">Delete Series</th>
+                        </tr>
+<?php
+        foreach($list_of_series as $series_id => $series_info){
+            $edit_series_url = "edit_series.php?series_id=$series_id"; 
+            if($series_info['Live?']==1){
+                //if series has been published and is live:
+                $live_variable = "Series is Live"; 
+                $status_styling = "color:#5cb85c";
+            }
+            else{
+                //if series has been not yet been published and is NOT live:
+                $live_variable = "Series is not yet Live"; 
+                $status_styling = "color:black";
+            }
+?>
+                        <tr>
+                            <td class="pool_row"><a href=<?php echo $edit_series_url; ?>><?php echo $series_info['Title']; ?></a></td>
+                            <td class="pool_status"><a href=<?php echo $edit_series_url; ?> style="<?php echo $status_styling; ?>"><?php echo $live_variable; ?></a></td>
+<?php
+            $delete_series_url = "delete_template_or_series.php?series_id=$series_id";
+?>
+                            <td>
+                                <a href=<?php echo $delete_series_url; ?>>Delete</a>
+                            </td>
+                        </tr>
+<?php
+            } //END OF TEMPLATES FOREACH STATEMENT
+?>
+                    </table> 
+                </div>
+            </div> <!--End of Pool Series Div-->
+                <br>
+
+    <!--************END SERIES SECTION***********************************************-->
+
 <?php
     } //END OF "IF USER IS ADMIN" IF STATEMENT
 ?>
-
-
-
-
 
 
         </div>

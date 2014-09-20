@@ -403,6 +403,29 @@
     } //END OF TEMPLATE IF STATEMENT FOR POOL SETTINGS TAB
 ?>
             <br><br>
+<?php 
+    if($admin == 1){ //only allow pool series to be edited if user is an admin (keeping pool series internal as of 9/16/14)
+            //NOTE 9/16/14:  CHANGE THIS SECTION BEFORE RELEASING PUBLICLY (NEEDS A GOOD INTERFACE)
+        if(is_null($pool_fetch_result["Series ID"])){ //if no pool series ID set in DB for given pool:
+            $edit_pool_series_display_value = "**No Series ID Set**";
+        }
+        else{ //if there is a pool series ID set for the given pool:
+            $edit_pool_series_display_value = $pool_fetch_result["Series ID"];
+        }
+?>
+                <div id="edit_pool_series_for_pool_div">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h2>Pool Series (INTERNAL ONLY):</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <h2><span class="label label-info"><span class="edit_pool_field" id="Series ID"><?php echo $edit_pool_series_display_value; ?> </span></span></h2>
+                        </div>
+                    </div>
+                </div>
+<?php
+    } //end of admin if statement for pool series edit functionality
+?>
             </div> <!--END OF EDIT POOL SETTINGS DIV -->
         </div> <!-- END OF POOL_TAB_CONTENT DIV-->
     </div> <!--END OF CONTENT DIV-->

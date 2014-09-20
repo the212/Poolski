@@ -328,7 +328,7 @@
                                 <span class='glyphicon glyphicon-pencil' id='pool_score_manual_glyph'></span>
                             </h4>
                             <h3>
-                                <a href='score_pool_manual.php?pool_id=<?php echo $pool_id; ?>'>Click here to score picks</a>
+                                <span class='label label-warning'><a href='score_pool_manual.php?pool_id=<?php echo $pool_id; ?>' style="color:white">Click here to score picks</a></span>
                             </h3>
 <?php
                 }

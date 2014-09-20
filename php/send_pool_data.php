@@ -23,7 +23,10 @@ if(isset($_POST['element_id'])){
     $category_check = substr_compare(substr($input_id,0,8),"category",0,8); //get first 8 characters of pool item id and check to see if they are "category" - if so, we are updating a category or a category's point value and need to write to the 'Pool Category' table
     $choice_check = substr_compare(substr($input_id,0,6),"choice",0,6);
     $template_info_check = substr_compare(substr($input_id,0,8),"template",0,8); //see if we are editing a template's info (edit_template.php)
-    $template_category_update_check = substr_compare(substr($pool_id,0,8),"template",0,8);
+    if(isset($pool_id)) { //if we are editing a pool's info (9/1/14: this is so that the substr_compare function for the $template_category_update_check variable below doesn't error out if we aren't editing a pool's info)
+        $template_category_update_check = substr_compare(substr($pool_id,0,8),"template",0,8);
+    }
+    $series_info_check = substr_compare(substr($input_id,0,6),"series",0,6); //see if we are editing a series's info (edit_series.php)
     //BELOW SEQUENCE OF IF'S IS TO VALIDATE CATEGORY POINT INPUTS (THEY MUST BE NUMERIC IN DB)
     if($category_check == 0){ //if we have been sent a category related update:
         $category_item = $input_id[9]; //CHECK TO SEE WHAT CATEGORY ITEM IS BEING EDITED 
@@ -41,20 +44,25 @@ if(isset($_POST['element_id'])){
         $new_nickname_result = $pool->UpdateNickname($_POST['user_id'], $pool_id, $input_value);
         echo $new_nickname_result;
     }
-    elseif($choice_check == 0){ //if we are updating a category's choice name:
+    elseif($choice_check == 0){ //UPDATE CATEGORY CHOICE NAME:
         $choice_id = substr($input_id,11);
         $new_category_choice_result = $pool->UpdateCategoryChoice($choice_id, $input_value);
     }
-    elseif($template_info_check == 0) { //if we are updating a template's info (name, description, overall question, tie breaker question):
+    elseif($series_info_check == 0){ //UPDATE POOL SERIES INFO:
+        $series_item_to_be_updated = substr($input_id,7); //get name of field in Series DB table that is to be updated
+        $series_id = $_POST['series_id'];
+        $new_series_result = $pool->UpdateSeriesData($series_id, $series_item_to_be_updated, $input_value); //as of 9/1/14, this function doesn't actually return anything
+    }
+    elseif($template_info_check == 0) { //UPDATE TEMPLATE INFO (name, description, overall question, tie breaker question):
         $template_item_to_be_updated = substr($input_id,9); //get name of field in Templates DB table that is to be updated
         $template_id = $_POST['template_id'];
         $new_template_result = $pool->UpdateTemplateData($template_id, $template_item_to_be_updated, $input_value);
     }
-    elseif($template_category_update_check == 0){ //if we are updating a template category:
+    elseif($template_category_update_check == 0){ //UPDATE TEMPLATE CATEGORY:
         $template_id = substr($pool_id,9); //the last characters in the $pool_id input variable will be the template id in which the given category is to be updated
         $new_pool_result = $pool->UpdateTemplateData($template_id, $input_id, $input_value);
     }
-    else{ //if we are updating a non-template category for a pool:
+    else{ //if we are updating a non-template category for a pool or a pool info item (e.g., pool title, overall question, series id, etc.:
         $new_pool_result = $pool->UpdatePoolData($pool_id, $input_id, $input_value);
     }
     //END INPUT COMMANDS
@@ -163,11 +171,18 @@ else{ //IF EDIT IN PLACE IS NOT BEING CALLED:
         }
     }
 
-    //PUBLISH TEMPLATE - MAKE IT VISIBLE TO ALL SITE USERS 
+    //PUBLISH OR RETIRE TEMPLATE
     if(isset($_GET['change_template_variable_action'])){
         $pool = new Pool();
         $template_id = $_GET['template_id'];
         $result_array_test = $pool->ChangeTemplateLiveVariable($template_id, $_GET['change_template_variable_action']);
+    }
+
+    //PUBLISH OR RETIRE SERIES
+    if(isset($_GET['change_series_variable_action'])){
+        $pool = new Pool();
+        $series_id = $_GET['series_id'];
+        $result_array_test = $pool->ChangeSeriesLiveVariable($series_id, $_GET['change_series_variable_action']);
     }
 
     //DELETE POOL - IF POOL IS TO BE DELETED
